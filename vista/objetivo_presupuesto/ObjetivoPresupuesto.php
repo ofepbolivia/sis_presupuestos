@@ -75,7 +75,7 @@ Phx.vista.ObjetivoPresupuesto=Ext.extend(Phx.gridInterfaz,{
                     '<div class="x-combo-list-item">',
                     '<div class="awesomecombo-item {checked}">',
                     '<p><b>Tipo: {tipo_pres}</b></p>',
-                    '</div><p><b>Descripción:</b> <span style="color: green;">{descripcion}</span></p>',
+                    '</div><p><b>Descripción:</b> <span style="color: green;">{desc_tcc}</span></p>',
                     '</div></tpl>'
                 ]),
 
