@@ -2176,45 +2176,7 @@ AS
        
 -----------------
 
-CREATE OR REPLACE VIEW pre.vpresupuesto_cc(
-    id_centro_costo,
-    estado_reg,
-    id_ep,
-    id_gestion,
-    id_uo,
-    id_usuario_reg,
-    fecha_reg,
-    id_usuario_mod,
-    fecha_mod,
-    usr_reg,
-    usr_mod,
-    codigo_uo,
-    nombre_uo,
-    ep,
-    gestion,
-    codigo_cc,
-    nombre_programa,
-    nombre_proyecto,
-    nombre_actividad,
-    nombre_financiador,
-    nombre_regional,
-    tipo_pres,
-    cod_act,
-    cod_fin,
-    cod_prg,
-    cod_pry,
-    estado_pres,
-    estado,
-    id_presupuesto,
-    id_estado_wf,
-    nro_tramite,
-    id_proceso_wf,
-    movimiento_tipo_pres,
-    desc_tipo_presupuesto,
-    sw_oficial,
-    sw_consolidado,
-    id_categoria_prog,
-    descripcion)
+CREATE OR REPLACE VIEW pre.vpresupuesto_cc
 AS
   SELECT cec.id_centro_costo,
          cec.estado_reg,
@@ -2532,3 +2494,41 @@ AS
 
 
 
+/***********************************I-DEP-RAC-PRE-0-12/10/2017*****************************************/
+  
+
+
+CREATE OR REPLACE VIEW pre.vpe_check_partida(
+    id_gestion,
+    nro_tramite,
+    id_moneda,
+    id_presupuesto,
+    id_partida)
+AS
+  SELECT DISTINCT pr.id_gestion,
+         pe.nro_tramite,
+         pe.id_moneda,
+         pe.id_presupuesto,
+         pe.id_partida
+  FROM pre.tpartida_ejecucion pe
+       JOIN param.tperiodo pr ON pe.fecha >= pr.fecha_ini AND pe.fecha <=
+         pr.fecha_fin;
+         
+         
+CREATE OR REPLACE VIEW pre.vpartida_ejecucion_check(
+    id_gestion,
+    nro_tramite,
+    id_moneda,
+    id_presupuesto)
+AS
+  SELECT DISTINCT pr.id_gestion,
+         pe.nro_tramite,
+         pe.id_moneda,
+         pe.id_presupuesto
+  FROM pre.tpartida_ejecucion pe
+       JOIN param.tperiodo pr ON pe.fecha >= pr.fecha_ini AND pe.fecha <=
+         pr.fecha_fin;         
+         
+         
+/***********************************F-DEP-RAC-PRE-0-12/10/2017*****************************************/
+  

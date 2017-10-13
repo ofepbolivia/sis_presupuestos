@@ -59,9 +59,9 @@ BEGIN
 						obj_part.id_usuario_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod,
-                        (tpar.codigo||'' - ''|| tpar.nombre_partida)::varchar as desc_partida,
-                        tg.gestion::varchar as desc_gestion	,
-                        obj_part.estado as tipo_reg
+            (''''(''''||tpar.codigo||'''') - ''''|| tpar.nombre_partida)::varchar as desc_partida,
+            tg.gestion::varchar as desc_gestion	,
+            obj_part.estado as tipo_reg
 						from pre.tobjetivo_partida obj_part
 						inner join segu.tusuario usu1 on usu1.id_usuario = obj_part.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = obj_part.id_usuario_mod
@@ -97,7 +97,7 @@ BEGIN
                         INNER JOIN pre.tpartida tpar ON tpar.id_partida = obj_part.id_partida
                         INNER JOIN param.tgestion tg ON tg.id_gestion = tpar.id_gestion
                         INNER JOIN pre.tobjetivo tobj ON tobj.id_objetivo = obj_part.id_objetivo
-					    where obj_part.id_objetivo='||v_parametros.id_objetivo||' AND ;
+					    where obj_part.id_objetivo='||v_parametros.id_objetivo||' AND ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
