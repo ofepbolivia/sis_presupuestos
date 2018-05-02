@@ -100,6 +100,25 @@ class MODEntidadTransferencia extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+    function clonarConfig(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_entidad_transferencia_ime';
+        $this->transaccion='PRE_CLOENTRANS_REP';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_gestion_maestro','id_gestion_maestro','int4');
+        $this->setParametro('id_gestion','id_gestion','int4');
+
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
 
     function validarCampos(){
         //Definicion de variables para ejecucion del procedimiento

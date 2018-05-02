@@ -243,7 +243,7 @@ class ACTPresupPartida extends ACTbase{
 				//Instancia la clase de pdf
 				if($this->objParam->getParametro('formato_reporte')=='pdf'){
 				    $reporte = new REjecucion($this->objParam);
-					$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData,$dataGestion->getDatos(),$dataEmpresa->getDatos());
+					$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData,$dataGestion->getDatos(),$dataEmpresa->getDatos(),$this->objParam->getParametro('fecha_ini'),$this->objParam->getParametro('fecha_fin'));
 				    $reporte->generarReporte();
 				    $reporte->output($reporte->url_archivo,'F');  
 				}

@@ -11,8 +11,30 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 
-	constructor:function(config){		
-		this.maestro=config.maestro;
+	constructor:function(config){
+
+        this.tbarItems = ['-',
+            this.cmbGestion,'-'
+
+        ];
+
+        var fecha = new Date();
+        Ext.Ajax.request({
+            url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+            params:{fecha:fecha.getDate()+'/'+(fecha.getMonth()+1)+'/'+fecha.getFullYear()},
+            success:function(resp){
+                var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                this.cmbGestion.setRawValue(fecha.getFullYear());
+                this.store.baseParams.id_gestion=reg.ROOT.datos.id_gestion;
+                this.load({params:{start:0, limit:this.tam_pag}});
+            },
+            failure: this.conexionFailure,
+            timeout:this.timeout,
+            scope:this
+        });
+
+        this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.Ajuste.superclass.constructor.call(this,config);
 		this.addButton('ant_estado',{
@@ -24,7 +46,10 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
               handler: this.antEstado,
               tooltip: '<b>Pasar al Anterior Estado</b>'
         });
-          
+
+
+        this.cmbGestion.on('select',this.capturarEventos, this);
+
         this.addButton('fin_registro', { grupo:[0], text:'Siguiente', iconCls: 'badelante', disabled:true,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
         this.addButton('diagrama_gantt',{ grupo:[1,2], text: 'Gantt', iconCls: 'bgantt', disabled: true, handler: this.diagramGantt, tooltip: '<b>Diagrama gantt de proceso macro</b>'});
         this.addButton('btnChequeoDocumentosWf',
@@ -59,7 +84,46 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
          
          
 	},
-			
+    capturarEventos: function () {
+
+        this.store.baseParams.id_gestion=this.cmbGestion.getValue();
+        this.load({params:{start:0, limit:this.tam_pag}});
+    },
+    cmbGestion: new Ext.form.ComboBox({
+        name: 'gestion',
+        id: 'gestion_reg',
+        fieldLabel: 'Gestion',
+        allowBlank: true,
+        emptyText:'Gestion...',
+        blankText: 'Año',
+        editable:false,
+        store:new Ext.data.JsonStore(
+            {
+                url: '../../sis_parametros/control/Gestion/listarGestion',
+                id: 'id_gestion',
+                root: 'datos',
+                sortInfo:{
+                    field: 'gestion',
+                    direction: 'DESC'
+                },
+                totalProperty: 'total',
+                fields: ['id_gestion','gestion'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams:{par_filtro:'gestion'}
+            }),
+        valueField: 'id_gestion',
+        triggerAction: 'all',
+        displayField: 'gestion',
+        hiddenName: 'id_gestion',
+        mode:'remote',
+        pageSize:5,
+        queryDelay:500,
+        listWidth:'280',
+        hidden:false,
+        width:80
+    }),
+    
 	Atributos:[
 		{
 			//configuracion del componente

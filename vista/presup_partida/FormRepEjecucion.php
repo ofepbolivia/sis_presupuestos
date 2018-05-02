@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  *@package pXP
  *@file    GenerarLibroBancos.php
@@ -122,7 +122,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				allowBlank:false,
 	    		triggerAction: 'all',
 	    		emptyText:'Tipo...',
-	    		selectOnFocus:true,
+	    		selectOnFocus:false,
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
@@ -261,7 +261,8 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 					fieldLabel: 'Desde',
 					allowBlank: true,
 					format: 'd/m/Y',
-					width: 150
+					width: 150,
+                    //data : ['fecha_ini']
 				},
 				type: 'DateField',
 				id_grupo: 0,
@@ -317,6 +318,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 		
 		topBar : true,
 		botones : false,
+
 		labelSubmit : 'Generar',
 		tooltipSubmit : '<b>Reporte Proyecto Presupeustario</b>',
 		

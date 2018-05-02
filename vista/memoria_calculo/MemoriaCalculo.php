@@ -141,7 +141,7 @@ Phx.vista.MemoriaCalculo=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 300,
-				maxLength:400
+				maxLength:1000
 			},
 				type:'TextArea',
 				bottom_filter: true,
