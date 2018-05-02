@@ -157,7 +157,7 @@ BEGIN
                                   CASE WHEN v_parametros.nivel = 4  THEN   -- todos 
                                          0 = 0 
                                       WHEN v_parametros.nivel = 5  THEN     --solo movimiento
-                                        sw_transaccional = 'movimiento'
+                                        sw_transaccional = 'movimiento' or nivel_partida = 0
                                       ELSE
                                         nivel_partida <= v_parametros.nivel
                                       END
