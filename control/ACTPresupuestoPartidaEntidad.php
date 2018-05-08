@@ -13,6 +13,12 @@ class ACTPresupuestoPartidaEntidad extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_presupuesto_partida_entidad');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+
+		if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("p_p_ent.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
+
+        }
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODPresupuestoPartidaEntidad','listarPresupuestoPartidaEntidad');
@@ -43,6 +49,12 @@ class ACTPresupuestoPartidaEntidad extends ACTbase{
     function validarCampos(){
         $this->objFunc=$this->create('MODPresupuestoPartidaEntidad');
         $this->res=$this->objFunc->validarCampos($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function clonarConfig(){
+        $this->objFunc=$this->create('MODPresupuestoPartidaEntidad');
+        $this->res=$this->objFunc->clonarConfig($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 			

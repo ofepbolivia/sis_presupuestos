@@ -383,7 +383,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         bdel: true,
         bsave: true,
-
+        
 
         onButtonNew: function () {
             Ext.Ajax.request({
