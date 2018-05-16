@@ -116,12 +116,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_gestion.on('select', function (cmb, record, index) {
                     //this.Cmp.id_partida.store.baseParams = {id_gestion:record.data.id_gestion};
                     //this.Cmp.id_presupuesto.store.baseParams = {id_gestion:record.data.id_gestion};
+                    //this.Cmp.id_entidad_transferencia.store.baseParams, {id_gestion: record.data.id_gestion};
+
                     this.Cmp.id_presupuesto.reset();
                     this.Cmp.id_partida.reset();
                     this.Cmp.id_entidad_transferencia.reset();
 
                     this.Cmp.id_partida.store.baseParams = {
                         par_filtro: 'par.codigo#par.nombre_partida',
+                        //tpar.codigo#tpar.nombre_partida
                         id_gestion: record.data.id_gestion,
                         sw_transaccional: 'movimiento'
                     };
@@ -130,6 +133,11 @@ header("content-type: text/javascript; charset=UTF-8");
                         tipo_interfaz: 'PresupuestoInicio',
                         id_gestion: record.data.id_gestion,
                         codigo_tipo_pres: '2'
+                    };
+                    //
+                    this.Cmp.id_entidad_transferencia.store.baseParams = {
+                        par_filtro: 'ent_tran.codigo#ent_tran.nombre',
+                        id_gestion: record.data.id_gestion,
                     };
 
                 }, this);
@@ -486,7 +494,7 @@ header("content-type: text/javascript; charset=UTF-8");
             tam_pag: 50,
             title: 'Relación de Entidades',
             ActSave: '../../sis_presupuestos/control/PresupuestoPartidaEntidad/insertarPresupuestoPartidaEntidad',
-            ActDel:  '../../sis_presupuestos/control/PresupuestoPartidaEntidad/eliminarPresupuestoPartidaEntidad',
+            ActDel: '../../sis_presupuestos/control/PresupuestoPartidaEntidad/eliminarPresupuestoPartidaEntidad',
             ActList: '../../sis_presupuestos/control/PresupuestoPartidaEntidad/listarPresupuestoPartidaEntidad',
             id_store: 'id_presupuesto_partida_entidad',
             fields:
@@ -543,6 +551,12 @@ header("content-type: text/javascript; charset=UTF-8");
                                 id_gestion: reg.ROOT.datos.id_gestion,
                                 codigo_tipo_pres: '2'
                             };
+                            //
+                            this.Cmp.id_entidad_transferencia.store.baseParams = {
+                                par_filtro: 'ent_tran.codigo#ent_tran.nombre',
+                                id_gestion: reg.ROOT.datos.id_gestion,
+                            };
+
                             this.Cmp.id_gestion.setValue(this.cmbGestion.getValue());
                             this.Cmp.id_gestion.setRawValue(this.cmbGestion.getRawValue());
                             //this.store.baseParams.id_gestion=this.cmbGestion.getValue();
@@ -569,6 +583,11 @@ header("content-type: text/javascript; charset=UTF-8");
                     tipo_interfaz: 'PresupuestoInicio',
                     id_gestion: this.Cmp.id_gestion.getValue(),
                     codigo_tipo_pres: '2'
+                };
+                this.Cmp.id_entidad_transferencia.store.baseParams = {
+                    par_filtro: 'ent_tran.codigo#ent_tran.nombre',
+
+                    id_gestion: this.Cmp.id_gestion.getValue(),
                 };
 
             }

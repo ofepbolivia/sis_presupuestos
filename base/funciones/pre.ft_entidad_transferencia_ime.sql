@@ -39,6 +39,7 @@ DECLARE
   --v_cont_m                    integer;
   --v_cont_d                    integer;
   v_record_aux record;
+
 BEGIN
 
   v_nombre_funcion = 'pre.ft_entidad_transferencia_ime';
@@ -216,7 +217,7 @@ begin
   WHERE gestion = v_gestion;
   --raise exception 'gestiones %, %',v_gestion,v_id_gestion;
 
-  FOR v_record_m IN (SELECT tet.codigo,tet.nombre
+ FOR v_record_m IN (SELECT tet.codigo,tet.nombre, tet.id_entidad_transferencia
 					  FROM pre.tentidad_transferencia tet
 					  where tet.id_gestion = v_parametros.id_gestion)loop
 
@@ -227,14 +228,20 @@ begin
    ya que se encarga de verificar si existe un dato porlo menos*/
    IF EXISTS ( select true from  pre.tentidad_transferencia where id_gestion=v_id_gestion and codigo = v_record_m.codigo ) then
 
-    RAISE EXCEPTION 'ESTIMADO USUARIO: LAS ENTIDADES DE TRANSFERENCIA YA FUERON REGISTRADOS PARA LA GESTION % ANTERIORMENTE.',v_gestion ;
+    RAISE EXCEPTION 'ESTIMADO USUARIO: LAS ENTIDADES DE TRANSFERENCIA YA FUERON REGISTRADOS PARA LA GESTION % ANTERIORMENTE',v_gestion ;
     ELSE
+
+
      INSERT INTO pre.tentidad_transferencia(id_gestion, codigo, nombre,
           estado_reg, id_usuario_ai, usuario_ai, fecha_reg, id_usuario_reg,
           fecha_mod, id_usuario_mod)
         values (v_id_gestion, v_record_m.codigo, v_record_m.nombre, 'activo',
           v_parametros._id_usuario_ai, v_parametros._nombre_usuario_ai, now(),
-          p_id_usuario, null, null);
+          p_id_usuario, null, null)RETURNING id_entidad_transferencia into v_id_entidad_transferencia;
+
+     insert into pre.tentidad_transferencia_ids(id_entidad_uno, id_entidad_dos)
+     VALUES(v_record_m.id_entidad_transferencia, v_id_entidad_transferencia );
+
    end if;
 
 

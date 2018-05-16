@@ -20,6 +20,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
             ];
 
+
             var fecha = new Date();
             Ext.Ajax.request({
                 url:'../../sis_parametros/control/Gestion/obtenerGestionByFecha',
@@ -72,7 +73,7 @@ header("content-type: text/javascript; charset=UTF-8");
             allowBlank: true,
             emptyText: 'Gestion...',
             blankText: 'Año',
-            editable: false,
+            editable: true,
             store: new Ext.data.JsonStore(
                 {
                     url: '../../sis_parametros/control/Gestion/listarGestion',
@@ -360,10 +361,10 @@ header("content-type: text/javascript; charset=UTF-8");
 
         clonarConf:function(){
             var d = this.getSelectedData();
-            console.log('prueba de d......',d)
+
             if(confirm('¿Está seguro de clonar?')){
                 var d = this.getSelectedData();
-                console.log('prueba de d......',d)
+
                 Phx.CP.loadingShow();
                 Ext.Ajax.request({
                     url: '../../sis_presupuestos/control/EntidadTransferencia/clonarConfig',
@@ -383,7 +384,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         bdel: true,
         bsave: true,
-        
+
 
         onButtonNew: function () {
             Ext.Ajax.request({
@@ -425,7 +426,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             icon: Ext.Msg.WARNING
                         });
                     } else {
-                        Phx.vista.PresupuestoObjetivo.superclass.onSubmit.call(this, o);
+                        Phx.vista.EntidadTransferencia.superclass.onSubmit.call(this, o);
                     }
 
                 },
