@@ -26,6 +26,8 @@ class MODPartidaEjecucion extends MODbase{
         $this->captura('moneda','varchar');
 		$this->captura('id_presupuesto','int4');
         $this->captura('desc_pres','varchar');
+        $this->captura('codigo_cc','text');
+
         $this->captura('codigo_categoria','varchar');
 		$this->captura('id_partida','int4');
         $this->captura('codigo','varchar');
@@ -49,6 +51,7 @@ class MODPartidaEjecucion extends MODbase{
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
 		
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

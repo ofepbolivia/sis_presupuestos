@@ -21,6 +21,19 @@ class ACTPartidaEjecucion extends ACTbase{
             $this->objParam->addFiltro("pareje.id_presupuesto = ".$this->objParam->getParametro('id_centro_costo'));
         }
 
+
+        if($this->objParam->getParametro('id_presupuesto')!=''){
+            $this->objParam->addFiltro("pareje.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
+        }
+        //mmm
+        if($this->objParam->getParametro('id_categoria_programatica')!=''){
+            $this->objParam->addFiltro("cat.id_categoria_programatica = ".$this->objParam->getParametro('id_categoria_programatica'));
+        }
+//        if($this->objParam->getParametro('codigo_categoria')!=''){
+//            $this->objParam->addFiltro("cat.codigo_categoria ilike ''%".$this->objParam->getParametro('codigo_categoria')."%''");
+//       }
+        //m
+
         if($this->objParam->getParametro('nro_tramite')!=''){
             $this->objParam->addFiltro("pareje.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");
         }
