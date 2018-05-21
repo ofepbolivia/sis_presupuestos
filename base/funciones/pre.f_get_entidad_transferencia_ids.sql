@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION pre.f_get_entidad_transferencia_ids (
 RETURNS integer AS
 $body$
 /*
-Autor: admin.admin
+Autor: maylee.perez
 Fecha: 2018
 Descripción: Función que devuelve el v_id_entidad_tranferencia equivalente anterior o siguiente de la tabla pre.tentidad_tranferencia_ids
 */
