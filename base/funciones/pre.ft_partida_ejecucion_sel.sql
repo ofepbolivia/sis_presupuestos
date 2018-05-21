@@ -53,6 +53,7 @@ BEGIN
                         mon.moneda,
 						pareje.id_presupuesto,
                         pre.descripcion as desc_pres,
+                        vpre.codigo_cc,
                         cat.codigo_categoria,
 						pareje.id_partida,
                         par.codigo,
@@ -75,8 +76,10 @@ BEGIN
 						pareje.id_usuario_mod,
 						usu1.cuenta as usr_reg,
 						usu2.cuenta as usr_mod
+
 						from pre.tpartida_ejecucion pareje
                         inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+                        INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
                         inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
                         inner join pre.tpartida par on par.id_partida = pareje.id_partida
                         inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
@@ -89,6 +92,7 @@ BEGIN
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			raise notice 'La consulta es:  %', v_consulta;
+            --raise EXCEPTION 'Provocando el error';
 
 			--Devuelve la respuesta
 			return v_consulta;
@@ -109,6 +113,8 @@ BEGIN
 			v_consulta:='select count(id_partida_ejecucion)
 					    from pre.tpartida_ejecucion pareje
               inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+              INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
+
               inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
               inner join pre.tpartida par on par.id_partida = pareje.id_partida
               inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
