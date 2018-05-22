@@ -159,7 +159,9 @@ BEGIN
                               vcc.id_tipo_cc,
                               (''(''||vcc.codigo_tcc ||'') '' ||vcc.descripcion_tcc)::varchar AS desc_tcc,
                               pre.fecha_inicio_pres,
-                              pre.fecha_fin_pres
+                              pre.fecha_fin_pres,
+                              vcc.codigo_tcc,
+                              vcc.descripcion_tcc
 						from pre.tpresupuesto pre
                         inner join param.vcentro_costo vcc on vcc.id_centro_costo=pre.id_centro_costo
 						inner join segu.tusuario usu1 on usu1.id_usuario = pre.id_usuario_reg
@@ -175,7 +177,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
              raise notice 'v_consulta %',v_consulta ;
-
+--raise exception 'errorrrrrrrrr may';
 
 			--Devuelve la respuesta
 			return v_consulta;
