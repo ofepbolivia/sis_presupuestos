@@ -52,7 +52,8 @@ BEGIN
 						p_p_ent.id_entidad_transferencia,
 						p_p_ent.estado_reg,
 						p_p_ent.id_presupuesto,
-						p_p_ent.id_usuario_ai,
+                        vpre.codigo_cc,
+                        p_p_ent.id_usuario_ai,
 						p_p_ent.id_usuario_reg,
 						p_p_ent.usuario_ai,
 						p_p_ent.fecha_reg,
@@ -64,6 +65,7 @@ BEGIN
                         ges.gestion::varchar as desc_gestion,
                         (''[''||te.codigo||''] - '' || te.nombre)::varchar AS desc_entidad_tranferencia,
                         tpre.descripcion AS desc_presupuesto
+
 						from pre.tpresupuesto_partida_entidad p_p_ent
 						inner join segu.tusuario usu1 on usu1.id_usuario = p_p_ent.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = p_p_ent.id_usuario_mod
@@ -71,12 +73,13 @@ BEGIN
                         inner join param.tgestion ges on ges.id_gestion = p_p_ent.id_gestion
                         INNER JOIN pre.tentidad_transferencia te ON te.id_entidad_transferencia	= p_p_ent.id_entidad_transferencia
                         INNER JOIN pre.tpresupuesto tpre ON tpre.id_presupuesto = p_p_ent.id_presupuesto
-				        where  ';
+				        INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = tpre.id_presupuesto
+                        where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
-
+--RAISE notice 'consulta %', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
 
@@ -95,13 +98,14 @@ BEGIN
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(id_presupuesto_partida_entidad)
 					    from pre.tpresupuesto_partida_entidad p_p_ent
-					    inner join segu.tusuario usu1 on usu1.id_usuario = p_p_ent.id_usuario_reg
+						inner join segu.tusuario usu1 on usu1.id_usuario = p_p_ent.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = p_p_ent.id_usuario_mod
                         INNER JOIN pre.tpartida tpar ON tpar.id_partida = p_p_ent.id_partida
                         inner join param.tgestion ges on ges.id_gestion = p_p_ent.id_gestion
                         INNER JOIN pre.tentidad_transferencia te ON te.id_entidad_transferencia	= p_p_ent.id_entidad_transferencia
                         INNER JOIN pre.tpresupuesto tpre ON tpre.id_presupuesto = p_p_ent.id_presupuesto
-					    where ';
+				        INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = tpre.id_presupuesto
+                        where  ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

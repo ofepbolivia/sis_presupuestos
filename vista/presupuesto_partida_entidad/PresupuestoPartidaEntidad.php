@@ -22,7 +22,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     params: {fecha: fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear()},
                     success: function (resp) {
                         var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
-                        this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                        //this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
                         this.cmbGestion.setRawValue(fecha.getFullYear());
                         this.store.baseParams.id_gestion = reg.ROOT.datos.id_gestion;
                         this.load({params: {start: 0, limit: this.tam_pag}});
@@ -36,7 +36,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 //llama al constructor de la clase padre
                 Phx.vista.PresupuestoPartidaEntidad.superclass.constructor.call(this, config);
                 this.init();
-                this.load({params: {start: 0, limit: this.tam_pag}});
+                //this.load({params: {start: 0, limit: this.tam_pag}});
                 this.iniciaEventos();
 
                 this.cmbGestion.on('select', this.capturarEventos, this);
@@ -92,10 +92,10 @@ header("content-type: text/javascript; charset=UTF-8");
 
             clonarConf: function () {
                 var d = this.getSelectedData();
-                console.log('prueba de d......', d)
+                //console.log('prueba de d......', d)
                 if (confirm('¿Está seguro de clonar?')) {
                     var d = this.getSelectedData();
-                    console.log('prueba de d......', d)
+                    //console.log('prueba de d......', d)
                     Phx.CP.loadingShow();
                     Ext.Ajax.request({
                         url: '../../sis_presupuestos/control/PresupuestoPartidaEntidad/clonarConfig',
@@ -129,10 +129,11 @@ header("content-type: text/javascript; charset=UTF-8");
                         sw_transaccional: 'movimiento'
                     };
                     this.Cmp.id_presupuesto.store.baseParams = {
-                        par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                        //par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                        par_filtro: 'pre.id_presupuesto#vcc.codigo_tcc#vcc.descripcion_tcc',
                         tipo_interfaz: 'PresupuestoInicio',
                         id_gestion: record.data.id_gestion,
-                        codigo_tipo_pres: '2'
+                        //codigo_tipo_pres: '2'
                     };
                     //
                     this.Cmp.id_entidad_transferencia.store.baseParams = {
@@ -204,6 +205,58 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 {
                     config: {
+                        name: 'id_entidad_transferencia',
+                        fieldLabel: 'Entidad Transf.',
+                        allowBlank: false,
+                        emptyText: 'Elija una opción...',
+                        store: new Ext.data.JsonStore({
+                            url: '../../sis_presupuestos/control/EntidadTransferencia/listarEntidadTransferencia',
+                            id: 'id_entidad_transferencia',
+                            root: 'datos',
+                            sortInfo: {
+                                field: 'nombre',
+                                direction: 'ASC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_entidad_transferencia', 'nombre', 'codigo'],
+                            remoteSort: true,
+                            baseParams: {par_filtro: 'ent_tran.codigo#ent_tran.nombre'}
+                        }),
+                        valueField: 'id_entidad_transferencia',
+                        displayField: 'nombre',
+                        gdisplayField: 'desc_entidad_tranferencia',
+                        hiddenName: 'id_entidad_transferencia',
+                        forceSelection: true,
+                        typeAhead: false,
+                        triggerAction: 'all',
+                        lazyRender: true,
+                        mode: 'remote',
+                        pageSize: 15,
+                        queryDelay: 1000,
+                        anchor: '100%',
+                        gwidth: 300,
+                        minChars: 2,
+                        renderer: function (value, p, record) {
+                            return String.format('{0}', record.data['desc_entidad_tranferencia']);
+                        },
+                        tpl: new Ext.XTemplate([
+                            '<tpl for=".">',
+                            '<div class="x-combo-list-item">',
+                            '<div class="awesomecombo-item {checked}">',
+                            '<p><b>Codigo: {codigo}</b></p>',
+                            '</div><p><b>Nombre:</b> <span style="color: green;">{nombre}</span></p>',
+                            '</div></tpl>'
+                        ])
+                    },
+                    type: 'AwesomeCombo',
+                    id_grupo: 0,
+                    bottom_filter: true,
+                    filters: {pfiltro: 'te.codigo#te.nombre', type: 'string'},
+                    grid: true,
+                    form: true
+                },
+                {
+                    config: {
                         name: 'id_partida',
                         fieldLabel: 'Partida',
                         allowBlank: false,
@@ -268,59 +321,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 {
                     config: {
-                        name: 'id_entidad_transferencia',
-                        fieldLabel: 'Entidad Transf.',
-                        allowBlank: false,
-                        emptyText: 'Elija una opción...',
-                        store: new Ext.data.JsonStore({
-                            url: '../../sis_presupuestos/control/EntidadTransferencia/listarEntidadTransferencia',
-                            id: 'id_entidad_transferencia',
-                            root: 'datos',
-                            sortInfo: {
-                                field: 'nombre',
-                                direction: 'ASC'
-                            },
-                            totalProperty: 'total',
-                            fields: ['id_entidad_transferencia', 'nombre', 'codigo'],
-                            remoteSort: true,
-                            baseParams: {par_filtro: 'ent_tran.codigo#ent_tran.nombre'}
-                        }),
-                        valueField: 'id_entidad_transferencia',
-                        displayField: 'nombre',
-                        gdisplayField: 'desc_entidad_tranferencia',
-                        hiddenName: 'id_entidad_transferencia',
-                        forceSelection: true,
-                        typeAhead: false,
-                        triggerAction: 'all',
-                        lazyRender: true,
-                        mode: 'remote',
-                        pageSize: 15,
-                        queryDelay: 1000,
-                        anchor: '100%',
-                        gwidth: 300,
-                        minChars: 2,
-                        renderer: function (value, p, record) {
-                            return String.format('{0}', record.data['desc_entidad_tranferencia']);
-                        },
-                        tpl: new Ext.XTemplate([
-                            '<tpl for=".">',
-                            '<div class="x-combo-list-item">',
-                            '<div class="awesomecombo-item {checked}">',
-                            '<p><b>Codigo: {codigo}</b></p>',
-                            '</div><p><b>Nombre:</b> <span style="color: green;">{nombre}</span></p>',
-                            '</div></tpl>'
-                        ])
-                    },
-                    type: 'AwesomeCombo',
-                    id_grupo: 0,
-                    bottom_filter: true,
-                    filters: {pfiltro: 'te.codigo#te.nombre', type: 'string'},
-                    grid: true,
-                    form: true
-                },
-
-                {
-                    config: {
                         name: 'id_presupuesto',
                         fieldLabel: 'Presupuesto',
                         allowBlank: false,
@@ -330,26 +330,29 @@ header("content-type: text/javascript; charset=UTF-8");
                             id: 'id_presupuesto',
                             root: 'datos',
                             sortInfo: {
-                                field: 'descripcion',
+                                field: 'descripcion_tcc',
                                 direction: 'ASC'
                             },
                             totalProperty: 'total',
-                            fields: ['id_presupuesto', 'tipo_pres', 'descripcion'],
+                            fields: ['id_presupuesto', 'codigo_tcc' ,'descripcion_tcc'],
+                            //fields: ['id_presupuesto', 'codigo_tcc' ,'descripcion'],
                             remoteSort: true,
                             baseParams: {
-                                par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                                par_filtro: 'pre.id_presupuesto#vcc.codigo_tcc#vcc.descripcion_tcc',
+                                //par_filtro: 'pre.id_presupuesto#vcc.codigo_tcc#pre.descripcion',
                                 tipo_interfaz: 'PresupuestoInicio',
-                                codigo_tipo_pres: '2'
+                                //codigo_tipo_pres: '2'
                             }
                         }),
                         valueField: 'id_presupuesto',
-                        displayField: 'descripcion',
+                        displayField: 'descripcion_tcc',
                         tpl: new Ext.XTemplate([
                             '<tpl for=".">',
                             '<div class="x-combo-list-item">',
-                            '<div class="awesomecombo-item {checked}">',
-                            '<p><b>Tipo: {tipo_pres}</b></p>',
-                            '</div><p><b>Descripción:</b> <span style="color: green;">{descripcion}</span></p>',
+                            //'<div class="awesomecombo-item {checked}">',
+                            //'<p><b></b></p>',
+                            //'</div>' +
+                            '<p>{codigo_tcc}<span style="color: green;"> - {descripcion_tcc}</span></p>',
                             '</div></tpl>'
                         ]),
                         gdisplayField: 'desc_presupuesto',
@@ -367,13 +370,15 @@ header("content-type: text/javascript; charset=UTF-8");
                         resizable: true,
                         enableMultiSelect: false,
                         renderer: function (value, p, record) {
-                            return String.format('{0}', record.data['desc_presupuesto']);
+                            //return String.format('{0}', record.data['desc_presupuesto']);
+                            return String.format('{0}', record.data['codigo_cc']);
                         }
                     },
                     type: 'ComboBox',
                     id_grupo: 0,
                     bottom_filter: true,
-                    filters: {pfiltro: 'tpre.descripcion', type: 'string'},
+                    //filters: {pfiltro: 'tpre.descripcion', type: 'string'},
+                    filters: {pfiltro: 'vpre.codigo_cc', type: 'string'},
                     grid: true,
                     form: true
                 },
@@ -505,6 +510,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     {name: 'id_entidad_transferencia', type: 'numeric'},
                     {name: 'estado_reg', type: 'string'},
                     {name: 'id_presupuesto', type: 'numeric'},
+                    {name: 'codigo_cc', type: 'string'},
                     {name: 'id_usuario_ai', type: 'numeric'},
                     {name: 'id_usuario_reg', type: 'numeric'},
                     {name: 'usuario_ai', type: 'string'},
@@ -538,18 +544,19 @@ header("content-type: text/javascript; charset=UTF-8");
                         params: {id_usuario: 0},
                         success: function (resp) {
                             var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
-                            this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
-                            this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);
+                            //this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
+                            //this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);
                             this.Cmp.id_partida.store.baseParams = {
                                 par_filtro: 'par.codigo#par.nombre_partida',
                                 id_gestion: reg.ROOT.datos.id_gestion,
                                 sw_transaccional: 'movimiento'
                             };
                             this.Cmp.id_presupuesto.store.baseParams = {
-                                par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                                //par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                                par_filtro: 'pre.id_presupuesto#vcc.codigo_tcc#vcc.descripcion_tcc',
                                 tipo_interfaz: 'PresupuestoInicio',
                                 id_gestion: reg.ROOT.datos.id_gestion,
-                                codigo_tipo_pres: '2'
+                                //codigo_tipo_pres: '2'
                             };
                             //
                             this.Cmp.id_entidad_transferencia.store.baseParams = {
@@ -557,8 +564,8 @@ header("content-type: text/javascript; charset=UTF-8");
                                 id_gestion: reg.ROOT.datos.id_gestion,
                             };
 
-                            this.Cmp.id_gestion.setValue(this.cmbGestion.getValue());
-                            this.Cmp.id_gestion.setRawValue(this.cmbGestion.getRawValue());
+                            //this.Cmp.id_gestion.setValue(this.cmbGestion.getValue());
+                            //this.Cmp.id_gestion.setRawValue(this.cmbGestion.getRawValue());
                             //this.store.baseParams.id_gestion=this.cmbGestion.getValue();
                         },
                         failure: this.conexionFailure,
@@ -573,16 +580,18 @@ header("content-type: text/javascript; charset=UTF-8");
 
             onButtonEdit: function () {
                 Phx.vista.PresupuestoPartidaEntidad.superclass.onButtonEdit.call(this);
+
                 this.Cmp.id_partida.store.baseParams = {
                     par_filtro: 'par.codigo#par.nombre_partida',
                     id_gestion: this.Cmp.id_gestion.getValue(),
                     sw_transaccional: 'movimiento'
                 };
                 this.Cmp.id_presupuesto.store.baseParams = {
-                    par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                    //par_filtro: 'pre.id_presupuesto#pre.tipo_pres#pre.descripcion',
+                    par_filtro: 'pre.id_presupuesto#vcc.codigo_tcc#vcc.descripcion_tcc',
                     tipo_interfaz: 'PresupuestoInicio',
                     id_gestion: this.Cmp.id_gestion.getValue(),
-                    codigo_tipo_pres: '2'
+                    //codigo_tipo_pres: '2'
                 };
                 this.Cmp.id_entidad_transferencia.store.baseParams = {
                     par_filtro: 'ent_tran.codigo#ent_tran.nombre',
@@ -602,6 +611,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         'id_entidad_transferencia': this.Cmp.id_entidad_transferencia.getValue(),
                         'id_presupuesto': this.Cmp.id_presupuesto.getValue()
                     },
+
                     success: function (resp) {
                         var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
                         if (JSON.parse(reg.ROOT.datos.v_valid)) {
@@ -627,5 +637,4 @@ header("content-type: text/javascript; charset=UTF-8");
         }
     )
 </script>
-		
-		
+

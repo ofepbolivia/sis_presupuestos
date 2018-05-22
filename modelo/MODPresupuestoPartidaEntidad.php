@@ -26,7 +26,8 @@ class MODPresupuestoPartidaEntidad extends MODbase{
 		$this->captura('id_entidad_transferencia','int4');
 		$this->captura('estado_reg','varchar');
 		$this->captura('id_presupuesto','int4');
-		$this->captura('id_usuario_ai','int4');
+        $this->captura('codigo_cc','text');
+        $this->captura('id_usuario_ai','int4');
 		$this->captura('id_usuario_reg','int4');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('fecha_reg','timestamp');
@@ -38,6 +39,7 @@ class MODPresupuestoPartidaEntidad extends MODbase{
 		$this->captura('desc_gestion','varchar');
 		$this->captura('desc_entidad_tranferencia','varchar');
 		$this->captura('desc_presupuesto','varchar');
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

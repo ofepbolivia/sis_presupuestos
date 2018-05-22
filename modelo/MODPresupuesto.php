@@ -56,10 +56,12 @@ class MODPresupuesto extends MODbase{
 		$this->captura('desc_tcc','varchar');
 		$this->captura('fecha_inicio_pres','date');
 		$this->captura('fecha_fin_pres','date');
+		$this->captura('codigo_tcc','varchar');
+		$this->captura('descripcion_tcc','varchar');
 
 		
 		//Ejecuta la instruccion
-		$this->armarConsulta();
+		$this->armarConsulta();//echo $this->consulta;exit;
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
