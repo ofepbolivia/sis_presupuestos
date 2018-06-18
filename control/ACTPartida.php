@@ -32,7 +32,7 @@ class ACTPartida extends ACTbase{
 	    	
 		}
 		if($this->objParam->getParametro('sw_transaccional')!=''){
-	    	$this->objParam->addFiltro("par.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''");	
+	    	$this->objParam->addFiltro("par.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''");
 		}
 		if($this->objParam->getParametro('partida_tipo')!=''){
 			$tmp=$this->objParam->getParametro('partida_tipo');
@@ -48,11 +48,11 @@ class ACTPartida extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('id_centro_costo')!=''){
-	    	$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_centro_costo') . ")");	
+	    	$this->objParam->addFiltro("(par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_centro_costo') . ") or par.sw_movimiento=''flujo'' ) ");
 		}
-		
+
 		if($this->objParam->getParametro('id_presupuesto')!=''){
-	    	$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_presupuesto') . ")");	
+	    	$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_presupuesto') . ") ");
 		}
 		
 		if($this->objParam->getParametro('tipo_ajuste')!='' && 
