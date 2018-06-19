@@ -157,6 +157,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 name: 'fecha',
                 fieldLabel: 'Fecha',
                 allowBlank: false,
+                anchor: '80%',
                 gwidth: 80,
                 format: 'd/m/Y', 
                 renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
@@ -172,7 +173,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 name: 'tipo_ajuste',
                 fieldLabel: 'Tipo ',
                 allowBlank: false,
-                anchor: '40%',
+                anchor: '80%',
                 gwidth: 100,
                 typeAhead: true,
                 bottom_filter: true,
@@ -219,6 +220,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
             config:{
                 name:'nro_tramite_aux',
                 fieldLabel:'Nº Trámite',
+                anchor: '80%',
                 allowBlank:true,
                 emptyText:'Tipo...',
                 store: new Ext.data.JsonStore({
@@ -262,8 +264,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'Movimiento ',
                 qtip: '¿Para definir si se ajusta  presupuestos de gasto o de recurso?',
                 allowBlank: false,
-                anchor: '40%',
-                gwidth: 70,
+                anchor: '80%',
+                gwidth: 110,
                 typeAhead: true,
                 triggerAction: 'all',
                 lazyRender:true,
@@ -275,7 +277,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                
                               var ajustes = {
 				                              	'recurso':'Recurso',
-				                              	'gasto':'Gasto'
+				                              	'gasto':'Gasto',
+                                                'recurso-gasto':'Recurso-Gasto'
 				                              };
 				               return String.format('<b>{0}</b>', ajustes[value]);
 	                     }
@@ -283,12 +286,14 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 store:new Ext.data.ArrayStore({
                             fields :['variable','valor'],
                             data :  [['recurso','Recurso'],
-                                      ['gasto','Gasto']]}),
+                                      ['gasto','Gasto'],
+                                      ['recurso-gasto','Recurso-Gasto']
+                                    ]}),
             },
             type:'ComboBox',
             filters:{   pfiltro:'aju.tipo_ajuste',
                         type: 'list',
-                        options: ['recurso','gasto'],  
+                        options: ['recurso','gasto','recurso-gasto'],
                     },
             grid:true,
             form:true

@@ -76,6 +76,11 @@ Phx.comborec.sis_presupuestos.configini = function (config){
 		     	'<tpl if="movimiento_tipo_pres == \'recurso\'">',
 		     	'<font color="green"><p>{codigo_cc}</p></font>',
 		     	'</tpl>',
+
+                '<tpl if="movimiento_tipo_pres == \'recurso-gasto\'">',
+                '<font color="green"><p>{codigo_cc}</p></font>',
+                '</tpl>',
+
 		     	'<tpl if="movimiento_tipo_pres == \'administrativo\'">',
 		     	'<font color="blue"><p>{codigo_cc}</p></font>',
 		     	'</tpl>',
