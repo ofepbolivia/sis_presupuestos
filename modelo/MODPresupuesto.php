@@ -1,70 +1,72 @@
 <?php
 /**
-*@package pXP
-*@file gen-MODPresupuesto.php
-*@author  Gonzalo Sarmiento Sejas
-*@date 26-11-2012 21:35:35
-*@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
-*/
+ *@package pXP
+ *@file gen-MODPresupuesto.php
+ *@author  Gonzalo Sarmiento Sejas
+ *@date 26-11-2012 21:35:35
+ *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
+ */
 
 class MODPresupuesto extends MODbase{
-	
-	function __construct(CTParametro $pParam){
-		parent::__construct($pParam);
-	}
-			
-	function listarPresupuesto(){
-		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='pre.ft_presupuesto_sel';
-		$this->transaccion='PRE_PRE_SEL';
-		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		$this->setParametro('tipo_interfaz','tipo_interfaz','varchar');	
-		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
-			
-			
-		//Definicion de la lista del resultado del query
-		$this->captura('id_presupuesto','int4');
-		$this->captura('id_centro_costo','int4');
-		$this->captura('codigo_cc','text');
-		$this->captura('tipo_pres','varchar');
-		$this->captura('estado_pres','varchar');
-		$this->captura('estado_reg','varchar');		
-		$this->captura('id_usuario_reg','int4');
-		$this->captura('fecha_reg','timestamp');
-		$this->captura('fecha_mod','timestamp');
-		$this->captura('id_usuario_mod','int4');
-		$this->captura('usr_reg','varchar');
-		$this->captura('usr_mod','varchar');
-		$this->captura('estado','varchar');
-		$this->captura('id_estado_wf','int4');
-		$this->captura('nro_tramite','varchar');
-		$this->captura('id_proceso_wf','int4');
-		$this->captura('desc_tipo_presupuesto','varchar');
-		$this->captura('descripcion','varchar');
-		$this->captura('movimiento_tipo_pres','varchar');
-		$this->captura('id_gestion','int4');
-		$this->captura('obs_wf','varchar');
-		$this->captura('sw_consolidado','VARCHAR');		
-		$this->captura('id_categoria_prog','int4');
-		$this->captura('codigo_categoria','varchar');
-		$this->captura('mov_pres','varchar');
-		$this->captura('momento_pres','varchar');		
-		$this->captura('id_uo','int4');
-		$this->captura('codigo_uo','varchar');		
-		$this->captura('nombre_uo','varchar');
-		$this->captura('id_tipo_cc','int4');
-		$this->captura('desc_tcc','varchar');
-		$this->captura('fecha_inicio_pres','date');
-		$this->captura('fecha_fin_pres','date');
 
-		
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
-		
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
+    function __construct(CTParametro $pParam){
+        parent::__construct($pParam);
+    }
+
+    function listarPresupuesto(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='pre.ft_presupuesto_sel';
+        $this->transaccion='PRE_PRE_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
+        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_presupuesto','int4');
+        $this->captura('id_centro_costo','int4');
+        $this->captura('codigo_cc','text');
+        $this->captura('tipo_pres','varchar');
+        $this->captura('estado_pres','varchar');
+        $this->captura('estado_reg','varchar');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+        $this->captura('estado','varchar');
+        $this->captura('id_estado_wf','int4');
+        $this->captura('nro_tramite','varchar');
+        $this->captura('id_proceso_wf','int4');
+        $this->captura('desc_tipo_presupuesto','varchar');
+        $this->captura('descripcion','varchar');
+        $this->captura('movimiento_tipo_pres','varchar');
+        $this->captura('id_gestion','int4');
+        $this->captura('obs_wf','varchar');
+        $this->captura('sw_consolidado','VARCHAR');
+        $this->captura('id_categoria_prog','int4');
+        $this->captura('codigo_categoria','varchar');
+        $this->captura('mov_pres','varchar');
+        $this->captura('momento_pres','varchar');
+        $this->captura('id_uo','int4');
+        $this->captura('codigo_uo','varchar');
+        $this->captura('nombre_uo','varchar');
+        $this->captura('id_tipo_cc','int4');
+        $this->captura('desc_tcc','varchar');
+        $this->captura('fecha_inicio_pres','date');
+        $this->captura('fecha_fin_pres','date');
+        $this->captura('codigo_tcc','varchar');
+        $this->captura('descripcion_tcc','varchar');
+
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta;exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 
     function listarPresupuestoRest(){
         //Definicion de variables para ejecucion del procedimientp
@@ -87,136 +89,136 @@ class MODPresupuesto extends MODbase{
     }
 
     function listarPresupuestoCmb(){
-		//Definicion de variables para ejecucion del procedimientp
-		$this->procedimiento='pre.ft_presupuesto_sel';
-		$this->transaccion='PRE_CBMPRES_SEL';
-		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
-		      $this->captura('id_centro_costo','int4');
-              $this->captura('estado_reg','VARCHAR');
-              $this->captura('id_ep','int4');
-              $this->captura('id_gestion','int4');
-              $this->captura('id_uo','int4');
-              $this->captura('id_usuario_reg','int4');
-              $this->captura('fecha_reg','timestamp');
-              $this->captura('id_usuario_mod','int4');
-              $this->captura('fecha_mod','timestamp');
-              $this->captura('usr_reg','VARCHAR');
-              $this->captura('usr_mod','VARCHAR');
-              $this->captura('codigo_uo','VARCHAR');
-              $this->captura('nombre_uo','VARCHAR');
-              $this->captura('ep','TEXT');
-              $this->captura('gestion','INTEGER');
-              $this->captura('codigo_cc','text');
-              $this->captura('nombre_programa','VARCHAR');
-              $this->captura('nombre_proyecto','VARCHAR');
-              $this->captura('nombre_actividad','VARCHAR');
-              $this->captura('nombre_financiador','VARCHAR');
-              $this->captura('nombre_regional','VARCHAR');
-              $this->captura('tipo_pres','VARCHAR');
-              $this->captura('cod_act','VARCHAR');
-              $this->captura('cod_fin','VARCHAR');
-              $this->captura('cod_prg','VARCHAR');
-              $this->captura('cod_pry','VARCHAR');
-              $this->captura('estado_pres','VARCHAR');
-              $this->captura('estado','VARCHAR');
-              $this->captura('id_presupuesto','int4');
-              $this->captura('id_estado_wf','int4');
-              $this->captura('nro_tramite','VARCHAR');
-              $this->captura('id_proceso_wf','int4');
-              $this->captura('movimiento_tipo_pres','VARCHAR');
-              $this->captura('desc_tipo_presupuesto','VARCHAR');
-			  $this->captura('sw_oficial','VARCHAR');
-			  $this->captura('sw_consolidado','VARCHAR');
-			
-		
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
-		
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
-			
-	function insertarPresupuesto(){
-		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='pre.ft_presupuesto_ime';
-		$this->transaccion='PRE_PRE_INS';
-		$this->tipo_procedimiento='IME';
-				
-		//Define los parametros para la funcion
-		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
-		$this->setParametro('id_uo','id_uo','int4');
-		$this->setParametro('id_gestion','id_gestion','int4');		
-		$this->setParametro('tipo_pres','tipo_pres','varchar');
-		$this->setParametro('descripcion','descripcion','varchar');
-		$this->setParametro('sw_consolidado','sw_consolidado','varchar');
-		$this->setParametro('id_categoria_prog','id_categoria_prog','int4');
-		$this->setParametro('fecha_inicio_pres','fecha_inicio_pres','date');
-		$this->setParametro('fecha_fin_pres','fecha_fin_pres','date');
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='pre.ft_presupuesto_sel';
+        $this->transaccion='PRE_CBMPRES_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
 
-	
+        $this->captura('id_centro_costo','int4');
+        $this->captura('estado_reg','VARCHAR');
+        $this->captura('id_ep','int4');
+        $this->captura('id_gestion','int4');
+        $this->captura('id_uo','int4');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('usr_reg','VARCHAR');
+        $this->captura('usr_mod','VARCHAR');
+        $this->captura('codigo_uo','VARCHAR');
+        $this->captura('nombre_uo','VARCHAR');
+        $this->captura('ep','TEXT');
+        $this->captura('gestion','INTEGER');
+        $this->captura('codigo_cc','text');
+        $this->captura('nombre_programa','VARCHAR');
+        $this->captura('nombre_proyecto','VARCHAR');
+        $this->captura('nombre_actividad','VARCHAR');
+        $this->captura('nombre_financiador','VARCHAR');
+        $this->captura('nombre_regional','VARCHAR');
+        $this->captura('tipo_pres','VARCHAR');
+        $this->captura('cod_act','VARCHAR');
+        $this->captura('cod_fin','VARCHAR');
+        $this->captura('cod_prg','VARCHAR');
+        $this->captura('cod_pry','VARCHAR');
+        $this->captura('estado_pres','VARCHAR');
+        $this->captura('estado','VARCHAR');
+        $this->captura('id_presupuesto','int4');
+        $this->captura('id_estado_wf','int4');
+        $this->captura('nro_tramite','VARCHAR');
+        $this->captura('id_proceso_wf','int4');
+        $this->captura('movimiento_tipo_pres','VARCHAR');
+        $this->captura('desc_tipo_presupuesto','VARCHAR');
+        $this->captura('sw_oficial','VARCHAR');
+        $this->captura('sw_consolidado','VARCHAR');
 
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
 
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
-			
-	function modificarPresupuesto(){
-		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='pre.ft_presupuesto_ime';
-		$this->transaccion='PRE_PRE_MOD';
-		$this->tipo_procedimiento='IME';
-				
-		//Define los parametros para la funcion
-		$this->setParametro('id_presupuesto','id_presupuesto','int4');
-		
-		$this->setParametro('id_tipo_cc','id_tipo_cc','int4');
-		$this->setParametro('id_uo','id_uo','int4');
-		$this->setParametro('id_gestion','id_gestion','int4');	
-		
-		$this->setParametro('tipo_pres','tipo_pres','varchar');
-		$this->setParametro('descripcion','descripcion','varchar');
-		$this->setParametro('sw_consolidado','sw_consolidado','varchar');
-		$this->setParametro('id_categoria_prog','id_categoria_prog','int4');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function insertarPresupuesto(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_PRE_INS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+        $this->setParametro('id_uo','id_uo','int4');
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('tipo_pres','tipo_pres','varchar');
+        $this->setParametro('descripcion','descripcion','varchar');
+        $this->setParametro('sw_consolidado','sw_consolidado','varchar');
+        $this->setParametro('id_categoria_prog','id_categoria_prog','int4');
         $this->setParametro('fecha_inicio_pres','fecha_inicio_pres','date');
         $this->setParametro('fecha_fin_pres','fecha_fin_pres','date');
-		
 
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
 
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
-			
-	function eliminarPresupuesto(){
-		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='pre.ft_presupuesto_ime';
-		$this->transaccion='PRE_PRE_ELI';
-		$this->tipo_procedimiento='IME';
-				
-		//Define los parametros para la funcion
-		$this->setParametro('id_presupuesto','id_presupuesto','int4');
 
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
 
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
-	
-	function verificarPresupuesto(){
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function modificarPresupuesto(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_PRE_MOD';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_presupuesto','id_presupuesto','int4');
+
+        $this->setParametro('id_tipo_cc','id_tipo_cc','int4');
+        $this->setParametro('id_uo','id_uo','int4');
+        $this->setParametro('id_gestion','id_gestion','int4');
+
+        $this->setParametro('tipo_pres','tipo_pres','varchar');
+        $this->setParametro('descripcion','descripcion','varchar');
+        $this->setParametro('sw_consolidado','sw_consolidado','varchar');
+        $this->setParametro('id_categoria_prog','id_categoria_prog','int4');
+        $this->setParametro('fecha_inicio_pres','fecha_inicio_pres','date');
+        $this->setParametro('fecha_fin_pres','fecha_fin_pres','date');
+
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function eliminarPresupuesto(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_PRE_ELI';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_presupuesto','id_presupuesto','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function verificarPresupuesto(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento='pre.ft_presup_partida_ime';
         $this->transaccion='PRE_VERPRE_IME';
         $this->tipo_procedimiento='IME';
-                
+
         //Define los parametros para la funcion
         $this->setParametro('id_presupuesto','id_presupuesto','int4');
         $this->setParametro('id_partida','id_partida','int4');
@@ -230,27 +232,27 @@ class MODPresupuesto extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-    
+
     function reportePresupuesto(){
         $this->procedimiento='pre.ft_presupuesto_sel';
         $this->transaccion='PRE_SALPRE_SEL';
         $this->tipo_procedimiento='SEL';
-        
+
         $this->setCount(false);
-        
+
         //definicion de los parametros para la funcion
         $this->setParametro('id_presupuesto','id_presupuesto','varchar');
         $this->setParametro('id_partida','id_partida','varchar');
         $this->setParametro('fecha_ini','fecha_ini','timestamp');
         $this->setParametro('fecha_fin','fecha_fin','timestamp');
-        
+
         //Definicion de la lista del resultado del query
         $this->captura('id_partida','int4');
         $this->captura('codigo_par','varchar');
         $this->captura('id_presupuesto','int4');
         $this->captura('codigo_pres','varchar');
         $this->captura('centro_costo','varchar');
-        $this->captura('moneda','varchar');      
+        $this->captura('moneda','varchar');
         $this->captura('presup_ene','numeric');
         $this->captura('ejec_ene','numeric');
         $this->captura('presup_feb','numeric');
@@ -274,59 +276,59 @@ class MODPresupuesto extends MODbase{
         $this->captura('presup_nov','numeric');
         $this->captura('ejec_nov','numeric');
         $this->captura('presup_dic','numeric');
-        $this->captura('ejec_dic','numeric');        
-        
+        $this->captura('ejec_dic','numeric');
+
         //devuelve la respuesta
         $this->armarConsulta();
         $this->ejecutarConsulta();
-        
+
         return $this->respuesta;
-    }	
+    }
 
-   function clonarPresupuestosGestion(){
-		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='pre.ft_presupuesto_ime';
-		$this->transaccion='PRE_CLONARPRE_IME';
-		$this->tipo_procedimiento='IME';
-				
-		//Define los parametros para la funcion
-		$this->setParametro('id_gestion','id_gestion','int4');
+    function clonarPresupuestosGestion(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_CLONARPRE_IME';
+        $this->tipo_procedimiento='IME';
 
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
+        //Define los parametros para la funcion
+        $this->setParametro('id_gestion','id_gestion','int4');
 
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
-   
-   
-   
-   function iniciarTramite(){
-		//Definicion de variables para ejecucion del procedimiento
-		$this->procedimiento='pre.ft_presupuesto_ime';
-		$this->transaccion='PRE_INITRA_IME';
-		$this->tipo_procedimiento='IME';
-				
-		//Define los parametros para la funcion
-		
-		$this->setParametro('id_presupuesto','id_presupuesto','int4');
-		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
 
-		//Ejecuta la instruccion
-		$this->armarConsulta();
-		$this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 
-		//Devuelve la respuesta
-		return $this->respuesta;
-	}
-   
-   function siguienteEstadoPresupuesto(){
+
+
+    function iniciarTramite(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_INITRA_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+
+        $this->setParametro('id_presupuesto','id_presupuesto','int4');
+        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function siguienteEstadoPresupuesto(){
         //Definicion de variables para ejecucion del procedimiento
         $this->procedimiento = 'pre.ft_presupuesto_ime';
         $this->transaccion = 'PRE_SIGESTP_IME';
         $this->tipo_procedimiento = 'IME';
-   
+
         //Define los parametros para la funcion
         $this->setParametro('id_presupuesto','id_presupuesto','int4');
         $this->setParametro('id_proceso_wf_act','id_proceso_wf_act','int4');
@@ -334,7 +336,7 @@ class MODPresupuesto extends MODbase{
         $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
         $this->setParametro('id_tipo_estado','id_tipo_estado','int4');
         $this->setParametro('id_funcionario_wf','id_funcionario_wf','int4');
-        $this->setParametro('id_depto_wf','id_depto_wf','int4');		
+        $this->setParametro('id_depto_wf','id_depto_wf','int4');
         $this->setParametro('obs','obs','text');
         $this->setParametro('json_procesos','json_procesos','text');
 
@@ -352,15 +354,15 @@ class MODPresupuesto extends MODbase{
         $this->procedimiento='pre.ft_presupuesto_ime';
         $this->transaccion='PR_ANTEPR_IME';
         $this->tipo_procedimiento='IME';
-                
+
         //Define los parametros para la funcion
         $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
         $this->setParametro('id_estado_wf','id_estado_wf','int4');
-		$this->setParametro('obs','obs','varchar');
-		$this->setParametro('estado_destino','estado_destino','varchar');
-		
-		
-	
+        $this->setParametro('obs','obs','varchar');
+        $this->setParametro('estado_destino','estado_destino','varchar');
+
+
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         $this->ejecutarConsulta();
@@ -406,6 +408,7 @@ class MODPresupuesto extends MODbase{
         $this->captura('gestion', 'integer');
         $this->captura('codigo_poa', 'varchar');
         $this->captura('codigo_descripcion', 'varchar');
+        $this->captura('tipo', 'varchar');
 
 
         //Ejecuta la instruccion
@@ -485,7 +488,7 @@ class MODPresupuesto extends MODbase{
         return $this->respuesta;
     }
 
- 
-   		
+
+
 }
 ?>

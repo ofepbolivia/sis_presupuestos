@@ -159,7 +159,9 @@ BEGIN
                               vcc.id_tipo_cc,
                               (''(''||vcc.codigo_tcc ||'') '' ||vcc.descripcion_tcc)::varchar AS desc_tcc,
                               pre.fecha_inicio_pres,
-                              pre.fecha_fin_pres
+                              pre.fecha_fin_pres,
+                              vcc.codigo_tcc,
+                              vcc.descripcion_tcc
 						from pre.tpresupuesto pre
                         inner join param.vcentro_costo vcc on vcc.id_centro_costo=pre.id_centro_costo
 						inner join segu.tusuario usu1 on usu1.id_usuario = pre.id_usuario_reg
@@ -175,7 +177,7 @@ BEGIN
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
              raise notice 'v_consulta %',v_consulta ;
-
+--raise exception 'errorrrrrrrrr may';
 
 			--Devuelve la respuesta
 			return v_consulta;
@@ -285,7 +287,15 @@ BEGIN
 
     	begin
 
-        v_consulta := 'select DISTINCT pcc.id_centro_costo,
+        --modificacion 26-06-18
+        /*select DISTINCT pcc.id_centro_costo,
+                     substring(pcc.descripcion from 6)
+
+                      pcc.codigo_cc
+                     */
+
+        v_consulta := 'select DISTINCT substring(pcc.codigo_cc from 0 for 3):: integer as id_centro_costo,
+
                      substring(pcc.descripcion from 6)
                      from pre.vpresupuesto_cc pcc
                      where pcc.gestion='||v_parametros.gestion||
@@ -553,7 +563,7 @@ BEGIN
             FROM adq.tsolicitud ts
             WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
 
-            IF(v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado')THEN
+            IF(v_record_sol.estado='vbpresupuestos' OR v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado')THEN
               v_index = 1;
               FOR v_record IN (WITH RECURSIVE firmas(id_estado_fw, id_estado_anterior,fecha_reg, codigo, id_funcionario) AS (
                                 SELECT tew.id_estado_wf, tew.id_estado_anterior , tew.fecha_reg, te.codigo, tew.id_funcionario
@@ -568,7 +578,7 @@ BEGIN
                                 INNER JOIN firmas f ON f.id_estado_anterior = ter.id_estado_wf
                                 INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = ter.id_tipo_estado
                                 WHERE f.id_estado_anterior IS NOT NULL
-                            )SELECT distinct on (codigo) codigo, fecha_reg , id_estado_fw, id_estado_anterior, id_funcionario FROM firmas ORDER BY codigo, fecha_reg ASC) LOOP
+                            )SELECT distinct on (codigo) codigo, fecha_reg , id_estado_fw, id_estado_anterior, id_funcionario FROM firmas ORDER BY codigo, fecha_reg DESC) LOOP
                   IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc')THEN
                     SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                     INTO v_record_funcionario
@@ -582,6 +592,7 @@ BEGIN
             ELSE
             	v_firma_fun = '';
         	END IF;
+
         		------
             SELECT (''||te.codigo||' '||te.nombre)::varchar
             INTO v_nombre_entidad
@@ -610,29 +621,30 @@ BEGIN
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
             (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
-            COALESCE(ts.fecha_soli,null::date) AS fecha_soli,
+            CASE WHEN ts.tipo = ''''Boa'''' and ts.fecha_soli >= ''''27/04/2018'''' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite) ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
             ts.codigo_poa,
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
             from pre.tobjetivo ob
             where ob.codigo = ANY (string_to_array(ts.codigo_poa,'',''))
 
-            )::varchar as codigo_descripcion
+            )::varchar as codigo_descripcion,
+            ts.tipo
             FROM adq.tsolicitud ts
             INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tsd.id_partida
 
             inner join param.tgestion tg on tg.id_gestion = ts.id_gestion
 
-            INNER JOIN pre.tpresup_partida tpp ON tpp.id_partida = tpar.id_partida AND tpp.id_centro_costo = tsd.id_centro_costo
+            --INNER JOIN pre.tpresup_partida tpp ON tpp.id_partida = tpar.id_partida AND tpp.id_centro_costo = tsd.id_centro_costo
 
             INNER JOIN param.tcentro_costo tcc ON tcc.id_centro_costo = tsd.id_centro_costo
             INNER JOIN param.ttipo_cc ttc ON ttc.id_tipo_cc = tcc.id_tipo_cc
 
-            INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tpp.id_presupuesto
+            INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tsd.id_centro_costo --tpp.id_presupuesto
             INNER JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = tp.id_categoria_prog
 
-            INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpp.id_partida
+            INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida --tpp.id_partida
             INNER JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
 
             INNER JOIN param.tmoneda tmo ON tmo.id_moneda = ts.id_moneda

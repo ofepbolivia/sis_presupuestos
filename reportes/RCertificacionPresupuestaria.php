@@ -20,7 +20,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $this->SetFont('','B',12);
         $this->Cell(0,5,"CERTIFICACIÓN PRESUPUESTARIA",0,1,'C');
         $this->Ln(2);
-        
+
         $this->SetFont('','',10);
     }
 
@@ -52,21 +52,28 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         }
 
 
-            foreach ($firmas as $fir){
-                if(strpos($fir, 'vbpresupuestos')!==false){
-                    $firma_elaborado = explode(',',$fir);
-                }
+        foreach ($firmas as $fir){
+            if(strpos($fir, 'vbpresupuestos')!==false){
+                $firma_elaborado = explode(',',$fir);
             }
+        }
 
-            foreach ($firmas as $fir){
-                if(strpos($fir, 'suppresu')!==false){
-                    $firma_aprobado = explode(',',$fir);
-                }
+        foreach ($firmas as $fir){
+            if(strpos($fir, 'suppresu')!==false){
+                $firma_aprobado = explode(',',$fir);
             }
+        }
 
 
-        $fecha = date_format(date_create($firma_fecha[1]), 'd/m/Y');
+        $fecha = date_create($firma_fecha[1]);
 
+        $fecha_sol = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
+
+        if($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018')){
+            $fecha  = $fecha_sol;
+        }else{
+            $fecha  = date_format($fecha,'d/m/Y');
+        }
 
         $tbl = '<table border="0" style="font-size: 7pt;"> 
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
@@ -82,7 +89,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         $this->Ln(5);
 
-      
+
         //variables para la tabla
         $codigo_cg = '';
         $id_cp = 0;
@@ -96,7 +103,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $codigo = '';
 
         foreach( $this->datos as $record){
-            
+
             if($record["codigo_cg"] != $codigo_cg){
 
                 if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
@@ -215,7 +222,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                         
                </tr></table>';
         $this->writeHTML ($tbl);
-       //controlamos el alto para las firmas
+        //controlamos el alto para las firmas
         if($this->GetY() == 220)
             $this->SetY(250);
 
@@ -284,7 +291,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         }
 
         if($this->datos[0]['codigo_poa']!=''){
-            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.$this->datos[0]['fecha_soli'].'</b> 
+            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y').'</b> 
             acerca de: <b>'.$this->datos[0]['justificacion'].'</b>, certificar que el mismo se encuentra contemplado en el Plan Operativo gestion <b>'.$this->datos[0]['gestion'].'</b>, 
             en la operacion <b>'.$this->datos[0]['codigo_descripcion'].'.</b>';
 
@@ -345,7 +352,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             }
         }
     }
-    
+
     function basico($numero) {
         $valor = array ('Uno','Dos','Tres','Cuatro','Cinco','Seis','Siete','Ocho',
             'Nueve','Diez','Once','Doce','Trece','Catorce','Quince','Dieciséis','Diecisiete',
