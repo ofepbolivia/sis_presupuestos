@@ -79,6 +79,7 @@ class MODPresupuesto extends MODbase{
         //Definicion de la lista del resultado del query
         $this->captura('id_centro_costo','int4');
         $this->captura('descripcion','text');
+        //$this->captura('codigo_cc','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();

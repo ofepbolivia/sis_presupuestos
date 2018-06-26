@@ -287,7 +287,15 @@ BEGIN
 
     	begin
 
-        v_consulta := 'select DISTINCT pcc.id_centro_costo,
+        --modificacion 26-06-18
+        /*select DISTINCT pcc.id_centro_costo,
+                     substring(pcc.descripcion from 6)
+
+                      pcc.codigo_cc
+                     */
+
+        v_consulta := 'select DISTINCT substring(pcc.codigo_cc from 0 for 3):: integer as id_centro_costo,
+
                      substring(pcc.descripcion from 6)
                      from pre.vpresupuesto_cc pcc
                      where pcc.gestion='||v_parametros.gestion||
