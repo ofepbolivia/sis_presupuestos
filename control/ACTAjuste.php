@@ -12,8 +12,12 @@ class ACTAjuste extends ACTbase{
 	function listarAjuste(){
 		$this->objParam->defecto('ordenacion','id_ajuste');
 		$this->objParam->defecto('dir_ordenacion','asc');
-		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
-		
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
+
+        if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("aju.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
+
+        }
 		if(strtolower($this->objParam->getParametro('estado'))=='borrador'){
              $this->objParam->addFiltro("(aju.estado in (''borrador''))");
         }

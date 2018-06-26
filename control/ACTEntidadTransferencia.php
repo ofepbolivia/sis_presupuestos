@@ -8,11 +8,17 @@
 */
 
 class ACTEntidadTransferencia extends ACTbase{    
-			
+
+
 	function listarEntidadTransferencia(){
 		$this->objParam->defecto('ordenacion','id_entidad_transferencia');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_gestion') != ''){
+            $this->objParam->addFiltro("ent_tran.id_gestion = ".$this->objParam->getParametro('id_gestion')." ");
+
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODEntidadTransferencia','listarEntidadTransferencia');
@@ -39,12 +45,17 @@ class ACTEntidadTransferencia extends ACTbase{
 		$this->res=$this->objFunc->eliminarEntidadTransferencia($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-
+    function clonarConfig(){
+        $this->objFunc=$this->create('MODEntidadTransferencia');
+        $this->res=$this->objFunc->clonarConfig($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 	function validarCampos(){
 			$this->objFunc=$this->create('MODEntidadTransferencia');
 		$this->res=$this->objFunc->validarCampos($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+
 			
 }
 

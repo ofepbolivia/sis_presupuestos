@@ -82,7 +82,7 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 					dato = (dato==''&&value=='5')?'Traspaso':dato;
 					dato = (dato==''&&value=='6')?'Reformulacion':dato;
 					dato = (dato==''&&value=='7')?'Incremento':dato;
-					return String.format('{0}', dato);
+					return String.format('{0}', value);
 				},
 
 				store:new Ext.data.ArrayStore({
@@ -193,21 +193,23 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 50
 			},
 			type:'Field',
-			grid: true,
+			grid: false,
 			filters:{pfiltro:'pre.id_presupuesto',type:'string'},
 			bottom_filter: true,
 			form:true
 		},
 		{
 			config:{
-				name: 'desc_pres',
+				name: 'codigo_cc',
+				//name: 'desc_pres',
 				fieldLabel: 'Desc. Presupuesto',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 200
 			},
 			type:'TextField',
-			filters:{pfiltro:'pre.descripcion',type:'string'},
+			//filters:{pfiltro:'pre.descripcion',type:'string'},
+			filters:{pfiltro:'vpre.codigo_cc',type:'string'},
 			id_grupo:1,
 			bottom_filter: true,
 			grid:true,
@@ -216,19 +218,21 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'codigo_categoria',
-				fieldLabel: 'Código Categoría',
+				fieldLabel: 'Código Categoría Programatica',
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 150,
-				maxLength:-5
+				maxLength:1000
 			},
 			type:'TextField',
-			filters:{pfiltro:'pareje.nro_tramite',type:'string'},
+			//filters:{pfiltro:'pareje.nro_tramite',type:'string'},
+			filters:{pfiltro:'cat.codigo_categoria',type:'string'},
 			bottom_filter: true,
 			id_grupo:1,
 			grid:true,
 			form:true
 		},
+
 		{
 			config: {
 				name: 'id_partida',
@@ -248,7 +252,7 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Codigo Partida',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 80,
+				gwidth: 60,
 				maxLength:-5
 			},
 			type:'TextField',
@@ -454,6 +458,7 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_int_comprobante', type: 'numeric'},
 		{name:'id_moneda', type: 'numeric'},
 		{name:'id_presupuesto', type: 'numeric'},
+
 		{name:'id_partida', type: 'numeric'},
 		{name:'nro_tramite', type: 'string'},
 		{name:'tipo_cambio', type: 'numeric'},
@@ -472,7 +477,8 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'moneda','desc_pres','codigo_categoria','codigo','nombre_partida',
+		{name:'usr_mod', type: 'string'},
+        'moneda','desc_pres','codigo_cc','codigo_categoria','codigo','nombre_partida',
 		
 	],
 	arrayDefaultColumHidden:['id_partida_ejecucion','columna_origen','valor_id_origen',

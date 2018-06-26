@@ -9,64 +9,66 @@
 
 class MODPresupuesto extends MODbase{
 
-    function __construct(CTParametro $pParam){
-        parent::__construct($pParam);
-    }
+	
+	function __construct(CTParametro $pParam){
+		parent::__construct($pParam);
+	}
+			
+	function listarPresupuesto(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='pre.ft_presupuesto_sel';
+		$this->transaccion='PRE_PRE_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+		$this->setParametro('tipo_interfaz','tipo_interfaz','varchar');	
+		$this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+			
+			
+		//Definicion de la lista del resultado del query
+		$this->captura('id_presupuesto','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('codigo_cc','text');
+		$this->captura('tipo_pres','varchar');
+		$this->captura('estado_pres','varchar');
+		$this->captura('estado_reg','varchar');		
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('estado','varchar');
+		$this->captura('id_estado_wf','int4');
+		$this->captura('nro_tramite','varchar');
+		$this->captura('id_proceso_wf','int4');
+		$this->captura('desc_tipo_presupuesto','varchar');
+		$this->captura('descripcion','varchar');
+		$this->captura('movimiento_tipo_pres','varchar');
+		$this->captura('id_gestion','int4');
+		$this->captura('obs_wf','varchar');
+		$this->captura('sw_consolidado','VARCHAR');		
+		$this->captura('id_categoria_prog','int4');
+		$this->captura('codigo_categoria','varchar');
+		$this->captura('mov_pres','varchar');
+		$this->captura('momento_pres','varchar');		
+		$this->captura('id_uo','int4');
+		$this->captura('codigo_uo','varchar');		
+		$this->captura('nombre_uo','varchar');
+		$this->captura('id_tipo_cc','int4');
+		$this->captura('desc_tcc','varchar');
+		$this->captura('fecha_inicio_pres','date');
+		$this->captura('fecha_fin_pres','date');
+		$this->captura('codigo_tcc','varchar');
+		$this->captura('descripcion_tcc','varchar');
 
-    function listarPresupuesto(){
-        //Definicion de variables para ejecucion del procedimientp
-        $this->procedimiento='pre.ft_presupuesto_sel';
-        $this->transaccion='PRE_PRE_SEL';
-        $this->tipo_procedimiento='SEL';//tipo de transaccion
-        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
-        $this->setParametro('id_funcionario_usu','id_funcionario_usu','int4');
+		
+		//Ejecuta la instruccion
+		$this->armarConsulta();//echo $this->consulta;exit;
+		$this->ejecutarConsulta();
+		
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
 
-
-        //Definicion de la lista del resultado del query
-        $this->captura('id_presupuesto','int4');
-        $this->captura('id_centro_costo','int4');
-        $this->captura('codigo_cc','text');
-        $this->captura('tipo_pres','varchar');
-        $this->captura('estado_pres','varchar');
-        $this->captura('estado_reg','varchar');
-        $this->captura('id_usuario_reg','int4');
-        $this->captura('fecha_reg','timestamp');
-        $this->captura('fecha_mod','timestamp');
-        $this->captura('id_usuario_mod','int4');
-        $this->captura('usr_reg','varchar');
-        $this->captura('usr_mod','varchar');
-        $this->captura('estado','varchar');
-        $this->captura('id_estado_wf','int4');
-        $this->captura('nro_tramite','varchar');
-        $this->captura('id_proceso_wf','int4');
-        $this->captura('desc_tipo_presupuesto','varchar');
-        $this->captura('descripcion','varchar');
-        $this->captura('movimiento_tipo_pres','varchar');
-        $this->captura('id_gestion','int4');
-        $this->captura('obs_wf','varchar');
-        $this->captura('sw_consolidado','VARCHAR');
-        $this->captura('id_categoria_prog','int4');
-        $this->captura('codigo_categoria','varchar');
-        $this->captura('mov_pres','varchar');
-        $this->captura('momento_pres','varchar');
-        $this->captura('id_uo','int4');
-        $this->captura('codigo_uo','varchar');
-        $this->captura('nombre_uo','varchar');
-        $this->captura('id_tipo_cc','int4');
-        $this->captura('desc_tcc','varchar');
-        $this->captura('fecha_inicio_pres','date');
-        $this->captura('fecha_fin_pres','date');
-        $this->captura('codigo_tcc','varchar');
-        $this->captura('descripcion_tcc','varchar');
-
-
-        //Ejecuta la instruccion
-        $this->armarConsulta();//echo $this->consulta;exit;
-        $this->ejecutarConsulta();
-
-        //Devuelve la respuesta
-        return $this->respuesta;
-    }
 
     function listarPresupuestoRest(){
         //Definicion de variables para ejecucion del procedimientp
@@ -79,6 +81,7 @@ class MODPresupuesto extends MODbase{
         //Definicion de la lista del resultado del query
         $this->captura('id_centro_costo','int4');
         $this->captura('descripcion','text');
+        //$this->captura('codigo_cc','text');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -487,8 +490,5 @@ class MODPresupuesto extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-
-
-
 }
 ?>

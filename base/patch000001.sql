@@ -970,7 +970,15 @@ IS 'la moenda del ajuste, se agrega por la necesidad de ajsutar presupeusto comp
 
 /*****************************F-SCP-RAC-PRE-0-12/10/2017*************/
 
+/*****************************I-SCP-MAY-PRE-0-09/05/2018*************/
+CREATE TABLE pre.tentidad_transferencia_ids (
+  id_entidad_uno INTEGER NOT NULL,
+  id_entidad_dos INTEGER NOT NULL,
+  CONSTRAINT tentidad_transferencia_ids_pkey PRIMARY KEY(id_entidad_uno)
+)
+WITH (oids = false);
 
+/*****************************F-SCP-MAY-PRE-0-09/05/2018*************/
 
 
 

@@ -83,8 +83,13 @@ class ACTPresupuesto extends ACTbase{
 		}
 		
 		if($this->objParam->getParametro('movimiento_tipo_pres')!=''){
-	    	$this->objParam->addFiltro("movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."''");	
-		}
+	    	//$this->objParam->addFiltro("movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."''");
+            $this->objParam->addFiltro("((movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."'' or movimiento_tipo_pres=''gasto'')or movimiento_tipo_pres=''recurso'')" );
+            //$this->objParam->addFiltro("(movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."'') or( movimiento_tipo_pres=''gasto'' and movimiento_tipo_pres=''recurso'')" );
+            //$this->objParam->addFiltro("(movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."'') or( movimiento_tipo_pres=''gasto'' and movimiento_tipo_pres=''recurso'') and (movimiento_tipo_pres=''gasto'')" );
+            //$this->objParam->addFiltro("(movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."'' == ''recurso-gasto'') " );
+        }
+
 		
 		if($this->objParam->getParametro('sw_oficial')!=''){
 	    	$this->objParam->addFiltro("sw_oficial = ''".$this->objParam->getParametro('sw_oficial')."''");	

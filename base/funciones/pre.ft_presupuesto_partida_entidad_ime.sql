@@ -33,6 +33,12 @@ DECLARE
     v_id_gestion						integer;
     v_datos 				record;
     v_valid					boolean;
+    v_gestion				integer;
+    v_record_m				record;
+
+    v_partida_dos			integer;
+    v_presupuesto_dos		integer;
+    v_entidad_dos			integer;
 
 BEGIN
 
@@ -176,6 +182,117 @@ BEGIN
             return v_resp;
 
 		end;
+
+ /*********************************
+     #TRANSACCION:  'PRE_CLOPREPAREN_REP'
+     #DESCRIPCION:    Clonar registros registros
+     #AUTOR:        maylee.perez
+     #FECHA:        25-08-2017 19:34:27
+    ***********************************/
+
+    elsif(p_transaccion='PRE_CLOPREPAREN_REP')then
+
+begin
+  /*
+            *    v_parametros.id_gestion_maestro: gestion de la que se quiere copiar (origen).
+            *    v_parametros.id_gestion: gestion a la que se quiere copiar (destino)
+            */
+  select gestion + 1
+  into v_gestion
+  FROM param.tgestion
+  WHERE id_gestion = v_parametros.id_gestion;
+
+ select id_gestion
+  into v_id_gestion
+  FROM param.tgestion
+  WHERE gestion = v_gestion;
+  --raise exception 'gestiones %, %',v_gestion,v_id_gestion;
+
+  FOR v_record_m IN (SELECT ppe. id_gestion, ppe.id_entidad_transferencia, ppe.id_presupuesto, ppe.id_partida
+					  FROM pre.tpresupuesto_partida_entidad ppe
+					  where ppe.id_gestion = v_parametros.id_gestion)loop
+
+
+
+  /*Preguntamos si existe un dato con el codigo y gestion duplkicados en la tabla entidad transferencia
+  donde se si existe el valor nos devolvera true pero si no hay no devolvera nada, para eso uso el exist
+   ya que se encarga de verificar si existe un dato porlo menos*/
+
+
+  Select p.id_partida_dos
+  into v_partida_dos
+  from pre.tpartida_ids p
+  where p.id_partida_uno=v_record_m.id_partida;
+
+
+
+  Select pr.id_presupuesto_dos
+  into v_presupuesto_dos
+  from pre.tpresupuesto_ids pr
+  where pr.id_presupuesto_uno=v_record_m.id_presupuesto;
+
+  Select ent.id_entidad_dos
+  into v_entidad_dos
+  from pre.tentidad_transferencia_ids ent
+  where ent.id_entidad_uno=v_record_m.id_entidad_transferencia;
+
+  --validamos que exista la entidad destino migrada
+  if v_entidad_dos is null then
+  	RAISE EXCEPTION 'No existe la entidad con ID %, en la nueva gestion.',v_gestion;
+    end if;
+
+
+
+   IF not  EXISTS ( select 1 from  pre.tpresupuesto_partida_entidad
+                     where id_gestion=v_id_gestion
+                     and id_partida=v_partida_dos
+                     and id_presupuesto=v_presupuesto_dos
+                     and id_entidad_transferencia=v_entidad_dos
+     				) then
+
+   INSERT INTO pre.tpresupuesto_partida_entidad(
+			id_gestion,
+            id_partida,
+			id_entidad_transferencia,
+			estado_reg,
+			id_presupuesto,
+			id_usuario_ai,
+			id_usuario_reg,
+			usuario_ai,
+			fecha_reg,
+			id_usuario_mod,
+			fecha_mod
+          	) values(
+
+			v_id_gestion,
+            v_partida_dos,
+			v_entidad_dos,
+			'activo',
+			v_presupuesto_dos,
+			v_parametros._id_usuario_ai,
+			p_id_usuario,
+			v_parametros._nombre_usuario_ai,
+			now(),
+			null,
+			null);
+  ELSE
+
+   RAISE EXCEPTION 'ESTIMADO USUARIO: LAS ENTIDADES DE TRANSFERENCIA YA FUERON REGISTRADOS PARA LA GESTION % ANTERIORMENTE',v_gestion ;
+
+
+   end if;
+
+
+  END LOOP;
+
+  --Definicion de la respuesta
+  v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se ha clonado exitosamente');
+
+  --Devuelve la respuesta
+  return v_resp;
+
+end;
+
 
 	else
 

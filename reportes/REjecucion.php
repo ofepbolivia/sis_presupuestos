@@ -16,17 +16,24 @@ class REjecucion extends  ReportePDF {
 	var $datos_periodo;
 	var $ult_codigo_partida;
 	var $ult_concepto;
+	var $fecha_ini;
+
+
 	
 	
-	
-	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa) {
+	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa,$fecha_ini, $fecha_fin) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->datos_titulo = $totales;
 		$this->datos_entidad = $dataEmpresa;
 		$this->datos_gestion = $gestion;
+		$this->fecha_ini = $fecha_ini;
+		$this->fecha_fin = $fecha_fin;
+
 		$this->subtotal = 0;
 		$this->SetMargins(7, 60, 5);
+
+
 	}
 	
 	function Header() {
@@ -38,7 +45,7 @@ class REjecucion extends  ReportePDF {
 		$this->Ln(3);
 		//formato de fecha
 		
-		//cabecera del reporte
+		//cabecera del report
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,35,20);
 		$this->ln(5);
 		
@@ -46,15 +53,19 @@ class REjecucion extends  ReportePDF {
 	    $this->SetFont('','BU',12);		
 		$this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA",0,1,'C');
 		$this->Cell(0,5,mb_strtoupper($this->datos_entidad['nombre'],'UTF-8'),0,1,'C');
-		$this->Cell(0,5,"GESTIÓN ".$this->datos_gestion['anho'],0,1,'C');		
+		$this->Cell(0,5,"GESTIÓN ".$this->datos_gestion['anho'],0,1,'C');
 		//$this->Ln();
 		$this->SetFont('','B',7);
 		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
 		$this->Ln(2);
-		
+		//
+        $this->SetFont('','B',8);
+        $this->Cell(0,4,"De: ".($this->fecha_ini). "    A: ".$this->fecha_fin,0,1,'C');
+        //$this->Ln(0);
+
 		$this->SetFont('','',10);
 		
-		$height = 5;
+		$height = 3;
         $width1 = 5;
 		$esp_width = 10;
         $width_c1= 55;
@@ -126,7 +137,7 @@ class REjecucion extends  ReportePDF {
                         's11' => 'SALDO POR PAGAR',   
                         's12' => '% EJE');
                          
-        $this-> MultiRow2($RowArray,false,1);
+        $this-> MultiRow($RowArray,false,1);
 		
 		
     }
@@ -305,7 +316,7 @@ class REjecucion extends  ReportePDF {
         
        
 						
-		$this-> MultiRow2($RowArray,$fill,1);
+		$this-> MultiRow($RowArray,$fill,1);
 		
 	}
 
@@ -338,7 +349,7 @@ class REjecucion extends  ReportePDF {
             $this->tablenumbers=array(0,);
             $this->tableborders=array('T');		
 	        $RowArray = array('espacio' => '');     
-	        $this-> MultiRow2($RowArray,false,1);			
+	        $this-> MultiRow($RowArray,false,1);
 			
 	
   }

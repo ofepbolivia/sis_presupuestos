@@ -98,7 +98,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				name: 'importe',
 				fieldLabel: 'importe',
 				allowBlank: false,
-				anchor: '80%',
+				anchor: '70%',
 				gwidth: 100,
 				maxLength:1310722,
 				renderer:function (value,p,record){

@@ -26,7 +26,8 @@ class MODPresupuestoPartidaEntidad extends MODbase{
 		$this->captura('id_entidad_transferencia','int4');
 		$this->captura('estado_reg','varchar');
 		$this->captura('id_presupuesto','int4');
-		$this->captura('id_usuario_ai','int4');
+        $this->captura('codigo_cc','text');
+        $this->captura('id_usuario_ai','int4');
 		$this->captura('id_usuario_reg','int4');
 		$this->captura('usuario_ai','varchar');
 		$this->captura('fecha_reg','timestamp');
@@ -39,8 +40,10 @@ class MODPresupuestoPartidaEntidad extends MODbase{
 		$this->captura('desc_entidad_tranferencia','varchar');
 		$this->captura('desc_presupuesto','varchar');
 
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
+		//echo $this->consulta;exit;
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta
@@ -117,6 +120,24 @@ class MODPresupuestoPartidaEntidad extends MODbase{
         $this->setParametro('id_partida','id_partida','int4');
         $this->setParametro('id_entidad_transferencia','id_entidad_transferencia','int4');
         $this->setParametro('id_presupuesto','id_presupuesto','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    function clonarConfig(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_partida_entidad_ime';
+        $this->transaccion='PRE_CLOPREPAREN_REP';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_gestion_maestro','id_gestion_maestro','int4');
+        $this->setParametro('id_gestion','id_gestion','int4');
+
 
         //Ejecuta la instruccion
         $this->armarConsulta();
