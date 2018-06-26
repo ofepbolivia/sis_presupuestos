@@ -300,7 +300,7 @@ BEGIN
                      where pcc.gestion='||v_parametros.gestion||
                      ' and pcc.tipo_pres=''2''
                      and pcc.descripcion not in (''(894) PREVISIONES FINANCIERAS'', ''(845) FLOTA BOA AERONAVES'')
-                     order by id_centro_costo';
+                     order by pcc.id_centro_costo';
 
         return v_consulta;
         end;
