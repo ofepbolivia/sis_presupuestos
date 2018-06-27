@@ -294,9 +294,8 @@ BEGIN
                       pcc.codigo_cc
                      */
 
-        v_consulta := 'select DISTINCT substring(pcc.codigo_cc from 0 for 3):: integer as id_centro_costo,
-
-                     substring(pcc.descripcion from 6)
+        v_consulta := 'select DISTINCT pcc.id_centro_costo,
+                     pcc.codigo_cc
                      from pre.vpresupuesto_cc pcc
                      where pcc.gestion='||v_parametros.gestion||
                      ' and pcc.tipo_pres=''2''
@@ -621,7 +620,9 @@ BEGIN
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
             (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
-            CASE WHEN ts.tipo = ''''Boa'''' and ts.fecha_soli >= ''''27/04/2018'''' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
+
+            CASE WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
+
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
             ts.codigo_poa,
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
