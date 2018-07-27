@@ -293,7 +293,8 @@ BEGIN
 
                       pcc.codigo_cc
                      */
-          v_consulta := 'select DISTINCT pcc.id_centro_costo,
+
+        v_consulta := 'select DISTINCT pcc.id_centro_costo,
                      pcc.codigo_cc
                      from pre.vpresupuesto_cc pcc
                      where pcc.gestion='||v_parametros.gestion||
@@ -556,7 +557,7 @@ BEGIN
 
 		begin
 
-            SELECT ts.estado, ts.id_estado_wf, ts.justificacion
+            SELECT ts.estado, ts.id_estado_wf, ts.justificacion, ts.id_gestion
             INTO v_record_sol
             FROM adq.tsolicitud ts
             WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
@@ -619,14 +620,12 @@ BEGIN
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
             (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
-
             CASE WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
-
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
             ts.codigo_poa,
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
             from pre.tobjetivo ob
-            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'',''))
+            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_sol.id_gestion||'
 
             )::varchar as codigo_descripcion,
             ts.tipo
