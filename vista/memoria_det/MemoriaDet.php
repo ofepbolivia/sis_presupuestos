@@ -170,6 +170,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				gwidth: 100,
 				sortable: false,
 				maxLength:1179650,
+                minValue: 0,
 				renderer:function (value,p,record){
 
 					Number.prototype.formatDinero = function(c, d, t){
@@ -396,6 +397,12 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
         this.store.baseParams={id_memoria_calculo:this.maestro.id_memoria_calculo};
         this.load({params:{start:0, limit:50}});  
     },
+    onButtonSave: function(){
+
+        Phx.vista.MemoriaDet.superclass.onButtonSave.call(this);
+	    console.log('Importe:', this.Cmp.importe);
+
+    },
     loadValoresIniciales:function()
     {
         Phx.vista.MemoriaDet.superclass.loadValoresIniciales.call(this);
@@ -423,7 +430,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
     	e.record.set( 'importe', tot );
     	e.record.markDirty();
     },
-    
+
     bnew: false,
     bedit: false,
 	bdel: false,

@@ -2531,4 +2531,20 @@ AS
          
          
 /***********************************F-DEP-RAC-PRE-0-12/10/2017*****************************************/
-  
+/***********************************I-DEP-MAY-PRE-0-06/07/2018*****************************************/
+
+ALTER TABLE pre.ttecho_presupuestos
+  ADD CONSTRAINT ttecho_presupuestos_fk FOREIGN KEY (id_presupuesto)
+    REFERENCES pre.tpresupuesto(id_presupuesto)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+/***********************************F-DEP-MAY-PRE-0-06/07/2018*****************************************/
+/***********************************I-DEP-MAY-PRE-0-24/07/2018*****************************************/
+ALTER TABLE pre.tpartida_usuario
+  ADD CONSTRAINT tpartida_usuario_fk FOREIGN KEY (id_partida)
+    REFERENCES pre.tpartida(id_partida)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+    NOT DEFERRABLE;
+/***********************************F-DEP-MAY-PRE-0-24/07/2018*****************************************/

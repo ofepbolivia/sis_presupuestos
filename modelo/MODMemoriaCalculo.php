@@ -18,6 +18,8 @@ class MODMemoriaCalculo extends MODbase{
 		$this->procedimiento='pre.ft_memoria_calculo_sel';
 		$this->transaccion='PRE_MCA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        $this->capturaCount('total_importe','numeric');
 				
 		//Definicion de la lista del resultado del query
 		$this->captura('id_memoria_calculo','int4');

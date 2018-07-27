@@ -37,6 +37,13 @@ class ACTMemoriaCalculo extends ACTbase{
 			
 			$this->res=$this->objFunc->listarMemoriaCalculo($this->objParam);
 		}
+        $temp = Array();
+        $temp['importe_total'] = $this->res->extraData['total_importe'];
+        $temp['tipo_reg'] = 'summary';
+        $temp['id_memoria_calculo'] = 0;
+        $this->res->total++;
+        $this->res->addLastRecDatos($temp);
+
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 

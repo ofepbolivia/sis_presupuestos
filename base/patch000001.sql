@@ -980,5 +980,40 @@ WITH (oids = false);
 
 /*****************************F-SCP-MAY-PRE-0-09/05/2018*************/
 
+/*****************************I-SCP-MAY-PRE-0-06/07/2018*************/
+CREATE TABLE pre.ttecho_presupuestos (
+  id_techo_presupuesto SERIAL NOT NULL,
+  importe_techo_presupuesto NUMERIC,
+  observaciones VARCHAR(350),
+  estado_techo_presupuesto VARCHAR(20),
+  PRIMARY KEY(id_techo_presupuesto)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false)
+TABLESPACE pg_default;
 
 
+ALTER TABLE pre.ttecho_presupuestos
+  ADD COLUMN id_presupuesto INTEGER;
+/*****************************F-SCP-MAY-PRE-0-06/07/2018*************/
+/*****************************I-SCP-MAY-PRE-0-24/07/2018*************/
+CREATE TABLE pre.tpartida_usuario (
+  id_partida_usuario SERIAL NOT NULL,
+  fecha_inicio_partida_usuario DATE,
+  fecha_fin_partida_usuario DATE,
+  estado_partida_usuario VARCHAR(20),
+  observaciones VARCHAR(450),
+  id_partida INTEGER,
+  PRIMARY KEY(id_partida_usuario)
+) INHERITS (pxp.tbase)
+
+WITH (oids = false);
+
+
+ALTER TABLE pre.tpartida_usuario
+  ADD COLUMN id_funcionario_resp INTEGER;
+
+
+ALTER TABLE pre.tpartida_usuario
+  ADD COLUMN id_gestion INTEGER;  
+/*****************************F-SCP-MAY-PRE-0-24/07/2018*************/
