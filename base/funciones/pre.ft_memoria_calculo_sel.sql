@@ -98,7 +98,8 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select count(id_memoria_calculo)
+			v_consulta:='select count(id_memoria_calculo),
+            			COALESCE(sum(mca.importe_total),0)::numeric  as total_importe
                         from pre.tmemoria_calculo mca
                         inner join pre.tpresupuesto pre on pre.id_presupuesto = mca.id_presupuesto
                         inner join param.tcentro_costo cc on cc.id_centro_costo = pre.id_centro_costo

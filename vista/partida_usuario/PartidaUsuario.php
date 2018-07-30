@@ -141,6 +141,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         valueField: 'id_funcionario',
                         gdisplayField: 'desc_funcionario',//mapea al store del grid
                         anchor: '100%',
+                        baseParams: {estado_func: 'activo'},
                         renderer: function (value, p, record) {
                             return String.format('{0}', record.data['desc_funcionario']);
                         }
@@ -444,5 +445,4 @@ header("content-type: text/javascript; charset=UTF-8");
         }
     )
 </script>
-		
-		
+
