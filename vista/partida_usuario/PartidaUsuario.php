@@ -13,6 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
     Phx.vista.PartidaUsuario = Ext.extend(Phx.gridInterfaz, {
 
             constructor: function (config) {
+
                 this.initButtons = [this.cmbGestion];
 
                 this.maestro = config.maestro;
