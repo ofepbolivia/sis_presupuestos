@@ -185,9 +185,9 @@ BEGIN
                     
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
-            --v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+            v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
-
+			--raise exception '%',v_consulta;				
 			--Devuelve la respuesta
 			return v_consulta;            
         end;
@@ -206,7 +206,7 @@ BEGIN
                       where ';
 
 			v_consulta:=v_consulta||v_parametros.filtro;
-
+			
 			--Devuelve la respuesta
 			return v_consulta;
                                   

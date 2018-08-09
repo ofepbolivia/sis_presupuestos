@@ -12,7 +12,7 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
     Phx.vista.presupuesto_multi_fun=Ext.extend(Phx.gridInterfaz,{
 	 nombreVista: 'presupuesto_multi_fun',
-	 register:'',	 
+	 register:'',	 	 
        constructor:function(config){
 		this.tbarItems = ['-',
             'Gestión:',this.cmbGestion,'-'
@@ -24,7 +24,7 @@ header("content-type: text/javascript; charset=UTF-8");
 		Phx.vista.presupuesto_multi_fun.superclass.constructor.call(this,config);
 		this.init();
 		this.cmbGestion.on('select', this.capturarEventos, this);
-		this.iniciarEventos();		
+		this.iniciarEventos();			
        }, 
             
     cmbGestion: new Ext.form.ComboBox({
@@ -64,14 +64,16 @@ header("content-type: text/javascript; charset=UTF-8");
     },
     
     iniciarEventos : function () {    	    	
-	Phx.vista.presupuesto_multi_fun.superclass.iniciarEventos.call();
-		
-	this.getComponente('id_gestion').on('select',function(c,r,n){																 		     	
-    this.Cmp.id_presupuesto.store.baseParams.id_gestion=r.data.id_gestion;    	        
-    this.Cmp.id_presupuesto.store.reload();     
-	this.Cmp.id_presupuesto.store.baseParams.id_gestion=r.data.id_gestion;			    	          		    		    		    		    					    		    		 																												
-	 },this);	
-		 		             					
+	//Phx.vista.presupuesto_multi_fun.superclass.iniciarEventos.call();
+		 			
+	this.getComponente('id_gestion').on('select',function(c,r,n){
+	this.Cmp.id_presupuesto.reset();
+	this.Cmp.id_presupuesto.modificado = true;																						 		     
+    this.Cmp.id_presupuesto.store.baseParams.id_gestion=r.data.id_gestion;            	        
+    //this.Cmp.id_presupuesto.store.reload();
+    //console.log('dattt',this.Cmp.id_presupuesto.store);
+    	              				    	          		    		    		    		    					    		    		 																												
+	 },this);	 		 		             					
 	},       
        Atributos:[
        		{
@@ -190,7 +192,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         '<tpl for=".">',
                         '<div class="x-combo-list-item">',
                         '<div class="awesomecombo-item {checked}">',                        
-                        '</div><p><b>Presupuesto:</b></p><p><span style="color: black;">{codigo_cc}</span></p>',
+                        '</div></p><p><span style="color: black;">{codigo_cc}</span></p>',
                         '</div></tpl>'
                     ]),                    
                     renderer:function(value, p, record){
@@ -402,7 +404,7 @@ header("content-type: text/javascript; charset=UTF-8");
         bsave: false,
 
         sortInfo:{
-            field: 'id_presupuesto',
+            field: 'codigo_cc',
             direction: 'ASC'
         },
 

@@ -76,7 +76,7 @@ class ACTPresupuestoFuncionario extends ACTbase{
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
     function listarPresupuestoFun(){
-        $this->objParam->defecto('ordenacion','id_presupuesto');
+        $this->objParam->defecto('ordenacion','codigo_cc');
         $this->objParam->defecto('dir_ordenacion','asc');
 		
 		if($this->objParam->getParametro('id_funcionario')!=''){
