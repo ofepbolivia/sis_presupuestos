@@ -650,7 +650,7 @@ header("content-type: text/javascript; charset=UTF-8");
         onButtonMemoria:function() {
             var rec=this.sm.getSelected();
             Phx.CP.loadWindows('../../../sis_presupuestos/vista/memoria_calculo/MemoriaCalculo.php',
-                'Memoria de Cálculo',
+                'Memoria de Cálculo <b style="color:green">['+rec.data.codigo_cc+']</b>',
                 {
                     width:'98%',
                     height:'98%'
@@ -706,4 +706,3 @@ header("content-type: text/javascript; charset=UTF-8");
 
     })
 </script>
-

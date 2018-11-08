@@ -69,13 +69,13 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         $fecha_sol = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
 
-        if($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018')){
+        if(($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018'))||($this->datos[0]['funcionario_solicitante']=='PASTOR JAIME LAZARTE VILLAGRA'&&$this->datos[0]['codigo_moneda']!='Bs')){
             $fecha  = $fecha_sol;
         }else{
             $fecha  = date_format($fecha,'d/m/Y');
         }
 
-        $tbl = '<table border="0" style="font-size: 7pt;"> 
+        $tbl = '<table border="0" style="font-size: 7pt;">
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
                 <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha.'</td></tr>
                 <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['unidad_ejecutora'].'</td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
@@ -209,7 +209,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                        </tr>';
         $tbl.='<tr>
                    <td colspan="10" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
-                        
+
                </tr>';
 
         $tbl.='</table>';
@@ -219,7 +219,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $this->Ln(1);
         $tbl.='<table border="1"><tr>
                    <td colspan="10" align="left" style="font-size: 8pt;">&nbsp;<b>JUSTIFICACIÓN:</b><br>&nbsp;'.$this->datos[0]['justificacion'].'</td>
-                        
+
                </tr></table>';
         $this->writeHTML ($tbl);
         //controlamos el alto para las firmas
@@ -237,15 +237,15 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                             <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> ' . $firma_aprobado[2] . '</td>
                         </tr>
                         <tr>
-                            <td align="center" > 
+                            <td align="center" >
                                 <br><br>
                                 <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_elaborado[2], $firma_elaborado[3],$firma_elaborado[4]) . '" alt="Logo">
-                               
+
                             </td>
                             <td align="center" >
                                 <br><br>
                                 <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_aprobado[2], $firma_aprobado[3],$firma_aprobado[4]) . '" alt="Logo">
-                                  
+
                             </td>
                          </tr>
                     </table>
@@ -253,7 +253,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                     <td style="width:15%;"></td>
                     </tr>
                     </table>
-                    
+
                 ';
             $this->Ln(5);
             $this->writeHTML($tbl, true, false, false, false, '');
@@ -268,15 +268,15 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                             <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> </td>
                         </tr>
                         <tr>
-                            <td align="center" > 
+                            <td align="center" >
                                 <br><br>
                                 <img  style="width: 95px; height: 95px;" src="" alt="Logo"><br>
-                                
+
                             </td>
                             <td align="center" >
                                 <br><br>
                                 <img  style="width: 95px; height: 95px;" src="" alt="Logo"><br>
-                                
+
                             </td>
                          </tr>
                     </table>
@@ -284,15 +284,15 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                     <td style="width:15%;"></td>
                     </tr>
                     </table>
-                    
+
                 ';
             $this->Ln(5);
             $this->writeHTML($tbl, true, false, false, false, '');
         }
 
         if($this->datos[0]['codigo_poa']!=''){
-            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y').'</b> 
-            acerca de: <b>'.$this->datos[0]['justificacion'].'</b>, certificar que el mismo se encuentra contemplado en el Plan Operativo gestion <b>'.$this->datos[0]['gestion'].'</b>, 
+            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y').'</b>
+            acerca de: <b>'.$this->datos[0]['justificacion'].'</b>, certificar que el mismo se encuentra contemplado en el Plan Operativo gestion <b>'.$this->datos[0]['gestion'].'</b>,
             en la operacion <b>'.$this->datos[0]['codigo_descripcion'].'.</b>';
 
             $this->SetFont('','B',12);
@@ -313,7 +313,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                         </td>
                     </tr>
                 </table>
-                    
+
                 ';
             $this->writeHTML($tbl, true, false, false, false, '');
             if($firma_elaborado[0]!='' || $firma_aprobado[0]!='') {
@@ -335,10 +335,10 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                                 <td style="font-family: Calibri; font-size: 9px;"><b> VoBo POA:</b> <br> ' . $firma_poa[2] . '</td>
                             </tr>
                             <tr>
-                                <td align="center" cellspacing="0" cellpadding="1"> 
+                                <td align="center" cellspacing="0" cellpadding="1">
                                     <br>
                                     <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_poa[2], $firma_poa[3], $firma_poa[4]) . '" alt="Logo">
-                                   
+
                                 </td>
                              </tr>
                         </table>
@@ -346,7 +346,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                         <td style="width:35%;"></td>
                         </tr>
                    </table>
-                        
+
                     ';
                 $this->writeHTML($tbl, true, false, false, false, '');
             }

@@ -17,10 +17,10 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
     	//llama al constructor de la clase padre
 		Phx.vista.MemoriaDet.superclass.constructor.call(this,config);
 		this.init();
-		this.bloquearMenus();   
+		this.bloquearMenus();
 		this.iniciarEventos();
 	},
-			
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -30,7 +30,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_memoria_det'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			//configuracion del componente
@@ -40,7 +40,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_memoria_calculo'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			config:{
@@ -67,11 +67,11 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 						dato = (dato==''&&value=='12')?'Diciembre':dato;
                         return String.format('{0}', dato);
                     },
-                
+
                 store:new Ext.data.ArrayStore({
                             fields :['variable','valor'],
                             data :  []}),
-               
+
                 valueField: 'variable',
                 displayField: 'valor'
 			},
@@ -80,7 +80,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				id_grupo:1,
 				grid:true,
 				form:false
-				
+
 		},
 		{
 		   config : {
@@ -108,7 +108,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 		   grid : true,
 		   form : true
 		},
-		
+
 		{
 			config:{
 				name: 'cantidad_mem',
@@ -159,7 +159,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-		
+
 		{
 			config:{
 				name: 'importe_unitario',
@@ -203,7 +203,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-		
+
 		{
 			config:{
 				name: 'importe',
@@ -248,7 +248,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
-		
+
 		{
 			config:{
 				name: 'estado_reg',
@@ -288,7 +288,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				anchor: '80%',
 				sortable: false,
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -336,7 +336,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				sortable: false,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -362,7 +362,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Detalle de Memoria',
 	ActSave:'../../sis_presupuestos/control/MemoriaDet/insertarMemoriaDet',
 	ActDel:'../../sis_presupuestos/control/MemoriaDet/eliminarMemoriaDet',
@@ -386,7 +386,7 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'cantidad_mem', type: 'numeric'},
 		{name:'importe_unitario', type: 'numeric'},'unidad_medida','tipo_reg'
 
-		
+
 	],
 	sortInfo:{
 		field: 'id_memoria_det',
@@ -395,18 +395,18 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 	onReloadPage:function(m){
 		this.maestro=m;
         this.store.baseParams={id_memoria_calculo:this.maestro.id_memoria_calculo};
-        this.load({params:{start:0, limit:50}});  
+        this.load({params:{start:0, limit:50}});
     },
     onButtonSave: function(){
 
         Phx.vista.MemoriaDet.superclass.onButtonSave.call(this);
-	    console.log('Importe:', this.Cmp.importe);
+	    //console.log('Importe:', this.Cmp.importe);
 
     },
     loadValoresIniciales:function()
     {
         Phx.vista.MemoriaDet.superclass.loadValoresIniciales.call(this);
-        this.Cmp.id_memoria_calculo.setValue(this.maestro.id_memoria_calculo);       
+        this.Cmp.id_memoria_calculo.setValue(this.maestro.id_memoria_calculo);
     },
     successSave:function(resp){
 
@@ -414,16 +414,16 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
     	 Phx.CP.getPagina(this.idContenedorPadre).reload();
 		 Phx.CP.getPagina(Phx.CP.getPagina(this.idContenedorPadre).idContenedorPadre).reload();
     },
-    
+
     iniciarEventos:function(){
     	this.grid.on('afteredit',function(e){
 			 e.record.set( 'cantidad_mem', parseInt(e.record.data.cantidad_mem));
 			 e.record.set( 'importe_unitario', parseInt(e.record.data.importe_unitario));
     		 this.calculaTotal(e);
     	}, this);
-    	
+
     },
-    
+
     calculaTotal: function(e){
 		console.log('IMPORTE: ',e.record.data.cantidad_mem, e.record.data.importe_unitario);
     	var tot = Number(e.record.data.cantidad_mem) * Number(e.record.data.importe_unitario);
@@ -438,5 +438,5 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 	}
 )
 </script>
-		
+
 		
