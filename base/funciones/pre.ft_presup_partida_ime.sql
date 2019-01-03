@@ -36,6 +36,9 @@ DECLARE
     v_registro_partidas  	record;
     v_id_partida 			integer;
 
+    v_techo_importe			numeric;
+    v_total_importe_presu   numeric;
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_presup_partida_ime';
@@ -51,8 +54,6 @@ BEGIN
 	if(p_transaccion='PRE_PRPA_INS')then
 
         begin
-
-
 
            select
              pre.estado
@@ -73,8 +74,28 @@ BEGIN
                     where pp.id_partida = v_parametros.id_partida
                           and pp.id_presupuesto = v_parametros.id_presupuesto
                           and pp.estado_reg = 'activo') THEN
-                raise exception 'esta aprtida ya esta relacionada con el presupuesto';
+                raise exception 'esta apartida ya esta relacionada con el presupuesto';
            END IF;
+
+           --control de techo presupuestario
+           SELECT
+             tecpre.importe_techo_presupuesto
+           INTO
+             v_techo_importe
+           FROM pre.ttecho_presupuestos tecpre
+           WHERE tecpre.estado_techo_presupuesto = 'Activo'
+           and tecpre.id_presupuesto = v_parametros.id_presupuesto;
+
+           SELECT sum(ppar.importe)
+           INTO
+           	v_total_importe_presu
+           FROM pre.tpresup_partida ppar
+           WHERE ppar.id_presupuesto = v_parametros.id_presupuesto;
+
+
+           IF (v_techo_importe < v_total_importe_presu) THEN
+            raise exception 'YA ESTA AL TOPE DE SU TECHO PRESUPUESTARIO, TOTAL IMPORTE:% , TECHO PRESUPUESTARIO: %', v_total_importe_presu, v_techo_importe;
+          END IF;
 
 
         	--Sentencia de la insercion

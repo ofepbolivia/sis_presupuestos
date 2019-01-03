@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.ft_presupuesto_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -63,6 +61,9 @@ DECLARE
     v_tipo_noti 						varchar;
     v_titulo  							varchar;
     v_id_presupuesto_dos				integer;
+    
+    v_fecha_ini							date;
+    v_fecha_fin							date;
     
     
 			    
@@ -412,9 +413,11 @@ BEGIN
                                   inner join param.tcentro_costo cc on cc.id_centro_costo = p.id_centro_costo
                                   left join pre.tcategoria_programatica_ids ci on ci.id_categoria_programatica_uno = p.id_categoria_prog
                                   where cc.id_gestion = v_parametros.id_gestion   
-                                        and p.estado_reg = 'activo') LOOP
+                                        and p.estado_reg = 'activo'
+                                        and p.estado = 'aprobado') LOOP
                                         
-                                        
+                
+                                                   
                     -- preguntamos si ya existe en la tabla de ids 
                     v_id_presupuesto_dos = NULL;
                     select 
@@ -433,7 +436,9 @@ BEGIN
                               v_reg_cc_ori 
                            from param.tcentro_costo cc 
                            where cc.id_centro_costo = v_registros.id_centro_costo;
-                           
+                     
+                                 
+                         
                          --insertamos nuevo centro de costo  
                            INSERT INTO  param.tcentro_costo
                                       (
@@ -455,7 +460,7 @@ BEGIN
                                         v_reg_cc_ori.id_tipo_cc
                                       ) RETURNING id_centro_costo into v_id_centro_costo;
                            
-                       
+                     
                      --TODO revisar el estado de formualcion del presupeusto ......        OJO
                      --  insertamos nuevo presupuesto
                      INSERT INTO  pre.tpresupuesto
@@ -476,7 +481,9 @@ BEGIN
                                     cod_pry,
                                     cod_act,
                                     descripcion,
-                                    sw_consolidado
+                                    sw_consolidado,
+                                    fecha_inicio_pres,
+                                    fecha_fin_pres
                                   )
                                   VALUES (
                                     p_id_usuario,                                   
@@ -495,14 +502,17 @@ BEGIN
                                     v_registros.cod_pry,
                                     v_registros.cod_act,
                                     v_registros.descripcion,
-                                    v_registros.sw_consolidado
+                                    v_registros.sw_consolidado,
+                                    ('01-01' ||'-'||v_registros_ges.gestion + 1)::date, 
+                                    ('31-12' ||'-'||v_registros_ges.gestion + 1)::date 
+                                   
                                   )RETURNING id_presupuesto into v_id_presupuesto;
                                   
                                   INSERT INTO pre.tpresupuesto_ids (id_presupuesto_uno, id_presupuesto_dos, sw_cambio_gestion ) 
                                   VALUES ( v_registros.id_presupuesto, v_id_presupuesto, 'gestion');
                                    v_conta = v_conta + 1;
                                    
-                     
+                 -- raise exception '%, %',('01-01' ||'-'||v_registros_ges.gestion + 1)::date , ('31-12' ||'-'||v_registros_ges.gestion + 1)::date ;   
                      ELSE
                         --si el presupeusto ya existe modificarlo
                       
@@ -576,7 +586,7 @@ BEGIN
                         where     pp.estado_reg = 'activo'  
                               and pp.id_presupuesto = v_parametros.id_presupuesto) THEN
               
-              raise exception 'Por lo menos necesita asignar una partida para formulación';
+              --raise exception 'Por lo menos necesita asignar una partida para formulación';
           END IF;
          
          

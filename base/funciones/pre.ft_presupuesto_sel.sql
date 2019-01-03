@@ -557,7 +557,7 @@ BEGIN
 
 		begin
 
-            SELECT ts.estado, ts.id_estado_wf, ts.justificacion
+            SELECT ts.estado, ts.id_estado_wf, ts.justificacion, ts.id_gestion
             INTO v_record_sol
             FROM adq.tsolicitud ts
             WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
@@ -620,14 +620,15 @@ BEGIN
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
             (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
-            COALESCE(ts.fecha_soli,null::date) AS fecha_soli,
+            CASE WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
             ts.codigo_poa,
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
             from pre.tobjetivo ob
-            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'',''))
+            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_sol.id_gestion||'
 
-            )::varchar as codigo_descripcion
+            )::varchar as codigo_descripcion,
+            ts.tipo
             FROM adq.tsolicitud ts
             INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tsd.id_partida
@@ -657,7 +658,7 @@ BEGIN
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
-            ts.fecha_soli, tg.gestion, ts.codigo_poa';
+            ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo';
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;

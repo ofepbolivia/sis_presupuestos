@@ -36,6 +36,15 @@ DECLARE
     v_gestion				integer;
     v_id_partida			integer;
 
+    v_techo_importe			numeric;
+    v_total_memoria			numeric;
+    v_funcionario			integer;
+    v_desc_funcionario		varchar;
+    v_des_partida			varchar;
+
+
+
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_memoria_calculo_ime';
@@ -91,9 +100,9 @@ BEGIN
             */
            --recupera partida a partir del presupuesto y concepto de gasto
            SELECT
-           		par.id_partida
+           		par.id_partida, par.codigo||' - '|| par.nombre_partida
            into
-           		v_id_partida
+           		v_id_partida, v_des_partida
            FROM pre.tpresupuesto pre
                JOIN param.tcentro_costo cc ON cc.id_centro_costo = pre.id_centro_costo
                JOIN param.tgestion ges ON ges.id_gestion = cc.id_gestion
@@ -112,68 +121,197 @@ BEGIN
 
            END IF;
 
-        	--Sentencia de la insercion
-        	insert into pre.tmemoria_calculo(
-              id_concepto_ingas,
-              importe_total,
-              obs,
-              id_presupuesto,
-              estado_reg,
-              id_usuario_ai,
-              fecha_reg,
-              usuario_ai,
-              id_usuario_reg,
-              fecha_mod,
-              id_usuario_mod,
-              id_partida
-          	) values(
-              v_parametros.id_concepto_ingas,
-              0,
-              replace(v_parametros.obs, '\n', ' '),
-              v_parametros.id_presupuesto,
-              'activo',
-              v_parametros._id_usuario_ai,
-              now(),
-              v_parametros._nombre_usuario_ai,
-              p_id_usuario,
-              null,
-              null,
-              v_id_partida
+           --control de techo presupuestario
+           SELECT
+             tecpre.importe_techo_presupuesto
+           INTO
+             v_techo_importe
+           FROM pre.ttecho_presupuestos tecpre
+           WHERE tecpre.estado_techo_presupuesto = 'Activo'
+           and tecpre.id_presupuesto = v_parametros.id_presupuesto;
 
-			)RETURNING id_memoria_calculo into v_id_memoria_calculo;
+           SELECT sum(mca.importe_total)
+           INTO
+            v_total_memoria
+           FROM pre.tmemoria_calculo mca
+           WHERE mca.id_presupuesto = v_parametros.id_presupuesto;
+
+           IF (v_techo_importe < v_total_memoria)THEN
+            raise exception 'YA ESTA AL TOPE DE SU TECHO PRESUPUESTARIO,TOTAL IMPORTE:% , TECHO PRESUPUESTARIO: %', v_total_memoria, v_techo_importe;
+           END IF;
+
+           --control de usuario
+
+           				select fu.id_funcionario, vfun.desc_funcionario1
+                        into v_funcionario, v_desc_funcionario
+                        from segu.tusuario us
+                        inner join segu.tpersona per on per.id_persona = us.id_persona
+                        inner join orga.tfuncionario fu on fu.id_persona = per.id_persona
+                        inner join orga.vfuncionario vfun on vfun.id_funcionario = fu.id_funcionario
+                        WHERE us.id_usuario = p_id_usuario;
 
 
-           -- inserta valores para todos los periodos de la gestion con valor 0
 
-           FOR v_registros in (select
-                                   per.id_periodo
-                                from param.tperiodo per
-                                where per.id_gestion = v_id_gestion
-                                      and per.estado_reg = 'activo'
-                                order by per.fecha_ini) LOOP
+              IF NOT EXISTS (select 1
+                            FROM pre.tpartida_usuario pu
+                            WHERE pu.id_partida = v_id_partida
+                            and now()::date BETWEEN pu.fecha_inicio_partida_usuario and pu.fecha_fin_partida_usuario) THEN
 
-                            insert into pre.tmemoria_det(
-                                importe,
-                                estado_reg,
-                                id_periodo,
-                                id_memoria_calculo,
-                                usuario_ai,
-                                fecha_reg,
-                                id_usuario_reg,
-                                id_usuario_ai
-                              )
-                              values
-                              (
-                                0,
-                                'activo',
-                                v_registros.id_periodo,
-                                v_id_memoria_calculo,
-                                v_parametros._nombre_usuario_ai,
-                                now(),
-                                p_id_usuario,
-                                v_parametros._id_usuario_ai);
 
-            END LOOP;
+  --RAISE EXCEPTION 'primer INSERT %, % ', v_funcionario, v_desc_funcionario;
+                  --Sentencia de la insercion
+                            insert into pre.tmemoria_calculo(
+                              id_concepto_ingas,
+                              importe_total,
+                              obs,
+                              id_presupuesto,
+                              estado_reg,
+                              id_usuario_ai,
+                              fecha_reg,
+                              usuario_ai,
+                              id_usuario_reg,
+                              fecha_mod,
+                              id_usuario_mod,
+                              id_partida
+                            ) values(
+                              v_parametros.id_concepto_ingas,
+                              0,
+                              replace(v_parametros.obs, '\n', ' '),
+                              v_parametros.id_presupuesto,
+                              'activo',
+                              v_parametros._id_usuario_ai,
+                              now(),
+                              v_parametros._nombre_usuario_ai,
+                              p_id_usuario,
+                              null,
+                              null,
+                              v_id_partida
+
+                            )RETURNING id_memoria_calculo into v_id_memoria_calculo;
+
+
+                           -- inserta valores para todos los periodos de la gestion con valor 0
+
+                           FOR v_registros in (select
+                                                   per.id_periodo
+                                                from param.tperiodo per
+                                                where per.id_gestion = v_id_gestion
+                                                      and per.estado_reg = 'activo'
+                                                order by per.fecha_ini) LOOP
+
+                                            insert into pre.tmemoria_det(
+                                                importe,
+                                                estado_reg,
+                                                id_periodo,
+                                                id_memoria_calculo,
+                                                usuario_ai,
+                                                fecha_reg,
+                                                id_usuario_reg,
+                                                id_usuario_ai
+                                              )
+                                              values
+                                              (
+                                                0,
+                                                'activo',
+                                                v_registros.id_periodo,
+                                                v_id_memoria_calculo,
+                                                v_parametros._nombre_usuario_ai,
+                                                now(),
+                                                p_id_usuario,
+                                                v_parametros._id_usuario_ai);
+
+                            END LOOP;
+
+                  else
+
+
+
+                           IF NOT EXISTS (select 1
+                                        FROM pre.tpartida_usuario pu
+                                        WHERE pu.id_partida = v_id_partida
+                                        AND pu.id_funcionario_resp = v_funcionario
+                                        and now()::date BETWEEN pu.fecha_inicio_partida_usuario and pu.fecha_fin_partida_usuario
+                                        ) THEN
+
+                                       raise exception 'USTED NO TIENE PERMISOS PARA REGISTRAR LA PARTIDA:\n %. CONSULTE CON LA UNIDAD DE PRESUPUESTOS.', v_des_partida;
+
+                           else
+
+
+     --RAISE EXCEPTION 'segundo INSERT %', v_funcionario;
+
+                                          --Sentencia de la insercion
+                                          insert into pre.tmemoria_calculo(
+                                            id_concepto_ingas,
+                                            importe_total,
+                                            obs,
+                                            id_presupuesto,
+                                            estado_reg,
+                                            id_usuario_ai,
+                                            fecha_reg,
+                                            usuario_ai,
+                                            id_usuario_reg,
+                                            fecha_mod,
+                                            id_usuario_mod,
+                                            id_partida
+                                          ) values(
+                                            v_parametros.id_concepto_ingas,
+                                            0,
+                                            replace(v_parametros.obs, '\n', ' '),
+                                            v_parametros.id_presupuesto,
+                                            'activo',
+                                            v_parametros._id_usuario_ai,
+                                            now(),
+                                            v_parametros._nombre_usuario_ai,
+                                            p_id_usuario,
+                                            null,
+                                            null,
+                                            v_id_partida
+
+                                          )RETURNING id_memoria_calculo into v_id_memoria_calculo;
+
+
+                                         -- inserta valores para todos los periodos de la gestion con valor 0
+
+                                         FOR v_registros in (select
+                                                                 per.id_periodo
+                                                              from param.tperiodo per
+                                                              where per.id_gestion = v_id_gestion
+                                                                    and per.estado_reg = 'activo'
+                                                              order by per.fecha_ini) LOOP
+
+                                                          insert into pre.tmemoria_det(
+                                                              importe,
+                                                              estado_reg,
+                                                              id_periodo,
+                                                              id_memoria_calculo,
+                                                              usuario_ai,
+                                                              fecha_reg,
+                                                              id_usuario_reg,
+                                                              id_usuario_ai
+                                                            )
+                                                            values
+                                                            (
+                                                              0,
+                                                              'activo',
+                                                              v_registros.id_periodo,
+                                                              v_id_memoria_calculo,
+                                                              v_parametros._nombre_usuario_ai,
+                                                              now(),
+                                                              p_id_usuario,
+                                                              v_parametros._id_usuario_ai);
+
+                                          END LOOP;
+
+
+
+
+            				end IF;
+
+
+
+
+            end if;
 
 			--Definicion de la respuesta
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','MEMCAL almacenado(a) con exito (id_memoria_calculo'||v_id_memoria_calculo||')');
@@ -220,18 +358,74 @@ BEGIN
            where pre.id_presupuesto = v_parametros.id_presupuesto
                  and cig.id_concepto_ingas  = v_parametros.id_concepto_ingas;
 
+		--control de usuario
 
-			--Sentencia de la modificacion
-			update pre.tmemoria_calculo set
-              id_concepto_ingas = v_parametros.id_concepto_ingas,
-              obs = replace(v_parametros.obs, '\n', ' '),
-              id_presupuesto = v_parametros.id_presupuesto,
-              fecha_mod = now(),
-              id_usuario_mod = p_id_usuario,
-              id_usuario_ai = v_parametros._id_usuario_ai,
-              usuario_ai = v_parametros._nombre_usuario_ai,
-              id_partida = v_id_partida
-			where id_memoria_calculo = v_parametros.id_memoria_calculo;
+           				select fu.id_funcionario, vfun.desc_funcionario1
+                        into v_funcionario, v_desc_funcionario
+                        from segu.tusuario us
+                        inner join segu.tpersona per on per.id_persona = us.id_persona
+                        inner join orga.tfuncionario fu on fu.id_persona = per.id_persona
+                        inner join orga.vfuncionario vfun on vfun.id_funcionario = fu.id_funcionario
+                        WHERE us.id_usuario = p_id_usuario;
+
+
+
+              IF NOT EXISTS (select 1
+                            FROM pre.tpartida_usuario pu
+                            WHERE pu.id_partida = v_id_partida
+                            and now()::date BETWEEN pu.fecha_inicio_partida_usuario and pu.fecha_fin_partida_usuario) THEN
+
+
+  --RAISE EXCEPTION 'primer INSERT %, % ', v_funcionario, v_desc_funcionario;
+
+                        --Sentencia de la modificacion
+                                    update pre.tmemoria_calculo set
+                                      id_concepto_ingas = v_parametros.id_concepto_ingas,
+                                      obs = replace(v_parametros.obs, '\n', ' '),
+                                      id_presupuesto = v_parametros.id_presupuesto,
+                                      fecha_mod = now(),
+                                      id_usuario_mod = p_id_usuario,
+                                      id_usuario_ai = v_parametros._id_usuario_ai,
+                                      usuario_ai = v_parametros._nombre_usuario_ai,
+                                      id_partida = v_id_partida
+                                    where id_memoria_calculo = v_parametros.id_memoria_calculo;
+
+                  else
+
+
+
+                           IF NOT EXISTS (select 1
+                                        FROM pre.tpartida_usuario pu
+                                        WHERE pu.id_partida = v_id_partida
+                                        AND pu.id_funcionario_resp = v_funcionario
+                                        and now()::date BETWEEN pu.fecha_inicio_partida_usuario and pu.fecha_fin_partida_usuario
+                                        ) THEN
+
+                                       raise exception 'USTED NO TIENE PERMISOS PARA REGISTRAR LA PARTIDA:\n %. CONSULTE CON LA UNIDAD DE PRESUPUESTOS.', v_des_partida;
+
+                           else
+
+
+     --RAISE EXCEPTION 'segundo INSERT %', v_funcionario;
+
+                                         --Sentencia de la modificacion
+                                        update pre.tmemoria_calculo set
+                                          id_concepto_ingas = v_parametros.id_concepto_ingas,
+                                          obs = replace(v_parametros.obs, '\n', ' '),
+                                          id_presupuesto = v_parametros.id_presupuesto,
+                                          fecha_mod = now(),
+                                          id_usuario_mod = p_id_usuario,
+                                          id_usuario_ai = v_parametros._id_usuario_ai,
+                                          usuario_ai = v_parametros._nombre_usuario_ai,
+                                          id_partida = v_id_partida
+                                        where id_memoria_calculo = v_parametros.id_memoria_calculo;
+
+
+            				end IF;
+
+            end if;
+
+
 
 			--Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','MEMCAL modificado(a)');
