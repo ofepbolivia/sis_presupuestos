@@ -102,8 +102,8 @@ header("content-type: text/javascript; charset=UTF-8");
         iniciarEventos: function () {
             this.Cmp.id_tipo_cc.on('select', function (cmp, rec, ind) {
                 this.Cmp.descripcion.setValue('(' + rec.data.codigo + ') ' + rec.data.descripcion);
-                this.Cmp.tipo_pres.store.baseParams.mov_pres = rec.data.mov_pres;
-                this.Cmp.tipo_pres.store.modificado = true;
+                // this.Cmp.tipo_pres.store.baseParams.mov_pres = rec.data.mov_pres;
+                // this.Cmp.tipo_pres.store.modificado = true;
 
 
             }, this)
