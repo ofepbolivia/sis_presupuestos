@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.ft_ajuste_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -425,7 +423,7 @@ BEGIN
                  IF v_registros_proc.tipo_ajuste = 'traspaso'  THEN
                      
                      IF v_registros_proc.importe_ajuste !=  v_total_incrementos THEN
-                        raise exception 'los incrementos no igualan con el monto a ajustar';
+                        --raise exception 'los incrementos no igualan con el monto a ajustar';
                      END IF;
                      
                      -- validar que el monto de incremento iguala al monto del decremento
@@ -449,7 +447,7 @@ BEGIN
                  ELSEIF  v_registros_proc.tipo_ajuste = 'reformulacion'   THEN
                   -- si es reformulacion
                      IF v_registros_proc.importe_ajuste !=  v_total_incrementos THEN
-                        raise exception 'los incrementos no igualan con el monto a ajustar';
+                        --raise exception 'Los incrementos no igualan con el monto a ajustar';
                      END IF;
                      
                      -- validar que el monto de incremento iguala al monto del decremento
@@ -463,7 +461,7 @@ BEGIN
                  -- si es incremento
              	    -- validar que se tenga un monto de incremento y ningun decremento
                      IF v_registros_proc.importe_ajuste !=  v_total_incrementos THEN
-                        raise exception 'los incrementos no igualan con el monto a ajustar';
+                        --raise exception 'Los incrementos no igualan con el monto a ajustar';
                      END IF;
                      
                      -- validar que no se tengan decrementos
@@ -477,7 +475,7 @@ BEGIN
                  -- si es decremento
                     -- validar que se tenga un monto a decrementar y cero a incrementar
                      IF v_registros_proc.importe_ajuste !=  (v_total_decrementos*-1) THEN
-                        raise exception 'los decrementos no igualan con el monto a ajustar';
+                        --raise exception 'los decrementos no igualan con el monto a ajustar';
                      END IF;
                                           
                      -- validar que no se tengan incrementos                     
@@ -490,7 +488,7 @@ BEGIN
                  -- si es decremento
                     -- validar que se tenga un monto a decrementar y cero a incrementar
                      IF v_registros_proc.importe_ajuste !=  (v_total_decrementos*-1) THEN
-                        raise exception 'los decrementos no igualan con el monto a ajustar';
+                        --raise exception 'los decrementos no igualan con el monto a ajustar';
                      END IF;
                                           
                      -- validar que no se tengan incrementos                     
@@ -502,7 +500,7 @@ BEGIN
                      -- si es incremento
              	    -- validar que se tenga un monto de incremento y ningun decremento
                      IF v_registros_proc.importe_ajuste !=  v_total_incrementos THEN
-                        raise exception 'los incrementos no igualan con el monto a ajustar';
+                        --raise exception 'los incrementos no igualan con el monto a ajustar';
                      END IF;
                      
                      -- validar que no se tengan decrementos

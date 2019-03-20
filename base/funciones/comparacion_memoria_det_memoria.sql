@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION pre.presu_partida_memeoria_md (
+CREATE OR REPLACE FUNCTION pre.comparacion_memoria_det_memoria (
 )
 RETURNS void AS
 $body$
@@ -8,46 +8,33 @@ DECLARE
     v_record			record;
     v_md				numeric ;
     v_importe			numeric;
-    v_id_presup_partida integer;
 
 
 BEGIN
 
-FOR v_record in (select me.id_partida,
+FOR v_record in (select me.id_memoria_calculo,
 						p.codigo,
 						me.id_presupuesto,
-						sum(me.importe_total) as importe
-						from pre.tmemoria_calculo me
+                        sum(md.importe) as importe_det,
+						me.importe_total as importe
+						from pre.tmemoria_det md 
+                        inner join pre.tmemoria_calculo me on me.id_memoria_calculo=md.id_memoria_calculo
                         inner join pre.tpartida p on p.id_partida = me.id_partida
-                        where p.id_gestion = 17 and me.estado_reg='activo'
-                        group by me.id_partida, me.id_presupuesto, p.codigo 
-                        order by me.id_presupuesto ASC, me.id_partida asc) loop
+                        where p.id_gestion = 17
+                        group by me.id_memoria_calculo,p.codigo,me.id_presupuesto
+                        order by me.id_partida ASC) loop
                         
-              
                         
-			Select pp.importe, pp.id_presup_partida
-            into v_importe,v_id_presup_partida
+                        
+			/*Select importe
+            into v_importe
             from pre.tpresup_partida pp
             where pp.id_partida = v_record.id_partida
-            and pp.id_presupuesto = v_record.id_presupuesto;
-            
-            if v_id_presup_partida is null then
-                raise exception 'No existe la relacion presupuesto partida, id_presupuesto: %, id_partida: %.',v_record.id_presupuesto, v_record.id_partida;
-            end if; 
+            and pp.id_presupuesto = v_record.id_presupuesto;*/
             
             
-            if (v_importe<>v_record.importe)then 
-            	raise notice 'Partida: %, presupuesto: %, importe presupartida: %, importe memoria:%',v_record.codigo,v_record.id_presupuesto,v_importe,v_record.importe;
-            
-            
-            	
-            
-            	/*UPDATE pre.tpresup_partida  set
-                    importe = v_record.importe
-                where id_partida = v_record.id_partida
-                and id_presupuesto = v_record.id_presupuesto;*/
-
-            
+            if (v_record.importe_det<>v_record.importe)then 
+            	raise notice 'id_memoria_calculo:%, partida: %, id_presupuesto: %, importe detalle: %, importe memoria:%',v_record.id_memoria_calculo ,v_record.codigo,v_record.id_presupuesto,v_record.importe_det,v_record.importe;
             end if;
                         
                         

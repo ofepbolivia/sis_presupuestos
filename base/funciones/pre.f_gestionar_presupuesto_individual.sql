@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.f_gestionar_presupuesto_individual (
   p_id_usuario integer,
   p_tipo_cambio numeric,
@@ -60,7 +58,7 @@ BEGIN
   v_id_moneda_base = param.f_get_moneda_base();
   v_error_presupuesto = pxp.f_get_variable_global('error_presupuesto')::numeric;
  
-
+  
 
   
     IF v_pre_integrar_presupuestos = 'true' THEN  
@@ -141,9 +139,10 @@ BEGIN
                     v_monto_mb, 
                     v_monto, 
                     p_sw_momento);
-                    
-            --raise exception '%-%-%-%-%-%-%', p_nro_tramite, p_id_partida_ejecucion, p_id_presupuesto , p_id_partida, v_monto_mb, v_monto, p_sw_momento;
-            
+         
+         
+            --raise exception '% -/ % -/ %- /% -/ % -/ % -/ %', p_nro_tramite, p_id_partida_ejecucion, p_id_presupuesto , p_id_partida, v_monto_mb, v_monto, p_sw_momento;
+         
             --evaluar error permitido
             
                     
@@ -159,10 +158,17 @@ BEGIN
                       v_permitido = true;
                    END IF;
                ELSE
-                   IF  (v_monto_mb*(-1)) - v_error_presupuesto  <= v_verif_pres[2]::numeric THEN
-                        v_monto_mb =  (v_verif_pres[2]::numeric)*(-1);
+               
+                
+               
+                   IF  ((v_monto_mb*(-1)) - v_error_presupuesto) <= v_verif_pres[2]::numeric THEN
+                   
+                        v_monto_mb =  ((v_verif_pres[2]::numeric)*(-1));
                         v_permitido = true;
+                 
                    END IF;
+ 
+
                END IF;
             
             END IF;

@@ -310,7 +310,21 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid:true,
                 bottom_filter : true
             },
-
+            {
+                config:{
+                    name: 'activo_fijo',
+                    fieldLabel: 'Activo Fijo?',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 100,
+                    maxLength:10
+                },
+                type:'TextField',
+                filters:{pfiltro:'conig.activo_fijo',type:'string'},
+                id_grupo:0,
+                grid:true,
+                form:false
+            },
             {
                 config:{
                     name: 'estado_reg',
@@ -413,7 +427,8 @@ header("content-type: text/javascript; charset=UTF-8");
             'fondo_avance',
             'pago_unico',
             'contrato',
-            'especial'
+            'especial',
+            'activo_fijo'
 
         ],
         sortInfo:{

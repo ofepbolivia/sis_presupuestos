@@ -34,6 +34,7 @@ BEGIN
     where h.id_funcionario = pm_id_funcionario
     and h.fecha_asignacion <= g_fecha_viaje_date
     and (h.fecha_finalizacion >= g_fecha_viaje_date or h.fecha_finalizacion is null)
+    and (carpres.fecha_fin >= g_fecha_viaje_date or carpres.fecha_fin is null)
     and g.gestion = g_gestion::NUMERIC
     and h.estado_reg = 'activo'
     and carpres.estado_reg = 'activo';

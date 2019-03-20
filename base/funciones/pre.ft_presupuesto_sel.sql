@@ -51,6 +51,10 @@ DECLARE
     v_nro_cite_dce_fin					varchar;
     v_nro_cite_dce_in					varchar;
     v_nro_tramite					varchar;
+    
+    --variables certificacion especiales
+    v_procesos_excepcion 			json;
+
 BEGIN
 
 	v_nombre_funcion = 'pre.ft_presupuesto_sel';
@@ -556,7 +560,28 @@ BEGIN
 	elsif(p_transaccion='PR_REPCERPRE_SEL')then
 
 		begin
-
+			
+            v_procesos_excepcion = '{
+              "CINTPD-000964-2018":"30/5/2018",
+              "CINTPD-000966-2018":"23/5/2018",
+              "CINTPD-000968-2018":"6/7/2018",
+              "CINTPD-000969-2018":"6/7/2018",
+              "CINTPD-000988-2018":"18/7/2018",
+              "CINTPD-000989-2018":"19/7/2018",
+              "CINTPD-000997-2018":"18/7/2018",
+              "CINTPD-000998-2018":"18/7/2018",
+              "CINTPD-000999-2018":"10/7/2018",
+              "CINTPD-001000-2018":"18/7/2018",
+              "CINTPD-001001-2018":"26/1/2018",
+              "CINTPD-001018-2018":"31/7/2018",
+              "CINTPD-001019-2018":"25/6/2018",
+              "CINTPD-001020-2018":"18/7/2018",
+              "CINTPD-001022-2018":"19/7/2018",
+              "CINTPD-001023-2018":"19/7/2018",
+              "CINTPD-001024-2018":"19/7/2018",
+              "CINTPD-001025-2018":"19/7/2018"
+            }';
+            --raise exception 'v_procesos_excepcion: %, %', v_procesos_excepcion->'CINTPD-000964-2018', json_object_keys (v_procesos_excepcion->'CINTPD-000964-2018');
             SELECT ts.estado, ts.id_estado_wf, ts.justificacion, ts.id_gestion
             INTO v_record_sol
             FROM adq.tsolicitud ts
@@ -620,7 +645,11 @@ BEGIN
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
             (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
-            CASE WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
+            CASE 
+            WHEN (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite) is not null then (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite)::date
+            WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date 
+            WHEN ((select count(sold.id_solicitud_det) from adq.tsolicitud_det sold where sold.id_solicitud = ts.id_solicitud and sold.id_concepto_ingas = 2208) >= 1 and (ts.fecha_po between ''13/08/2018''::date and ''13/10/2018''::date)) THEN (ts.fecha_po - 5)::date  
+            ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
             ts.codigo_poa,
             (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
@@ -658,7 +687,7 @@ BEGIN
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
-            ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo';
+            ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud';
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
