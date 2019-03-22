@@ -41,20 +41,29 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $firma_fecha = '';
         $firma_elaborado = '';
         $firma_aprobado = '';
+        $fecha_presupuesto = '';
 
         if(count($firmas)>1) {
 
             foreach ($firmas as $fir) {
                 if (strpos($fir, 'vbrpc') !== false) {
                     $firma_fecha = explode(',', $fir);
+                    //var_dump($firma_fecha);
                 }
             }
+            // foreach ($firmas as $fir) {
+            //     if (strpos($fir, 'vbpresupuestos') !== false) {
+            //         $fecha_presupuesto = explode(',', $fir);
+            //       //  var_dump($fecha_presupuesto);
+            //     }
+            // }
         }
 
 
         foreach ($firmas as $fir){
             if(strpos($fir, 'vbpresupuestos')!==false){
                 $firma_elaborado = explode(',',$fir);
+                //var_dump($firma_elaborado);
             }
         }
 
@@ -64,29 +73,46 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             }
         }
 
+        //var_dump($firma_fecha);
 
-        $fecha = date_create($firma_fecha[1]);
-
+        if($firma_fecha[0]=='vbrpc') {
+          $fecha = date_create($firma_fecha[1]);
+        }
         $fecha_sol = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
 
-        if(($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018'))||($this->datos[0]['funcionario_solicitante']=='PASTOR JAIME LAZARTE VILLAGRA'&&$this->datos[0]['codigo_moneda']!='Bs')/*||$fecha_sol<= date_create('31-10-2018')*/){
+
+        /*AUMENTANDO CODIGO PRUEBA IRVA*/
+        $fecha_soli = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
+        /**************************/
+
+
+
+
+      if(($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018'))||($this->datos[0]['funcionario_solicitante']=='PASTOR JAIME LAZARTE VILLAGRA'&&$this->datos[0]['codigo_moneda']!='Bs')/*||$fecha_sol<= date_create('31-10-2018')*/){
             if ($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018')){
+              if($firma_fecha[0]=='vbrpc') {
                 $fecha  = $fecha_sol;
+              }
             }else{
+              if($firma_fecha[0]=='vbrpc') {
                 $fecha = date_format($fecha, 'd/m/Y');
+              }
             }
 
         }else{
             /*if($fecha_sol<= date_create('31-10-2018')){
                 $fecha  = $fecha_sol;
             }else {*/
+            if($firma_fecha[0]=='vbrpc') {
             $fecha = date_format($fecha, 'd/m/Y');
+           }
             //}
         }
 
         $tbl = '<table border="0" style="font-size: 7pt;">
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
-                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha.'</td></tr>
+                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA SOLICITUD: </b></td><td>'.$fecha_soli.'</td></tr>
+                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA CERTIFICACION: </b></td><td>'.$fecha.'</td></tr>
                 <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['unidad_ejecutora'].'</td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
                 <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td></td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
                 <tr><td colspan="4"><b>CATEGORIA DE COMPRA: </b> '.($this->datos[0]['codigo_moneda']=='Bs'?'Compra Nacional.':'Compra Internacional.').'</td></tr>
