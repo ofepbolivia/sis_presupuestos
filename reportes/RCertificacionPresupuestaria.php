@@ -82,7 +82,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
 
         /*AUMENTANDO CODIGO PRUEBA IRVA*/
-        $fecha_soli = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
+      //  $fecha_soli = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
         /**************************/
 
 
@@ -111,12 +111,12 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         $tbl = '<table border="0" style="font-size: 7pt;">
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
-                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA SOLICITUD: </b></td><td>'.$fecha_soli.'</td></tr>
+                <!-- <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA SOLICITUD: </b></td><td>'.$fecha_soli.'</td></tr> -->
                 <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA CERTIFICACION: </b></td><td>'.$fecha.'</td></tr>
                 <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['unidad_ejecutora'].'</td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
                 <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td></td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
                 <tr><td colspan="4"><b>CATEGORIA DE COMPRA: </b> '.($this->datos[0]['codigo_moneda']=='Bs'?'Compra Nacional.':'Compra Internacional.').'</td></tr>
-                ';
+                '; 
 
         $this->Ln(5);
         $this->writeHTML ($tbl);
