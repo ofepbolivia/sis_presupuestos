@@ -60,6 +60,10 @@ DECLARE
     v_total_decrementos				numeric;
     va_id_partida					integer[];
     v_id_moneda						integer;
+
+    --variables franklin.espinoza incremento y decremento compromentido procesos (ADQ, TES)
+	  v_correlativo					integer;
+    v_tipo_ajuste					varchar;
 			    
 BEGIN
 

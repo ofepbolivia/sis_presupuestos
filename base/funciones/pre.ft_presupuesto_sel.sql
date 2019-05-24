@@ -54,6 +54,8 @@ DECLARE
     
     --variables certificacion especiales
     v_procesos_excepcion 			json;
+    --(franklin.espinoza) variables certificacion presupuestaria modificada
+	  v_record_ajuste					record;
 
 BEGIN
 

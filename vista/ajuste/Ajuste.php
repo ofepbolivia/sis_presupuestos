@@ -595,8 +595,47 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
         this.reload();
     },
     fin_registro: function(a,b,forzar_fin, paneldoc){                   
-            var d = this.sm.getSelected().data;
-            this.mostrarWizard(this.sm.getSelected());
+            var d = this.getSelectedData();
+
+            if (d.tipo_ajuste == "inc_comprometido"){
+
+                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-1').store;
+                var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+
+                if(d.importe_ajuste == importe_total){
+
+                    this.mostrarWizard(this.sm.getSelected());
+                }else{
+                    Ext.Msg.show({
+                        title: 'Información',
+                        msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, aun falta completar el importe de los destalles.',
+                        buttons: Ext.Msg.OK,
+                        width: 512,
+                        icon: Ext.Msg.INFO
+                    });
+                }
+            }else if(d.tipo_ajuste == "rev_comprometido"){
+
+                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-1').store;
+                var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+
+                if(d.importe_ajuste == importe_total){
+
+                    this.mostrarWizard(this.sm.getSelected());
+                }else{
+                    Ext.Msg.show({
+                        title: 'Información',
+                        msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, aun falta completar el importe de los destalles.',
+                        buttons: Ext.Msg.OK,
+                        width: 512,
+                        icon: Ext.Msg.INFO
+                    });
+                }
+            }
+            else{
+                this.mostrarWizard(this.sm.getSelected());
+            }
+
 	},
 	
 	mostrarWizard : function(rec) {
