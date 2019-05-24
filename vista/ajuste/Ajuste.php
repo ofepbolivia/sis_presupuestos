@@ -204,8 +204,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                       ['reformulacion','Reformulación'],
                                       ['incremento','Incremento'],
                                       ['decremento','Decremento'],
-                                      ['inc_comprometido','Comprometer'],
-                                      ['rev_comprometido','Revertir Comprometido']]}),
+                                      ['inc_comprometido','Incrementar Comprometido -> [ADQ, TES]'],
+                                      ['rev_comprometido','Revertir Comprometido -> [ADQ, TES]']]}),
             },
             type:'ComboBox',
             id_grupo:1,
@@ -338,7 +338,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'justificacion',
-				fieldLabel: 'justificacion',
+				fieldLabel: 'Justificacion',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 280,

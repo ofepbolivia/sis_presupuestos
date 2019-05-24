@@ -15,6 +15,7 @@ require_once(dirname(__FILE__).'/../../sis_mantenimiento/reportes/pxpReport/Data
 require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RCertificacionPresupuestaria.php');
 require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RPoaPDF.php');
 require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RNotaIntern.php');
+require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RCertificacionPresupuestariaMod.php');
 
 class ACTPresupuesto extends ACTbase{    
 			
@@ -285,6 +286,29 @@ class ACTPresupuesto extends ACTbase{
         $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 
         $this->objReporte = new RNotaIntern($this->objParam);
+        $this->objReporte->setDatos($this->dataSource);
+        $this->objReporte->generarReporte();
+        $this->objReporte->output($this->objReporte->url_archivo,'F');
+
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado', 'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+
+    //(franklin.espinoza) 23/5/2019 Certificacion Presupuestaria Modificada
+    function reporteCertificacionPMod (){
+        $this->objFunc=$this->create('MODPresupuesto');
+        $dataSource=$this->objFunc->reporteCertificacionPMod();
+        $this->dataSource=$dataSource->getDatos();
+
+        $nombreArchivo = uniqid(md5(session_id()).'[Reporte-CertificaciónPresupuestariaMod]').'.pdf';
+        $this->objParam->addParametro('orientacion','P');
+        $this->objParam->addParametro('tamano','LETTER');
+        $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+
+        $this->objReporte = new RCertificacionPresupuestariaMod($this->objParam);
         $this->objReporte->setDatos($this->dataSource);
         $this->objReporte->generarReporte();
         $this->objReporte->output($this->objReporte->url_archivo,'F');

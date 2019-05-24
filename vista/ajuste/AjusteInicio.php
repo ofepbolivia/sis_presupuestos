@@ -19,8 +19,7 @@ Phx.vista.AjusteInicio = {
 	require: '../../../sis_presupuestos/vista/ajuste/Ajuste.php',
 	requireclase: 'Phx.vista.Ajuste',
 	title: 'Ajustes Presupuestarios',
-	nombreVista: 'AjusteInicio',	
-	
+	nombreVista: 'AjusteInicio',
 	swEstado : 'borrador',
     gruposBarraTareas:[{name:'borrador',title:'<H1 align="center"><i class="fa fa-thumbs-o-down"></i> Borradores</h1>', grupo:0,height:0},
                         {name:'en_proceso',title:'<H1 align="center"><i class="fa fa-eye"></i> En Proceso</h1>', grupo:1,height:0},
@@ -30,7 +29,8 @@ Phx.vista.AjusteInicio = {
      bactGroups:  [0,1,2],
      btestGroups: [0],
      bexcelGroups: [0,1,2],
-	
+	//fwidth: '40%',
+    fheight: '60%',
 	constructor: function(config) {
 		Phx.vista.AjusteInicio.superclass.constructor.call(this,config);
         this.init();        
@@ -124,7 +124,7 @@ Phx.vista.AjusteInicio = {
 	        	this.Cmp.nro_tramite_aux.store.baseParams.fecha_ajuste = this.Cmp.fecha.getValue().dateFormat(this.Cmp.fecha.format);
 	             
 	             },this);
-             
+
            this.Cmp.tipo_ajuste.on('select',function(cmp,rec){        	
            	   
            	   if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido'){
@@ -152,14 +152,21 @@ Phx.vista.AjusteInicio = {
        this.Cmp.fecha.disable();
     },
      onButtonNew:function(){
-	       //abrir formulario de solicitud
+         //abrir formulario de solicitud
 	     var me = this;
+	     
+         this.Cmp.movimiento.on('render', function(cmb){
+             var fila= cmb.getStore().getAt(1);//selecciono primera fila
+             cmb.setValue(fila.get('variable'));//ingreso el value del combo
+         }, this);
+
 	     Phx.vista.AjusteInicio.superclass.onButtonNew.call(this);
 	     this.Cmp.nro_tramite_aux.enable();
 	     this.Cmp.tipo_ajuste.enable();
          this.Cmp.fecha.enable();
 	     this.mostrarComponente(this.Cmp.nro_tramite_aux);
-		   
+         //this.Cmp.movimiento.setValue(this.Cmp.movimiento.store.getAt(1).get('variable'));
+         
 	}    
 };
 </script>

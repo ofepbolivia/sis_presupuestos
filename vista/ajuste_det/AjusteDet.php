@@ -111,11 +111,12 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 					
 				}
 			},
-				type:'NumberField',
-				filters:{pfiltro:'ajd.importe',type:'numeric'},
-				id_grupo:1,
-				grid:true,
-				form:true
+            type:'NumberField',
+            filters:{pfiltro:'ajd.importe',type:'numeric'},
+            id_grupo:1,
+            egrid:true,
+            grid:true,
+            form:true
 		},
 		{
 			config:{

@@ -68,70 +68,78 @@ BEGIN
     
    
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_AJU_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		RAC	
+ 	#AUTOR:		RAC
  	#FECHA:		13-04-2016 13:21:12
 	***********************************/
 
 	if(p_transaccion = 'PRE_AJU_INS')then
-					
+
         begin
-        
+
          -- determina la gestion segun fecha
-        
-           select 
-               per.id_gestion 
-             into 
-                v_id_gestion 
+
+           select
+               per.id_gestion
+             into
+                v_id_gestion
             from
-              param.tperiodo per 
+              param.tperiodo per
               where per.fecha_ini <= v_parametros.fecha
                and per.fecha_fin >=  v_parametros.fecha
                and per.estado_reg = 'activo'
                limit 1 offset 0;
-        	
+
           --obtener el codigo del tipo de proceso
-          
-          select   
-               tp.codigo, 
-               pm.id_proceso_macro 
-            into 
-               v_codigo_tipo_proceso, 
+
+          select
+               tp.codigo,
+               pm.id_proceso_macro
+            into
+               v_codigo_tipo_proceso,
                v_id_proceso_macro
-          from  wf.tproceso_macro pm  
+          from  wf.tproceso_macro pm
           inner join wf.ttipo_proceso tp on tp.id_proceso_macro = pm.id_proceso_macro
           inner join segu.tsubsistema s on s.id_subsistema = pm.id_subsistema
-          where   tp.estado_reg = 'activo' 
+          where   tp.estado_reg = 'activo'
                   and tp.inicio = 'si'
                   and pm.codigo = 'AJT'
                   and s.codigo = 'PRE';
-                  
-                  
+
+
          IF  v_parametros.importe_ajuste is null or  v_parametros.importe_ajuste <=0 THEN
             raise exception 'Tiene que definir un importe a ajustar mayor a cero';
-         END IF;         
-                  
-                  
+         END IF;
+
+
          IF v_codigo_tipo_proceso is NULL THEN
            raise exception 'No existe un proceso inicial para el proceso macro indicado (Revise la configuración)';
          END IF;
-         
+
          --recuperamos la moenda del tramite en partida ejecucion
          IF  v_parametros.tipo_ajuste in ('inc_comprometido','rev_comprometido') and  v_parametros.nro_tramite_aux is not null and v_parametros.nro_tramite_aux != ''THEN
-            select               
+            select
                pe.id_moneda
             into
               v_id_moneda
             from pre.tpartida_ejecucion pe
             where pe.nro_tramite = v_parametros.nro_tramite_aux
             limit 1 offset 0;
-         ELSE   
+         ELSE
             v_id_moneda = param.f_get_moneda_base();
          END IF;
-         
-          
+         --franklin.espinoza insertar correlativo y detalle
+         select max(taj.correlativo)
+         into v_correlativo
+         from pre.tajuste taj
+         where taj.nro_tramite = v_parametros.nro_tramite_aux;
+
+         v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento' else 'decremento' end;
+
+
+
          -- Sentencia de la insercion
         	insert into pre.tajuste(
               estado_reg,
@@ -146,8 +154,9 @@ BEGIN
               id_gestion,
               importe_ajuste,
               movimiento,
-              id_moneda
-          	) values(              
+              id_moneda,
+              correlativo
+          	) values(
               'activo',
               'borrador',
               v_parametros.justificacion,
@@ -160,50 +169,87 @@ BEGIN
               v_id_gestion,
               v_parametros.importe_ajuste,
               v_parametros.movimiento,
-              v_id_moneda
+              v_id_moneda,
+              coalesce(v_correlativo+1, 1)
 		  )RETURNING id_ajuste into v_id_ajuste;
-            
-        -- iniciar el tramite en el sistema de WF
-       SELECT 
+
+		insert into pre.tajuste_det(
+              id_presupuesto,
+              importe,
+              id_partida,
+              estado_reg,
+              tipo_ajuste,
+              id_usuario_ai,
+              fecha_reg,
+              usuario_ai,
+              id_usuario_reg,
+              fecha_mod,
+              id_usuario_mod,
+              id_ajuste
+          ) select
+              tsd.id_centro_costo,
+              0,
+              tsd.id_partida,
+              'activo',
+              v_tipo_ajuste,
+              v_parametros._id_usuario_ai,
+              now(),
+              v_parametros._nombre_usuario_ai,
+              p_id_usuario,
+              null,
+              null,
+              v_id_ajuste
+          from adq.tsolicitud_det tsd
+          inner join adq.tsolicitud ts on ts.id_solicitud = tsd.id_solicitud
+          where ts.num_tramite = v_parametros.nro_tramite_aux;
+
+       SELECT tf.id_funcionario
+       INTO v_id_funcionario
+       FROM segu.tusuario tu
+       INNER JOIN orga.tfuncionario tf on tf.id_persona = tu.id_persona
+       WHERE tu.id_usuario = p_id_usuario ;
+
+       -- iniciar el tramite en el sistema de WF
+       SELECT
              ps_num_tramite ,
              ps_id_proceso_wf ,
              ps_id_estado_wf ,
-             ps_codigo_estado 
+             ps_codigo_estado
           into
              v_num_tramite,
              v_id_proceso_wf,
              v_id_estado_wf,
-             v_codigo_estado   
-              
+             v_codigo_estado
+
         FROM wf.f_inicia_tramite(
-             p_id_usuario, 
+             p_id_usuario,
              v_parametros._id_usuario_ai,
              v_parametros._nombre_usuario_ai,
-             v_id_gestion, 
-             v_codigo_tipo_proceso, 
-             NULL,
+             v_id_gestion,
+             v_codigo_tipo_proceso,
+             v_id_funcionario,
              NULL,
              'Inicio de  '|| v_parametros.tipo_ajuste,
              '',
              v_parametros.nro_tramite_aux);
-        
+
           -- UPDATE DATOS wf
-        
+
           UPDATE pre.tajuste  SET
              nro_tramite = v_num_tramite,
              id_proceso_wf = v_id_proceso_wf,
              id_estado_wf = v_id_estado_wf,
              estado = v_codigo_estado
           WHERE id_ajuste = v_id_ajuste;
-          
+
           -- inserta documentos en estado borrador si estan configurados
            v_resp_doc =  wf.f_inserta_documento_wf(p_id_usuario, v_id_proceso_wf, v_id_estado_wf);
-           
+
            -- verificar documentos
-           v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf); 
-			
+           v_resp_doc = wf.f_verifica_documento(p_id_usuario, v_id_estado_wf);
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ajustes almacenado(a) con exito (id_ajuste'||v_id_ajuste||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Ajustes almacenado(a) con exito (id_ajuste'||v_id_ajuste||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_ajuste',v_id_ajuste::varchar);
 
             --Devuelve la respuesta

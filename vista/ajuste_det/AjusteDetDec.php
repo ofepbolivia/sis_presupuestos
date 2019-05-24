@@ -14,7 +14,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.AjusteDetDec = {
     bedit: true,
     bnew: true,
-    bsave: false,
+    bsave: true,
     bdel: true,
 	require: '../../../sis_presupuestos/vista/ajuste_det/AjusteDet.php',
 	requireclase: 'Phx.vista.AjusteDet',
