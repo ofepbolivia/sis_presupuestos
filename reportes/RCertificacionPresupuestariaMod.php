@@ -18,7 +18,7 @@ class RCertificacionPresupuestariaMod extends  ReportePDF{
 
 
         $this->SetFont('','B',12);
-        $this->Cell(0,5,"MODIFICACIÓN CERTIFICACIÓN PRESUPUESTARIA",0,1,'C');
+        $this->Cell(0,5,"CERTIFICACIÓN PRESUPUESTARIA",0,1,'C');
         $this->Ln(2);
 
         $this->SetFont('','',10);
@@ -68,8 +68,8 @@ class RCertificacionPresupuestariaMod extends  ReportePDF{
             }
         }
 
-        if($firma_fecha[0]=='aprobado' || $firma_fecha[0]=='revision') {
-            $fecha = date_format(date_create($firma_elaborado[1]), 'd/m/Y');
+        if($firma_fecha[0]=='aprobado' /*|| $firma_fecha[0]=='revision'*/) {
+            $fecha = date_format(date_create($firma_fecha[1]), 'd/m/Y');
         }else{
             $fecha='SIN CERTIFICAR';
         }
@@ -83,8 +83,9 @@ class RCertificacionPresupuestariaMod extends  ReportePDF{
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
                 <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA CERTIFICACION: </b></td><td>'.$fecha.'</td></tr>
                 <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['unidad_ejecutora'].'</td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
-                <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td></td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
-                <tr><td><b>CATEGORIA DE COMPRA: </b> </td><td>'.($this->datos[0]['codigo_moneda']=='Bs'?'Compra Nacional.':'Compra Internacional.').'</td><td><b>TIPO AJUSTE: </b></td><td>'.$this->datos[0]['tipo_ajuste'].'</td></tr>
+                <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b>&nbsp;&nbsp;&nbsp;</td><td>Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
+                <tr><td><b>CATEGORIA DE COMPRA: </b> </td><td>'.($this->datos[0]['codigo_moneda']=='Bs'?'Compra Nacional.':'Compra Internacional.').'</td><td><b>TIPO DOCUMENTO: </b></td><td>'.$this->datos[0]['tipo_ajuste'].'</td></tr>
+                <tr><td></td><td></td><td><b>SECUENCIA:</b></td><td>'.$this->datos[0]['correlativo'].'</td></tr>
                 ';
 
         $this->Ln(5);

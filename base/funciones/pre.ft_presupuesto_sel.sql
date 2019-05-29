@@ -890,7 +890,7 @@ BEGIN
             tcg.nombre AS nombre_cg,
             sum(tad.importe) AS precio_total,
             tmo.codigo AS codigo_moneda,
-            (taj.nro_tramite||''-M''||taj.correlativo)::varchar as num_tramite,
+            taj.nro_tramite,
 
             '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
             COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
@@ -905,8 +905,8 @@ BEGIN
             taj.fecha::date AS fecha_soli,
 
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
-            (case when substring(taj.tipo_ajuste,1,3) = ''inc'' then ''INCREMENTAR'' else ''REVERTIR'' end)::varchar as tipo_ajuste
-
+            (case when substring(taj.tipo_ajuste,1,3) = ''inc'' then ''AUMENTO'' else ''DISMINUCIÓN'' end)::varchar as tipo_ajuste,
+            taj.correlativo
             FROM pre.tajuste taj
             INNER JOIN pre.tajuste_det tad ON tad.id_ajuste = taj.id_ajuste
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tad.id_partida
