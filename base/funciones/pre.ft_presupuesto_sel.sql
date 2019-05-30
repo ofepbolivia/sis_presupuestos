@@ -905,10 +905,11 @@ BEGIN
             taj.fecha::date AS fecha_soli,
 
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
-            (case when substring(taj.tipo_ajuste,1,3) = ''inc'' then ''AUMENTO'' else ''DISMINUCIÓN'' end)::varchar as tipo_ajuste,
+            (case when substring(taj.tipo_ajuste,12) = ''inc_comprometido'' then ''AUMENTO'' when substring(taj.tipo_ajuste,12) = ''rev_comprometido'' then ''DISMINUCIÓN'' else ''REVERSIÓN'' end)::varchar as tipo_ajuste,
             taj.correlativo
             FROM pre.tajuste taj
             INNER JOIN pre.tajuste_det tad ON tad.id_ajuste = taj.id_ajuste
+            inner join wf.tproceso_wf tpf on tpf.id_proceso = taj.id_proceso
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tad.id_partida
 
             inner join param.tgestion tg on tg.id_gestion = taj.id_gestion

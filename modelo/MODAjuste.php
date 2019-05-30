@@ -169,6 +169,23 @@ class MODAjuste extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+
+    function getImporteTotalProceso(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_ajuste_ime';
+        $this->transaccion='PR_GET_IMP_TOT_IME';
+        $this->tipo_procedimiento='IME';
+        //Define los parametros para la funcion
+        $this->setParametro('nro_tramite','nro_tramite','varchar');
+
+        $this->captura('importe_total','numeric');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 }
 ?>

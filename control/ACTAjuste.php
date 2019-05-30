@@ -64,7 +64,12 @@ class ACTAjuste extends ACTbase{
         $this->objFunc=$this->create('MODAjuste');  
         $this->res=$this->objFunc->anteriorEstadoAjuste($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
-    }
+   }
+   function getImporteTotalProceso(){
+        $this->objFunc=$this->create('MODAjuste');
+        $this->res=$this->objFunc->getImporteTotalProceso($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+   }
 			
 }
 

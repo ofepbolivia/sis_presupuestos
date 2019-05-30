@@ -140,7 +140,7 @@ BEGIN
          from pre.tajuste taj
          where taj.nro_tramite = v_parametros.nro_tramite_aux;
 
-         v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento' else 'decremento' end;
+          v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento' else 'decremento' end;
 
 
 
@@ -164,7 +164,7 @@ BEGIN
               'activo',
               'borrador',
               v_parametros.justificacion,
-              v_parametros.tipo_ajuste,
+              case when v_parametros.tipo_ajuste = 'rev_total_comprometido' then 'rev_comprometido' else v_parametros.tipo_ajuste end,
               p_id_usuario,
               now(),
               v_parametros._nombre_usuario_ai,
@@ -192,7 +192,7 @@ BEGIN
               id_ajuste
           ) select
               tsd.id_centro_costo,
-              0,
+              case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -tsd.precio_total end,
               tsd.id_partida,
               'activo',
               v_tipo_ajuste,
@@ -835,7 +835,29 @@ BEGIN
         
         
         
-        end;   
+        end;
+    /*********************************
+ 	#TRANSACCION:  'PR_GET_IMP_TOT_IME'
+ 	#DESCRIPCION:	Listado del importe total proceso
+ 	#AUTOR:		franklin.espinoza
+ 	#FECHA:		13-04-2016 13:21:12
+	***********************************/
+
+	elsif(p_transaccion='PR_GET_IMP_TOT_IME')then
+
+		begin
+            select sum(tsd.precio_total)
+            into v_importe_total
+            from adq.tsolicitud ts
+            inner join adq.tsolicitud_det tsd on tsd.id_solicitud = ts.id_solicitud
+            where ts.num_tramite = v_parametros.nro_tramite;
+
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se recupera con exito el importe)');
+            v_resp = pxp.f_agrega_clave(v_resp,'importe_total',v_importe_total::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+		end;
     
     else
      

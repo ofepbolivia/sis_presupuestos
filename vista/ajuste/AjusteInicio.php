@@ -95,11 +95,11 @@ Phx.vista.AjusteInicio = {
           this.getBoton('btnChequeoDocumentosWf').enable(); 
           this.getBoton('diagrama_gantt').enable();
           
-          if (data['tipo_ajuste'] == 'incremento' || data['tipo_ajuste'] == 'inc_comprometido'){ 
+          if (data['tipo_ajuste'] == 'incremento' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido'){
           	 this.disableTabDecrementos();
           }
           else {
-          	if (data['tipo_ajuste'] == 'decremento' || data['tipo_ajuste'] == 'rev_comprometido'){ 
+          	if (data['tipo_ajuste'] == 'decremento' || data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido'){
           	  this.disableTabIncrementos();
             }
             else{
@@ -107,7 +107,7 @@ Phx.vista.AjusteInicio = {
             }
           }
           
-          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido'){
+          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido'){
           	 this.getBoton('chkpresupuesto').enable();
           } 
           else{
@@ -127,13 +127,36 @@ Phx.vista.AjusteInicio = {
 
            this.Cmp.tipo_ajuste.on('select',function(cmp,rec){        	
            	   
-           	   if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido'){
-                	 this.mostrarComponente(this.Cmp.nro_tramite_aux);
+           	   if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_total_comprometido'){
+                   this.Cmp.nro_tramite_aux.reset();
+                   this.Cmp.nro_tramite_aux.modificado = true;
+           	       this.mostrarComponente(this.Cmp.nro_tramite_aux);
                 }
                 else{
+                   this.Cmp.importe_ajuste.reset();
+                   this.Cmp.importe_ajuste.modificado = true;
                 	 this.ocultarComponente(this.Cmp.nro_tramite_aux);
                 }
            	
+           },this);
+
+           this.Cmp.nro_tramite_aux.on('select',function(cmp,rec){
+               Ext.Ajax.request({
+                   url:'../../sis_presupuestos/control/Ajuste/getImporteTotalProceso',
+                   params:{nro_tramite:this.Cmp.nro_tramite_aux.getRawValue()},
+                   success:function(resp){
+                       var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                       if (this.Cmp.tipo_ajuste.getValue() != 'rev_total_comprometido') {
+                           this.Cmp.importe_ajuste.setValue()
+                       }else{
+                           this.Cmp.importe_ajuste.setValue(reg.ROOT.datos.importe_total);
+                       }
+
+                   },
+                   failure: this.conexionFailure,
+                   timeout:this.timeout,
+                   scope:this
+               });
            },this);
       
     },
@@ -141,7 +164,7 @@ Phx.vista.AjusteInicio = {
        var rec = this.getSelectedData();
        Phx.vista.AjusteInicio.superclass.onButtonEdit.call(this);
        
-       if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido'){
+       if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_total_comprometido'){
             this.mostrarComponente(this.Cmp.nro_tramite_aux);
        }
        else{
@@ -165,8 +188,8 @@ Phx.vista.AjusteInicio = {
 	     this.Cmp.tipo_ajuste.enable();
          this.Cmp.fecha.enable();
 	     this.mostrarComponente(this.Cmp.nro_tramite_aux);
-         //this.Cmp.movimiento.setValue(this.Cmp.movimiento.store.getAt(1).get('variable'));
          
+	     //this.Cmp.movimiento.setValue(this.Cmp.movimiento.store.getAt(1).get('variable'));
 	}    
 };
 </script>

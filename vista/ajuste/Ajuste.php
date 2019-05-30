@@ -204,8 +204,10 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                       ['reformulacion','Reformulación'],
                                       ['incremento','Incremento'],
                                       ['decremento','Decremento'],
-                                      ['inc_comprometido','Incrementar Comprometido -> [ADQ, TES]'],
-                                      ['rev_comprometido','Revertir Comprometido -> [ADQ, TES]']]}),
+                                      ['inc_comprometido','Aumento Comprometido -> [ADQ, TES]'],
+                                      ['rev_comprometido','Disminución Comprometido -> [ADQ, TES]'],
+                                      ['rev_total_comprometido','Reversión Comprometido -> [ADQ, TES]']
+                            ]}),
             },
             type:'ComboBox',
             id_grupo:1,
@@ -614,18 +616,18 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                         icon: Ext.Msg.INFO
                     });
                 }
-            }else if(d.tipo_ajuste == "rev_comprometido"){
+            }else if(d.tipo_ajuste == "rev_comprometido" || d.tipo_ajuste == "rev_total_comprometido"){
 
-                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-1').store;
+                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-0').store;
                 var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
 
-                if(d.importe_ajuste == importe_total){
+                if(d.importe_ajuste == importe_total || d.importe_ajuste == -importe_total){
 
                     this.mostrarWizard(this.sm.getSelected());
                 }else{
                     Ext.Msg.show({
                         title: 'Información',
-                        msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, aun falta completar el importe de los destalles.',
+                        msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, Los montos totales no coinciden <b>Modificación</b> (Importe = '+d.importe_ajuste+') ; <b>Detalle</b> ( Importe = '+importe_total+') .',
                         buttons: Ext.Msg.OK,
                         width: 512,
                         icon: Ext.Msg.INFO
@@ -641,8 +643,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 	mostrarWizard : function(rec) {
      	var configExtra = [],
      		obsValorInicial;
-     	 
-     	console.log('rec.data',rec.data)
+
      	this.objWizard = Phx.CP.loadWindows('../../../sis_workflow/vista/estado_wf/FormEstadoWf.php',
                                 'Estado de Wf',
                                 {
@@ -791,13 +792,13 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 	tabeast:[
 	      {
     		  url:'../../../sis_presupuestos/vista/ajuste_det/AjusteDetDec.php',
-    		  title:'Decrementos (-)', 
+    		  title:'Disminución (-)',
     		  width:'60%',
     		  cls:'AjusteDetDec'
 		  },
           {
     		  url:'../../../sis_presupuestos/vista/ajuste_det/AjusteDetInc.php',
-    		  title:'Incrementos (+)', 
+    		  title:'Aumento (+)',
     		  width:'60%',
     		  cls:'AjusteDetInc'
 		  },
