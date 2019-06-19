@@ -55,8 +55,11 @@ class RMemoriaCalculo extends  ReportePDF {
 		$this->SetFont('','B',7);
 		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
 		$this->Ln(2);
-		
-		$this->SetFont('','',9);
+		//
+        $this->SetFont('','B',8);
+        $this->Cell(0,4,"De: ".($this->fecha_ini). "    A: ".$this->fecha_fin,0,1,'C');
+
+        $this->SetFont('','',9);
 		
 		$height = 5;
         $width1 = 5;
