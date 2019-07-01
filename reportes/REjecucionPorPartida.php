@@ -170,8 +170,12 @@ class REjecucionPorPartida extends  ReportePDF {
 			$this->revisarfinPagina();
         }
         
-        //$por_eje = number_format((float)$this->totales_porcentaje_ejecucion, 2, '.', '');        
-        $calc = (($this->totales_ejecutado / $this->totales_aprobado)*100);
+        //$por_eje = number_format((float)$this->totales_porcentaje_ejecucion, 2, '.', '');
+        if($this->totales_aprobado != 0){        
+            $calc = (($this->totales_ejecutado / $this->totales_aprobado)*100);
+        }else{
+            $calc = 0 ;
+        }
         $por_eje = number_format((float)$calc, 2, '.', '');
         $RowArray = array(
             's2' => 'TOTALES',
