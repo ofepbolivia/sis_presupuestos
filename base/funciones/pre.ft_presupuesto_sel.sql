@@ -51,12 +51,12 @@ DECLARE
     v_nro_cite_dce_fin					varchar;
     v_nro_cite_dce_in					varchar;
     v_nro_tramite					varchar;
-    
+
     --variables certificacion especiales
     v_procesos_excepcion 			json;
     --(franklin.espinoza) variables certificacion presupuestaria modificada
-	  v_record_ajuste					record;
-
+	v_record_ajuste					record;
+	v_tipo_proceso					varchar;
 BEGIN
 
 	v_nombre_funcion = 'pre.ft_presupuesto_sel';
@@ -562,7 +562,7 @@ BEGIN
 	elsif(p_transaccion='PR_REPCERPRE_SEL')then
 
 		begin
-			
+
             v_procesos_excepcion = '{
               "CINTPD-000964-2018":"30/5/2018",
               "CINTPD-000966-2018":"23/5/2018",
@@ -647,10 +647,10 @@ BEGIN
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
             (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
             fun.desc_funcionario1::varchar as funcionario_solicitante,
-            CASE 
+            CASE
             WHEN (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite) is not null then (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite)::date
-            WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date 
-            WHEN ((select count(sold.id_solicitud_det) from adq.tsolicitud_det sold where sold.id_solicitud = ts.id_solicitud and sold.id_concepto_ingas = 2208) >= 1 and (ts.fecha_po between ''13/08/2018''::date and ''13/10/2018''::date)) THEN (ts.fecha_po - 5)::date  
+            WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date
+            WHEN ((select count(sold.id_solicitud_det) from adq.tsolicitud_det sold where sold.id_solicitud = ts.id_solicitud and sold.id_concepto_ingas = 2208) >= 1 and (ts.fecha_po between ''13/08/2018''::date and ''13/10/2018''::date)) THEN (ts.fecha_po - 5)::date
             ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
             COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
             ts.codigo_poa,
@@ -815,11 +815,6 @@ BEGIN
             FROM pre.tajuste taj
             WHERE taj.id_proceso_wf = v_parametros.id_proceso_wf;
 
-            select ts.id_funcionario, ts.id_uo
-            into v_record_sol
-            from adq.tsolicitud ts
-            where ts.num_tramite =  v_record_ajuste.nro_tramite;
-
 
             IF(v_record_ajuste.estado='borrador' OR v_record_ajuste.estado='revision' OR v_record_ajuste.estado = 'aprobado')THEN
               v_index = 1;
@@ -874,69 +869,89 @@ BEGIN
             FROM pre.tunidad_ejecutora tue;
             ---
 
-			--Sentencia de la consulta de conteo de registros
-			v_consulta:='
-            SELECT
-            vcp.id_categoria_programatica AS id_cp,
-            ttc.codigo AS centro_costo,
-            vcp.codigo_programa ,
-            vcp.codigo_proyecto,
-            vcp.codigo_actividad,
-            vcp.codigo_fuente_fin,
-            vcp.codigo_origen_fin,
-            tpar.codigo AS codigo_partida,
-            tpar.nombre_partida ,
-            tcg.codigo AS codigo_cg,
-            tcg.nombre AS nombre_cg,
-            sum(tad.importe) AS precio_total,
-            tmo.codigo AS codigo_moneda,
-            taj.nro_tramite,
+			--(f.e.a)inserccion detalle
+            select pm.codigo
+            into v_tipo_proceso
+            from wf.tproceso_wf pwf
+            inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+            inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+            where pwf.nro_tramite = v_record_ajuste.nro_tramite limit 1;
 
-            '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
-            COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
-            '''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
-            COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
-            COALESCE('''||v_record_ajuste.justificacion||'''::varchar,'''') AS justificacion,
+        	if v_tipo_proceso in ('CINTPD','CNAPD','CINTBR') then
+              select ts.id_funcionario, ts.id_uo
+              into v_record_sol
+              from adq.tsolicitud ts
+              where ts.num_tramite =  v_record_ajuste.nro_tramite;
+            else
+              select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,current_date) as id_uo
+              into v_record_sol
+              from tes.tobligacion_pago ts
+              where ts.num_tramite =  v_record_ajuste.nro_tramite;
+            end if;
 
-            COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
-            (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
-            fun.desc_funcionario1::varchar as funcionario_solicitante,
+              --Sentencia de la consulta de conteo de registros
+            v_consulta:='
+              SELECT
+              vcp.id_categoria_programatica AS id_cp,
+              ttc.codigo AS centro_costo,
+              vcp.codigo_programa ,
+              vcp.codigo_proyecto,
+              vcp.codigo_actividad,
+              vcp.codigo_fuente_fin,
+              vcp.codigo_origen_fin,
+              tpar.codigo AS codigo_partida,
+              tpar.nombre_partida ,
+              tcg.codigo AS codigo_cg,
+              tcg.nombre AS nombre_cg,
+              sum(tad.importe) AS precio_total,
+              tmo.codigo AS codigo_moneda,
+              taj.nro_tramite,
 
-            taj.fecha::date AS fecha_soli,
+              '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
+              COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
+              '''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+              COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
+              COALESCE('''||v_record_ajuste.justificacion||'''::varchar,'''') AS justificacion,
 
-            COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
-            (case when substring(taj.tipo_ajuste,12) = ''inc_comprometido'' then ''AUMENTO'' when substring(taj.tipo_ajuste,12) = ''rev_comprometido'' then ''DISMINUCIÓN'' else ''REVERSIÓN'' end)::varchar as tipo_ajuste,
-            taj.correlativo
-            FROM pre.tajuste taj
-            INNER JOIN pre.tajuste_det tad ON tad.id_ajuste = taj.id_ajuste
-            inner join wf.tproceso_wf tpf on tpf.id_proceso = taj.id_proceso
-            INNER JOIN pre.tpartida tpar ON tpar.id_partida = tad.id_partida
+              COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
+              (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
+              fun.desc_funcionario1::varchar as funcionario_solicitante,
 
-            inner join param.tgestion tg on tg.id_gestion = taj.id_gestion
+              taj.fecha::date AS fecha_soli,
 
-            INNER JOIN param.tcentro_costo tcc ON tcc.id_centro_costo = tad.id_presupuesto
-            INNER JOIN param.ttipo_cc ttc ON ttc.id_tipo_cc = tcc.id_tipo_cc
+              COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
+              (case when substring(tpf.descripcion,12) = ''inc_comprometido'' then ''AUMENTO'' when substring(tpf.descripcion,12) = ''rev_comprometido'' then ''DISMINUCIÓN'' else ''REVERSIÓN'' end)::varchar as tipo_ajuste,
+              taj.correlativo
+              FROM pre.tajuste taj
+              INNER JOIN pre.tajuste_det tad ON tad.id_ajuste = taj.id_ajuste
+              inner join wf.tproceso_wf tpf on tpf.id_proceso_wf = taj.id_proceso_wf
+              INNER JOIN pre.tpartida tpar ON tpar.id_partida = tad.id_partida
 
-            INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tad.id_presupuesto
-            INNER JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = tp.id_categoria_prog
+              inner join param.tgestion tg on tg.id_gestion = taj.id_gestion
 
-            INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida
-            INNER JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
+              INNER JOIN param.tcentro_costo tcc ON tcc.id_centro_costo = tad.id_presupuesto
+              INNER JOIN param.ttipo_cc ttc ON ttc.id_tipo_cc = tcc.id_tipo_cc
 
-            INNER JOIN param.tmoneda tmo ON tmo.id_moneda = taj.id_moneda
+              INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tad.id_presupuesto
+              INNER JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = tp.id_categoria_prog
 
-            inner join orga.vfuncionario fun on fun.id_funcionario = '||v_record_sol.id_funcionario||'
-            inner join orga.tuo uo on uo.id_uo = '||v_record_sol.id_uo||'
+              INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida
+              INNER JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
 
-            left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
+              INNER JOIN param.tmoneda tmo ON tmo.id_moneda = taj.id_moneda
 
-            left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
+              inner join orga.vfuncionario fun on fun.id_funcionario = '||v_record_sol.id_funcionario||'
+              inner join orga.tuo uo on uo.id_uo = '||v_record_sol.id_uo||'
 
-            WHERE tad.estado_reg = ''activo'' AND taj.id_proceso_wf = '||v_parametros.id_proceso_wf;
+              left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
+
+              left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
+
+              WHERE tad.estado_reg = ''activo'' AND taj.id_proceso_wf = '||v_parametros.id_proceso_wf;
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, taj.nro_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
-            taj.fecha, tg.gestion, taj.tipo_ajuste, taj.correlativo';
+            taj.fecha, tg.gestion, taj.tipo_ajuste, taj.correlativo, tpf.descripcion';
 
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta

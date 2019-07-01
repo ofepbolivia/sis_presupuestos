@@ -33,6 +33,7 @@ class ACTAjusteDet extends ACTbase{
 		
 		$temp = Array();
 		$temp['importe'] = $this->res->extraData['total_importe'];
+		$temp['desc_partida'] = '<b style="color: green; font-size: 15pt; ">Total:</b>';
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_ajuste_det'] = 0;
 		
@@ -59,6 +60,12 @@ class ACTAjusteDet extends ACTbase{
 		$this->res=$this->objFunc->eliminarAjusteDet($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
+    //franklin.espinoza total detalle ajuste
+    function getImporteTotalDetalle(){
+        $this->objFunc=$this->create('MODAjusteDet');
+        $this->res=$this->objFunc->getImporteTotalDetalle($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 			
 }
 
