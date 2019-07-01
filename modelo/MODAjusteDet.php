@@ -114,6 +114,23 @@ class MODAjusteDet extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
+    //franklin.espinoza total detalle ajuste
+    function getImporteTotalDetalle(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_ajuste_det_ime';
+        $this->transaccion='PRE_AJD_IMP_TOT_IME';
+        $this->tipo_procedimiento='IME';
+        //Define los parametros para la funcion
+        $this->setParametro('id_ajuste','id_ajuste','integer');
+
+        $this->captura('importe_total','numeric');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 			
 }
 ?>

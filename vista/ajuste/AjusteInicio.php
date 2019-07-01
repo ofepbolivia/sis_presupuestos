@@ -95,7 +95,7 @@ Phx.vista.AjusteInicio = {
           this.getBoton('btnChequeoDocumentosWf').enable(); 
           this.getBoton('diagrama_gantt').enable();
           
-          if (data['tipo_ajuste'] == 'incremento' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido'){
+          if (data['tipo_ajuste'] == 'incremento' || data['tipo_ajuste'] == 'inc_comprometido'){
           	 this.disableTabDecrementos();
           }
           else {

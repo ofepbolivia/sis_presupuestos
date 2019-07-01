@@ -14,13 +14,13 @@ $body$
  DESCRIPCION:   Funcion que gestiona las operaciones basicas (inserciones, modificaciones, eliminaciones de la tabla 'pre.tajuste_det'
  AUTOR: 		 (admin)
  FECHA:	        13-04-2016 13:51:41
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -32,35 +32,36 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_ajuste_det	integer;
-			    
+	--(franklin.espinoza)variables total detalle
+    v_importe_total			numeric;
 BEGIN
 
     v_nombre_funcion = 'pre.ft_ajuste_det_ime';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_AJD_INS'
  	#DESCRIPCION:	Insercion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		13-04-2016 13:51:41
 	***********************************/
 
 	if(p_transaccion='PRE_AJD_INS')then
-					
+
         begin
-        
+
             IF v_parametros.tipo_ajuste = 'incremento' THEN
               IF v_parametros.importe <= 0 THEN
                    RAISE EXCEPTION 'en incrementos el importe tiene que ser mayor a cero';
               END IF;
-            
+
             ELSE
               IF v_parametros.importe >= 0 THEN
                    RAISE EXCEPTION 'en decrementos el importe tiene que ser menor a cero';
               END IF;
             END IF;
-            
-            
+
+
         	--Sentencia de la insercion
         	insert into pre.tajuste_det(
                 id_presupuesto,
@@ -89,9 +90,9 @@ BEGIN
                 null,
                 v_parametros.id_ajuste
 		  )RETURNING id_ajuste_det into v_id_ajuste_det;
-			
+
 			--Definicion de la respuesta
-			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle del Ajuste almacenado(a) con exito (id_ajuste_det'||v_id_ajuste_det||')'); 
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle del Ajuste almacenado(a) con exito (id_ajuste_det'||v_id_ajuste_det||')');
             v_resp = pxp.f_agrega_clave(v_resp,'id_ajuste_det',v_id_ajuste_det::varchar);
 
             --Devuelve la respuesta
@@ -99,10 +100,10 @@ BEGIN
 
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_AJD_MOD'
  	#DESCRIPCION:	Modificacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		13-04-2016 13:51:41
 	***********************************/
 
@@ -120,20 +121,20 @@ BEGIN
 			id_usuario_ai = v_parametros._id_usuario_ai,
 			usuario_ai = v_parametros._nombre_usuario_ai
             where id_ajuste_det=v_parametros.id_ajuste_det;
-               
+
 			--Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle del Ajuste modificado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle del Ajuste modificado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_ajuste_det',v_parametros.id_ajuste_det::varchar);
-               
+
             --Devuelve la respuesta
             return v_resp;
-            
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_AJD_ELI'
  	#DESCRIPCION:	Eliminacion de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		13-04-2016 13:51:41
 	***********************************/
 
@@ -143,31 +144,53 @@ BEGIN
 			--Sentencia de la eliminacion
 			delete from pre.tajuste_det
             where id_ajuste_det=v_parametros.id_ajuste_det;
-               
+
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle del Ajuste eliminado(a)'); 
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle del Ajuste eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_ajuste_det',v_parametros.id_ajuste_det::varchar);
-              
+
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-         
+    /*********************************
+ 	#TRANSACCION:  'PRE_AJD_IMP_TOT_IME'
+ 	#DESCRIPCION:	Listado del importe total de los detalles
+ 	#AUTOR:		franklin.espinoza
+ 	#FECHA:		13-04-2016 13:21:12
+	***********************************/
+
+	elsif(p_transaccion='PRE_AJD_IMP_TOT_IME')then
+
+		begin
+            select sum(tad.importe)
+            into v_importe_total
+            from pre.tajuste ta
+            inner join pre.tajuste_det tad on tad.id_ajuste = ta.id_ajuste
+            where ta.id_ajuste = v_parametros.id_ajuste;
+
+			v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Se recupera con exito el importe del detalle)');
+            v_resp = pxp.f_agrega_clave(v_resp,'importe_total',v_importe_total::varchar);
+
+            --Devuelve la respuesta
+            return v_resp;
+		end;
+
 	else
-     
+
     	raise exception 'Transaccion inexistente: %',p_transaccion;
 
 	end if;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'

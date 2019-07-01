@@ -190,8 +190,9 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				                              	'reformulacion':'Reformulación',
 				                              	'incremento':'Incremento',
 				                              	'decremento':'Decremento',
-				                              	'inc_comprometido':'Comprometer',
-				                              	'rev_comprometido':'Revertir Comprometido'
+				                              	'inc_comprometido':'Aumento Comprometido',
+				                              	'rev_comprometido':'Disminución Comprometido',
+                                                'rev_total_comprometido':'Reversión Comprometido'
 				                              };
 				                               
 	                           return String.format('<b><font color="green">{0}</font></b>', ajustes[value]);
@@ -596,49 +597,84 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
         resp.argument.wizard.panel.destroy()
         this.reload();
     },
-    fin_registro: function(a,b,forzar_fin, paneldoc){                   
-            var d = this.getSelectedData();
+   fin_registro: function(a,b,forzar_fin, paneldoc){
+       var d = this.getSelectedData();
+       var that = this;
+       if (d.tipo_ajuste == "inc_comprometido"){
+           //validacion vista
+           if (this.nombreVista == 'AjusteInicio')
+               var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-1').store;
+           else
+               var storeDetalle = Phx.CP.getPagina('docs-VBAJT-east-1').store;
 
-            if (d.tipo_ajuste == "inc_comprometido"){
+           var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+           //validacion bd
+           Ext.Ajax.request({
+               url:'../../sis_presupuestos/control/AjusteDet/getImporteTotalDetalle',
+               params:{id_ajuste : d.id_ajuste},
+               success:function(resp){
+                   var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                   var importe_detalle = reg.ROOT.datos.importe_total;
 
-                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-1').store;
-                var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+                   if(d.importe_ajuste == importe_total && d.importe_ajuste == importe_detalle){
 
-                if(d.importe_ajuste == importe_total){
+                       this.mostrarWizard(this.sm.getSelected());
+                   }else{
+                       Ext.Msg.show({
+                           title: 'Información',
+                           msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, Los montos totales no coinciden <b>Modificación</b> (Importe = '+d.importe_ajuste+') ; <b>Detalle</b> ( Importe = '+importe_detalle+') .<br>' +
+                               '<br><b style="color:red">1.- Una posible razón es que no guardo su detalle.</b>',
+                           buttons: Ext.Msg.OK,
+                           width: 512,
+                           icon: Ext.Msg.INFO
+                       });
+                   }
 
-                    this.mostrarWizard(this.sm.getSelected());
-                }else{
-                    Ext.Msg.show({
-                        title: 'Información',
-                        msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, aun falta completar el importe de los destalles.',
-                        buttons: Ext.Msg.OK,
-                        width: 512,
-                        icon: Ext.Msg.INFO
-                    });
-                }
-            }else if(d.tipo_ajuste == "rev_comprometido" || d.tipo_ajuste == "rev_total_comprometido"){
+               },
+               failure: this.conexionFailure,
+               timeout:this.timeout,
+               scope:this
+           });
+       }else if(d.tipo_ajuste == "rev_comprometido" || d.tipo_ajuste == "rev_total_comprometido"){
 
-                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-0').store;
-                var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+           if (this.nombreVista == 'AjusteInicio')
+               var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-0').store;
+           else
+               var storeDetalle = Phx.CP.getPagina('docs-VBAJT-east-0').store;
 
-                if(d.importe_ajuste == importe_total || d.importe_ajuste == -importe_total){
+           var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
 
-                    this.mostrarWizard(this.sm.getSelected());
-                }else{
-                    Ext.Msg.show({
-                        title: 'Información',
-                        msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, Los montos totales no coinciden <b>Modificación</b> (Importe = '+d.importe_ajuste+') ; <b>Detalle</b> ( Importe = '+importe_total+') .',
-                        buttons: Ext.Msg.OK,
-                        width: 512,
-                        icon: Ext.Msg.INFO
-                    });
-                }
-            }
-            else{
-                this.mostrarWizard(this.sm.getSelected());
-            }
+           //validacion bd
+           Ext.Ajax.request({
+               url:'../../sis_presupuestos/control/AjusteDet/getImporteTotalDetalle',
+               params:{id_ajuste : d.id_ajuste},
+               success:function(resp){
+                   var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                   var importe_detalle = -reg.ROOT.datos.importe_total;
 
-	},
+                   if((d.importe_ajuste == importe_total || d.importe_ajuste == -importe_total) && d.importe_ajuste == importe_detalle){
+
+                       this.mostrarWizard(this.sm.getSelected());
+                   }else{
+                       Ext.Msg.show({
+                           title: 'Información',
+                           msg: '<b>Estimado Usuario:</b><br>No puede dar continuidad al proceso, Los montos totales no coinciden <b>Modificación</b> (Importe = '+d.importe_ajuste+') ; <b>Detalle</b> ( Importe = '+importe_detalle+'). <br>'+
+                               '<br><b style="color:red">1.- Una posible razón es que no guardo su detalle.</b>',
+                           buttons: Ext.Msg.OK,
+                           width: 512,
+                           icon: Ext.Msg.INFO
+                       });
+                   }
+               },
+               failure: this.conexionFailure,
+               timeout:this.timeout,
+               scope:this
+           });
+       }else{
+           this.mostrarWizard(this.sm.getSelected());
+       }
+
+   },
 	
 	mostrarWizard : function(rec) {
      	var configExtra = [],
