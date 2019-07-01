@@ -140,6 +140,7 @@ class ACTMemoriaCalculo extends ACTbase{
 					else{
 						$reporte = new RMemoriaCalculoXls($this->objParam);
 						$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData,$dataGestion->getDatos(),$dataEmpresa->getDatos());
+						$reporte->imprimeCabecera();
 						$reporte->generarReporte();
 					}
 

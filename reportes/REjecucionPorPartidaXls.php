@@ -90,6 +90,45 @@ class REjecucionPorPartidaXls
 		
 		
 	}
+
+    function imprimeCabecera()
+    {
+//        $this->docexcel->createSheet();
+        $styleTitulos1 = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 12,
+                'name' => 'Arial'
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+        );
+
+        $styleTitulos3 = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 11,
+                'name' => 'Arial'
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+
+        );
+
+        //titulos
+
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, 'EJECUCIÓN PRESUPUESTARIA POR PARTIDA');
+        $this->docexcel->getActiveSheet()->getStyle('A2:M2')->applyFromArray($styleTitulos1);
+        $this->docexcel->getActiveSheet()->mergeCells('A2:M2');
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, 'Del: ' . $this->objParam->getParametro('fecha_ini') . '   Al: ' . $this->objParam->getParametro('fecha_fin'));
+        $this->docexcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitulos3);
+        $this->docexcel->getActiveSheet()->mergeCells('A3:M3');
+
+    }
 			
 	function imprimeDatos(){
 		$datos = $this->datos_detalle;
@@ -118,39 +157,39 @@ class REjecucionPorPartidaXls
 								         )
 								     ));
 
-       $this->docexcel->getActiveSheet()->getStyle('B1:M1')->applyFromArray($styleTitulos);
+       $this->docexcel->getActiveSheet()->getStyle('B5:M5')->applyFromArray($styleTitulos);
 		
 		//*************************************Cabecera*****************************************
 		//$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(20);		
 		//$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,1,'Código');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[1])->setWidth(50);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,1,'Presupuesto');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,5,'PRESUPUESTO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[2])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,1,'Según Memoria');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,5,'SEGÚN MEMORIA');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,1,'Aprobado');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,5,'APROBADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,1,'Modificado');//Ajustado
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,5,'MODIFICADO');//Ajustado
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,1,'Vigente');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,5,'VIGENTE');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[6])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,1,'Comprometido');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,5,'COMPROMETIDO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[7])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,1,'Ejecutado');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,5,'EJECUTADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[8])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,1,'Pagado');		
-		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[9])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,1,'Saldo por Comprometer');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,5,'PAGADO');
+		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[9])->setWidth(22);
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,5,'SALDO POR COMPROMETER');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[10])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,1,'Saldo por Ejecutar');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,5,'SALDO POR EJECUTAR');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[11])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,1,'Saldo por Pagar');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,5,'SALDO POR PAGAR');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[12])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,1,'% Ejecución');		
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,5,'% EJECUCIÓN');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[13])->setWidth(20);
 		//*************************************Fin Cabecera*****************************************
 		
-		$fila = 2;
+		$fila = 6;
 		$contador = 1;
 		
 		/////////////////////***********************************Detalle***********************************************
@@ -182,6 +221,7 @@ class REjecucionPorPartidaXls
                 ));
 
             $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':'.'M'.$fila)->applyFromArray($styleTitulos);
+            $this->docexcel->getActiveSheet()->getStyle('C:M')->getNumberFormat()->setFormatCode('#,##0.00');
 
 			//$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,$value['codigo_partida']);
 			$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,$value['codigo_cc']);
@@ -232,6 +272,7 @@ class REjecucionPorPartidaXls
             ));
 
         $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':'.'M'.$fila)->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('C:M')->getNumberFormat()->setFormatCode('#,##0.00');
 
         $por_eje = number_format((float)$this->totales_porcentaje_ejecucion, 2, '.', '');
         $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,'TOTALES');

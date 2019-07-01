@@ -132,6 +132,9 @@ class MODMemoriaCalculo extends MODbase{
 		  $this->setParametro('tipo_pres','tipo_pres','VARCHAR');
 		  $this->setParametro('tipo_reporte','tipo_reporte','VARCHAR');
 		  $this->setParametro('id_partida','id_partida','int4');
+
+        $this->setParametro('fecha_ini', 'fecha_ini', 'date');
+        $this->setParametro('fecha_fin', 'fecha_fin', 'date');
 		
 		  //Definicion de la lista del resultado del query
 		 $this->captura('id_concepto','int4');

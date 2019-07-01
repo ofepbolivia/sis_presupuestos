@@ -28,16 +28,19 @@ class REjecucionPorPartida extends  ReportePDF {
     var $totales_saldoXdevengar = 0;
     var $totales_saldoXpagar = 0;
     var $totales_porcentaje_ejecucion = 0;
+
 	
 	
 	
-	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa) {
+	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa,$fecha_ini, $fecha_fin) {
         //var_dump($detalle,$this->totales);exit;
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->datos_titulo = $totales;
 		$this->datos_entidad = $dataEmpresa;
 		$this->datos_gestion = $gestion;
+        $this->fecha_ini = $fecha_ini;
+        $this->fecha_fin = $fecha_fin;
 		$this->subtotal = 0;
 		$this->SetMargins(7, 65, 5);
 	}
@@ -64,8 +67,11 @@ class REjecucionPorPartida extends  ReportePDF {
 		$this->SetFont('','B',7);
 		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
 		$this->Ln(2);
-		
-		$this->SetFont('','',10);
+        //
+        $this->SetFont('','B',8);
+        $this->Cell(0,4,"De: ".($this->fecha_ini). "    A: ".$this->fecha_fin,0,1,'C');
+
+        $this->SetFont('','',10);
 		
 		$height = 5;
         $width1 = 5;
