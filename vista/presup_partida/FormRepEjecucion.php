@@ -129,7 +129,8 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 	        	data :	[
 		        	        ['programa','Programa'],
 		        	        ['categoria','Categoría Programática'],	
-							['presupuesto','Presupuesto']
+							['presupuesto','Presupuesto'],
+                            ['centro_costo','Centro de Costo']
 						]	        				
 	    		}),
 				valueField:'ID',
@@ -366,34 +367,41 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				this.Cmp.id_categoria_programatica.reset();
 				this.Cmp.id_presupuesto.reset();
 				this.Cmp.id_cp_programa.reset();
+                this.Cmp.nivel.reset();                
 				
 				console.log('--->',record.data.ID)
 				if(record.data.ID == 'programa'){
 					this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
-					this.mostrarComponente(this.Cmp.id_cp_programa);
-					
+					this.mostrarComponente(this.Cmp.id_cp_programa);					
+                    this.mostrarComponente(this.Cmp.nivel);
 				}
 				
 				if(record.data.ID == 'categoria'){
 					this.mostrarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
-					this.ocultarComponente(this.Cmp.id_cp_programa);
-					
+					this.ocultarComponente(this.Cmp.id_cp_programa);                    					
+                    this.mostrarComponente(this.Cmp.nivel);
 				}
 				
 				if(record.data.ID == 'presupuesto'){
 					this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.mostrarComponente(this.Cmp.id_presupuesto);
 					this.ocultarComponente(this.Cmp.id_cp_programa);
+                    this.mostrarComponente(this.Cmp.nivel);
 					
 				}
+                if(record.data.ID == 'centro_costo'){
+					this.ocultarComponente(this.Cmp.id_categoria_programatica);
+					this.ocultarComponente(this.Cmp.id_presupuesto);
+					this.ocultarComponente(this.Cmp.id_cp_programa);                    
+                    this.ocultarComponente(this.Cmp.nivel);
+                }
 				
 				
 			}, this);
 			
-			this.Cmp.tipo_pres.on('change',function(){
-				 
+			this.Cmp.tipo_pres.on('change',function(){				  
 				  this.Cmp.id_presupuesto.reset();
 				  this.Cmp.id_presupuesto.store.baseParams.codigos_tipo_pres = this.Cmp.tipo_pres.getValue();				
 				  this.Cmp.id_presupuesto.modificado = true; 
@@ -436,6 +444,9 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 		if(this.Cmp.tipo_reporte.getValue()=='presupuesto'){
 			this.Cmp.concepto.setValue(this.Cmp.id_presupuesto.getRawValue());
 		}
+        if(this.Cmp.tipo_reporte.getValue()=='centro_costo'){
+            this.Cmp.concepto.setValue(this.Cmp.id_categoria_programatica.getRawValue());
+        }
 		
 		Phx.vista.FormRepEjecucion.superclass.onSubmit.call(this,o, x, force);
 	},

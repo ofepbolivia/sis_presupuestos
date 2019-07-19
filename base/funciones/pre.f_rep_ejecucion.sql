@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.f_rep_ejecucion (
   p_administrador integer,
   p_id_usuario integer,
@@ -94,6 +92,20 @@ BEGIN
              ELSEIF v_parametros.tipo_reporte = 'presupuesto' and v_parametros.id_presupuesto is not null and v_parametros.id_presupuesto != 0 THEN
                      
                    va_id_presupuesto[1] = v_parametros.id_presupuesto;
+
+			ELSEIF v_parametros.tipo_reporte = 'centro_costo' then  
+                    SELECT
+	                     pxp.aggarray(p.id_presupuesto)
+                    into 
+						 va_id_presupuesto
+                    FROM pre.tpresupuesto p
+                    where p.id_categoria_prog in (
+                    							  SELECT 
+                                                    cpr.id_categoria_programatica
+                                                  FROM 
+                                                    pre.vcategoria_programatica cpr 
+                                                  WHERE  cpr.id_gestion = v_parametros.id_gestion)                       
+                     and p.tipo_pres  = ANY (string_to_array(v_parametros.tipo_pres::text,','));                    
              
              ELSE
                      
@@ -119,7 +131,14 @@ BEGIN
                      par.nivel_partida
                   from pre.tpartida par
                   where       par.id_gestion = v_parametros.id_gestion
-                         and  par.id_partida_fk is null) LOOP
+                         and  par.id_partida_fk is null
+                         and  par.tipo in (select
+                                          tipr.movimiento	
+                                          from pre.ttipo_presupuesto tipr
+                                          where tipr.codigo = ANY(string_to_array(v_parametros.tipo_pres::text,','))
+                                          group by 
+                                          tipr.movimiento)                         
+                         ) LOOP
          
          
                  PERFORM pre.f_rep_ejecucion_recursivo(
@@ -136,9 +155,80 @@ BEGIN
          END LOOP;
          
         
-         -- listado consolidado segun parametros 
+         -- listado consolidado segun parametros          
+       if (v_parametros.tipo_reporte = 'centro_costo') then                                                                           
+
+    		        CREATE TEMPORARY TABLE temp_prog_costo (
+                    			cod_pro VARCHAR,
+                                codigo VARCHAR,
+                                descripcion VARCHAR,
+                                id_categoria INTEGER,                                                                                                
+                                importe	NUMERIC,
+                                importe_aprobado NUMERIC,
+                                modificado NUMERIC,
+                                vigente NUMERIC,
+                                comprometido NUMERIC,
+                                ejecutado NUMERIC,
+                                ajustado NUMERIC,
+                                pagado NUMERIC,
+                                porc_ejecucion NUMERIC) ON COMMIT DROP;
+                                
+            PERFORM pre.f_ins_centro_costo(v_parametros.id_gestion,
+            									 v_parametros.tipo_pres,
+                                                 v_parametros.fecha_ini,
+                                                 v_parametros.fecha_fin); 
+
+    		insert into temp_prog_costo(cod_pro, descripcion,id_categoria
+                ,importe,importe_aprobado,modificado,
+                vigente,comprometido,ejecutado,pagado,porc_ejecucion)
+                        
+            SELECT
+			  vca.codigo_categoria, 	              
+              'TOTAL' as descripcion,
+              pro.id_categoria,
+              sum(pro.importe),
+              sum(pro.importe_aprobado),
+              sum(pro.modificado),
+              sum(pro.vigente),
+              sum(pro.comprometido),
+              sum(pro.ejecutado),
+              sum(pro.pagado)
+              ,case when sum(pro.importe_aprobado) =0 then
+                0
+              else 
+                round(((sum(pro.ejecutado)/sum(pro.importe_aprobado))*100),2)
+              end
+            FROM temp_prog_costo pro
+            inner join pre.tcategoria_programatica catp on catp.id_categoria_programatica = pro.id_categoria
+            inner join pre.vcategoria_programatica vca on vca.id_categoria_programatica = catp.id_categoria_programatica
+            group by pro.id_categoria,
+		             vca.codigo_categoria;
+            
+			FOR v_registros in ( SELECT
+            					 cod_pro as categoria,
+                                 0::integer as id_partida,
+                                 codigo as codigo_partida,       
+                                 descripcion::varchar as nombre_partida,
+                                 0::integer as nivel_partida,
+                                (importe) as importe,
+                                (importe_aprobado) as importe_aprobado,
+                                (modificado) as formulado,
+                                (comprometido) as comprometido,
+                                (ejecutado) as ejecutado,
+                                (pagado) as pagado,
+            				    (vigente) as ajustado,
+                                (porc_ejecucion) as porc_ejecucion
+                                from temp_prog_costo
+                                order by id_categoria,
+                                codigo)LOOP
+                                                                        
+                             RETURN NEXT v_registros;
+			end loop;                             
+       else
+
          FOR v_registros in (
-                              SELECT   
+                              SELECT
+                                ''::varchar as categoria,   
                                 id_partida,
                                 codigo_partida,
                                 nombre_partida,
@@ -167,6 +257,7 @@ BEGIN
                RETURN NEXT v_registros;
                
        END LOOP;
+    END IF;
  /*********************************   
  #TRANSACCION:    'PRE_EJEXPAR_REP'
  #DESCRIPCION:     reporte de ejecucion por partida

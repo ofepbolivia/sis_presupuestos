@@ -28,7 +28,18 @@ class REjecucionXls
 	var $datos_entidad;
 	var $datos_periodo;
 	var $ult_codigo_partida;
-	var $ult_concepto;	
+    var $ult_concepto;
+
+    var $totales_importe = 0;
+    var $totales_importe_aprobado = 0;
+    var $totales_formulado = 0;
+    var $totales_ajustado = 0;
+    var $totales_comprometido = 0;
+    var $totales_ejecutado = 0;
+    var $totales_pagado = 0;
+    var $totales_saldoXcomprometer = 0;
+    var $totales_saldoEjecutado = 0;
+    var $totales_saldoXpagar = 0;
 	
 	
 	
@@ -107,8 +118,11 @@ class REjecucionXls
         );
 
         //titulos
-
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, 'EJECUCIÓN PRESUPUESTARIA');
+        $tipo_repo = 'EJECUCIÓN PRESUPUESTARIA';
+        if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
+            $tipo_repo = 'EJECUCIÓN PRESUPUESTARIA A NIVEL CENTRO DE COSTO';
+        }
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $tipo_repo);
         $this->docexcel->getActiveSheet()->getStyle('A2:M2')->applyFromArray($styleTitulos1);
         $this->docexcel->getActiveSheet()->mergeCells('A2:M2');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, 'Del: ' . $this->objParam->getParametro('fecha_ini') . '   Al: ' . $this->objParam->getParametro('fecha_fin'));
@@ -142,7 +156,13 @@ class REjecucionXls
 								         'allborders' => array(
 								             'style' => PHPExcel_Style_Border::BORDER_THIN
 								         )
-								     ));
+                                     ));
+
+        if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
+            $modificado = 'MODIFICADO';
+        }else{
+            $modificado = 'AJUSTADO';
+        }
 
        $this->docexcel->getActiveSheet()->getStyle('A5:M5')->applyFromArray($styleTitulos);
 		
@@ -156,7 +176,7 @@ class REjecucionXls
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(20);
 		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,5,'APROBADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,5,'AJUSTADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,5,$modificado);
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(20);
 		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,5,'VIGENTE');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[6])->setWidth(20);
@@ -177,11 +197,59 @@ class REjecucionXls
 		//*************************************Fin Cabecera*****************************************
 		
 		$fila = 6;
-		$contador = 1;
-		
-		/////////////////////***********************************Detalle***********************************************
-		foreach($datos as $value) {
+		$contador = 1;        
 
+        if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
+        
+            foreach($datos as $value) {                        
+                if($value['nombre_partida'] == 'TOTAL'){
+                    $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':M'.$fila)->applyFromArray($styleTitulos);
+    
+                    $nombre_partida = $value['nombre_partida']." ".$value['categoria'];
+                    $sal_comprometido = $value['ajustado'] - $value['comprometido'];
+                    $sal_ejecutado = $value['comprometido'] - $value['ejecutado'];
+                    $sal_pagado = $value['ejecutado'] - $value['pagado']; 
+    
+                    $this->totales_importe += $value['importe'];
+                    $this->totales_importe_aprobado += $value['importe_aprobado'];
+                    $this->totales_formulado += $value['formulado'];
+                    $this->totales_ajustado += $value['ajustado'];
+                    $this->totales_comprometido += $value['comprometido'];
+                    $this->totales_ejecutado += $value['ejecutado'];
+                    $this->totales_pagado += $value['pagado'];
+                    $this->totales_saldoXcomprometer += $sal_comprometido;
+                    $this->totales_saldoEjecutado += $sal_ejecutado;
+                    $this->totales_saldoXpagar += $sal_pagado;                 
+                }else{
+                    $nombre_partida = $value['nombre_partida'];
+                }
+
+                $this->docexcel->getActiveSheet()->getStyle('C:M')->getNumberFormat()->setFormatCode('#,##0.00');
+    
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,$value['codigo_partida']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,$nombre_partida);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fila,$value['importe']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$fila,$value['importe_aprobado']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$fila,$value['ajustado']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$fila,$value['formulado']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,$fila,$value['comprometido']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,$fila,$value['ejecutado']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,$fila,$value['pagado']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,$fila,"=E".$fila."-G".$fila);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,$fila,"=G".$fila."-H".$fila);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,$fila,"=H".$fila."-I".$fila);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,$fila,$value['porc_ejecucion']);
+                            
+                //$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(14,$fila,"=SUM(C".$fila.":N".$fila.")");
+                
+                $fila++;
+                $contador++;            
+        }
+    }else{
+        /////////////////////***********************************Detalle***********************************************
+        
+		foreach($datos as $value) {                                    
+                        
             $this->docexcel->getActiveSheet()->getStyle('C:M')->getNumberFormat()->setFormatCode('#,##0.00');
 
 			$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,$value['codigo_partida']);
@@ -202,7 +270,29 @@ class REjecucionXls
 			
 			$fila++;
 			$contador++;
-		}
+        }
+    }
+        if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
+            if($this->totales_importe_aprobado != 0){        
+                $calc = (($this->totales_ejecutado / $this->totales_importe_aprobado)*100);
+            }else{
+                $calc = 0 ;
+            }
+            $por_eje = number_format((float)$calc, 2, '.', '');
+            $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':M'.$fila)->applyFromArray($styleTitulos);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,'TOTALES');
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fila,$this->totales_importe);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$fila,$this->totales_importe_aprobado);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$fila,$this->totales_formulado);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$fila,$this->totales_ajustado);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,$fila,$this->totales_comprometido);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,$fila,$this->totales_ejecutado);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,$fila,$this->totales_pagado);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,$fila,$this->totales_saldoXcomprometer);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,$fila,$this->totales_saldoEjecutado);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,$fila,$this->totales_saldoXpagar);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,$fila,$por_eje);               
+        }
 		//************************************************Fin Detalle***********************************************
 		
 	}

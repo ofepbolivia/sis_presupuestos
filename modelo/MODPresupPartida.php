@@ -264,7 +264,8 @@ class MODPresupPartida extends MODbase{
 		  $this->setCount(false);
 		  $this->setTipoRetorno('record');	
 		
-		  //captura parametros adicionales para el count
+          //captura parametros adicionales para el count
+          //var_dump($this->objParam->getParametro('id_categoria_programatica'));exit;
 		  $this->setParametro('id_cp_programa','id_cp_programa','int4');
 		  $this->setParametro('id_categoria_programatica','id_categoria_programatica','int4');
 		  $this->setParametro('id_presupuesto','id_presupuesto','int4');
@@ -277,12 +278,12 @@ class MODPresupPartida extends MODbase{
 		  
 		 
 		
-		//Definicion de la lista del resultado del query
+        //Definicion de la lista del resultado del query
+        $this->captura('categoria','varchar');
 		$this->captura('id_partida','int4');
         $this->captura('codigo_partida','varchar');
         $this->captura('nombre_partida','varchar');
-        $this->captura('nivel_partida','int4');
-       
+        $this->captura('nivel_partida','int4');        
         $this->captura('importe','NUMERIC');
         $this->captura('importe_aprobado','NUMERIC');
         $this->captura('formulado','NUMERIC');

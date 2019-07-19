@@ -16,11 +16,19 @@ class REjecucion extends  ReportePDF {
 	var $datos_periodo;
 	var $ult_codigo_partida;
 	var $ult_concepto;
-	var $fecha_ini;
+    var $fecha_ini;
 
-
-	
-	
+    var $totales_importe = 0;
+    var $totales_importe_aprobado = 0;
+    var $totales_formulado = 0;
+    var $totales_ajustado = 0;
+    var $totales_comprometido = 0;
+    var $totales_ejecutado = 0;
+    var $totales_pagado = 0;
+    var $totales_saldoXcomprometer = 0;
+    var $totales_saldoEjecutado = 0;
+    var $totales_saldoXpagar = 0;
+            		
 	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa,$fecha_ini, $fecha_fin) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
@@ -41,29 +49,42 @@ class REjecucion extends  ReportePDF {
 		$white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
         $black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         
-		
-		$this->Ln(3);
+		if ($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){ 
+            $this->Ln(3);
+        }else{
+            $this->Ln(3);
+        }
 		//formato de fecha
 		
 		//cabecera del report
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,35,20);
 		$this->ln(5);
-		
-		
-	    $this->SetFont('','BU',12);		
-		$this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA",0,1,'C');
-		$this->Cell(0,5,mb_strtoupper($this->datos_entidad['nombre'],'UTF-8'),0,1,'C');
-		$this->Cell(0,5,"GESTIÓN ".$this->datos_gestion['anho'],0,1,'C');
-		//$this->Ln();
-		$this->SetFont('','B',7);
-		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
-		$this->Ln(2);
-		//
-        $this->SetFont('','B',8);
-        $this->Cell(0,4,"De: ".($this->fecha_ini). "    A: ".$this->fecha_fin,0,1,'C');
-        //$this->Ln(0);
-
-		$this->SetFont('','',10);
+		if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
+            $this->SetFont('','BU',12);		
+            $this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA A NIVEL CENTRO DE COSTO",0,1,'C');
+            $this->Cell(0,5,mb_strtoupper($this->datos_entidad['nombre'],'UTF-8'),0,1,'C');
+            $this->SetFont('','B',8);
+            $this->Cell(0,3,"De: ".($this->fecha_ini). "       A: ".$this->fecha_fin,0,1,'C');            
+            $this->SetFont('','B',7);            
+            $this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');              
+            $this->SetFont('','',10);             
+            $this->Ln(2);
+        }else{
+            $this->SetFont('','BU',12);		
+            $this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA",0,1,'C');
+            $this->Cell(0,5,mb_strtoupper($this->datos_entidad['nombre'],'UTF-8'),0,1,'C');
+            $this->Cell(0,5,"GESTIÓN ".$this->datos_gestion['anho'],0,1,'C');
+            //$this->Ln();
+            $this->SetFont('','B',7);
+            $this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');		
+            $this->Ln(2);
+            //
+            $this->SetFont('','B',8);
+            $this->Cell(0,4,"De: ".($this->fecha_ini). "    A: ".$this->fecha_fin,0,1,'C');
+            //$this->Ln(0);
+    
+            $this->SetFont('','',10);
+        }
 		
 		$height = 3;
         $width1 = 5;
@@ -76,7 +97,9 @@ class REjecucion extends  ReportePDF {
 	    
 		
 		$this->Ln();
-		
+        
+        $concepto = $this->objParam->getParametro('concepto');
+        
 		if($this->objParam->getParametro('tipo_reporte') =='categoria'){
 			$tmp = 'CATEGORÍA';
 		}
@@ -86,22 +109,31 @@ class REjecucion extends  ReportePDF {
 		if($this->objParam->getParametro('tipo_reporte') =='presupuesto'){
 			$tmp = 'PRESUPUESTO';
 		}
-		
-		
-		
-		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell($width_c1, $height, $tmp.": ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
-        $this->SetFillColor(192,192,192, true);
-        $this->Cell($width_c2, $height, $this->objParam->getParametro('concepto'), $black, 0, 'L', true, '', 0, false, 'T', 'C');
-        
-        
-		$this->Ln();
-		$this->Ln();
+        if ($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){ 
+            $this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->Cell($width_c1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->SetFont('', '');
+            $this->SetFillColor(0,0,0, false);
+            $this->Cell($width_c2, $height, '', '', 0, 'L', false, '', 0, false, 'T', 'C');                        
+            $this->Ln();                      
+            $this->Ln();
+            //$tmp = 'CATEGORÍA PROGRAMATICA';
+            //$concepto = 'Administración Central BoA';            
+        }else{
+				
+            $this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->Cell($width_c1, $height, $tmp.": ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->SetFont('', '');
+            $this->SetFillColor(192,192,192, true);
+            $this->Cell($width_c2, $height, $concepto, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+            
+            
+            $this->Ln();
+            $this->Ln();        
+        }
 		
 		$this->SetFont('','B',6);
-		$this->generarCabecera();
-		
+		$this->generarCabecera();		
 		
 	}
    
@@ -115,19 +147,33 @@ class REjecucion extends  ReportePDF {
 	} 
     function generarCabecera(){
     	
-		//armca caecera de la tabla
-		$this->tablewidths=array(15,53,18,18,18,18,18,18,18,18,18,18,15);
-        $this->tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C');
+		//armca caecera de la tabla		        
         $this->tablenumbers=array(0,0,0,0,0,0,0,0,0,0,0,0,0);
-        $this->tableborders=array('TB','TB','TB','TB','TB','TB','TB','TB','TB','TB','TB','TB','TB');
+        $nro = '';
+        $partida = '';
+        if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
+            $partida = 'CENTRO DE COSTO (UNIDAD ORGANIZACIONAL)';
+            $modificado = 'MODIFICADO';
+            $this->tablealigns=array('L','C','C','C','C','C','C','C','C','C','C','C','C');
+            $this->tablewidths=array(6,53,19,19,19,19,20,19,19,19,19,19,15);
+            $this->tableborders=array('TBL','TBR','TBRL','TBRL','TBRL','TBRL','TBRL','TBRL','TBRL','TBRL','TBRL','TBRL','TBRL');			
+            $this->Ln(6);
+        }else{
+            $nro = 'COD';
+            $partida = 'PARTIDA';
+            $modificado = 'AJUSTADO';
+            $this->tablealigns=array('C','C','C','C','C','C','C','C','C','C','C','C','C');
+            $this->tablewidths=array(15,53,18,18,18,18,18,18,18,18,18,18,15);
+            $this->tableborders=array('TB','TB','TB','TB','TB','TB','TB','TB','TB','TB','TB','TB','TB');
+        }
         $this->tabletextcolor=array();
 		
 	    $RowArray = array(
-            			's0'  => 'COD',
-            			's1' => 'PARTIDA',   
+            			's0'  => $nro,
+            			's1' => $partida,   
                         's2' => 'SEGÚN MEMORIA',        
                         's3' => 'APROBADO',
-                        's4' => 'AJUSTADO',            
+                        's4' => $modificado,            
                         's5' => 'VIGENTE',
                         's6' => 'COMPROMETIDO',
                         's7' => 'EJECUTADO',  
@@ -137,8 +183,7 @@ class REjecucion extends  ReportePDF {
                         's11' => 'SALDO POR PAGAR',   
                         's12' => '% EJE');
                          
-        $this-> MultiRow($RowArray,false,1);
-		
+        $this-> MultiRow($RowArray,false,1);		        
 		
     }
 	
@@ -155,18 +200,54 @@ class REjecucion extends  ReportePDF {
 		
 		$this->s1 = 0;
 		$this->t1 = 0;
-		$this->tg1 = 0;
-		
-		
-		foreach ($detalle as $val) {
-				
-			$this->imprimirLinea($val,$count,$fill);
-			$fill = !$fill;
-			$count = $count + 1;
-			$this->total = $this->total -1;
-			$this->revisarfinPagina();
-			
-		}
+        $this->tg1 = 0;		
+        
+		if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){            
+            foreach ($detalle as $val) {                
+                $this->imprimirCentroCosto($val,$count,$fill);
+                $fill = !$fill;
+                $count = $count + 1;
+                $this->total = $this->total -1;
+                $this->revisarfinPagina();
+            }
+            if($this->totales_importe_aprobado != 0){        
+                $calc = (($this->totales_ejecutado / $this->totales_importe_aprobado)*100);
+            }else{
+                $calc = 0 ;
+            }
+            $por_eje = number_format((float)$calc, 2, '.', '');
+            $RowArray = array(
+             's1'  => '',  
+             's2'  => 'TOTALES',   
+             's3'  => $this->totales_importe,
+             's4'  => $this->totales_importe_aprobado,
+             's5'  => $this->totales_formulado,
+             's6'  => $this->totales_ajustado,
+             's7'  => $this->totales_comprometido,
+             's8'  => $this->totales_ejecutado,
+             's9'  => $this->totales_pagado,
+             's10' => $this->totales_saldoXcomprometer,
+             's11' => $this->totales_saldoEjecutado,
+             's12' => $this->totales_saldoXpagar,
+             's13' => $por_eje. ' %');            
+                
+            $this->SetFont('','B',6);
+            $this->tablealigns=array('R','C','R','R','R','R','R','R','R','R','R','R','C');
+            $this->tablenumbers=array(0,0,2,2,2,2,2,2,2,2,2,2,0);
+    
+            $this-> MultiRow($RowArray,$fill,1);
+
+
+        }else{            
+            foreach ($detalle as $val) {                    
+                $this->imprimirLinea($val,$count,$fill);
+                $fill = !$fill;
+                $count = $count + 1;
+                $this->total = $this->total -1;
+                $this->revisarfinPagina();
+                
+            }
+        }
 		
 		
 		
@@ -308,14 +389,6 @@ class REjecucion extends  ReportePDF {
                         's13' => $val['porc_ejecucion'].' %');
 			 
 		}
-	   
-	   
-       
-		
-		
-        
-       
-						
 		$this-> MultiRow($RowArray,$fill,1);
 		
 	}
@@ -323,8 +396,7 @@ class REjecucion extends  ReportePDF {
 
     function revisarfinPagina(){
 		$dimensions = $this->getPageDimensions();
-		$hasBorder = false; //flag for fringe case
-		
+		$hasBorder = false; //flag for fringe case		
 		$startY = $this->GetY();
 		$this->getNumLines($row['cell1data'], 80);
 		
@@ -352,12 +424,52 @@ class REjecucion extends  ReportePDF {
 	        $this-> MultiRow($RowArray,false,1);
 			
 	
-  }
-  
-  
+  }  
+  function imprimirCentroCosto($val,$count,$fill){          
 
-  
-  
- 
+    $sal_comprometido = $val['ajustado'] - $val['comprometido'];
+    $sal_ejecutado = $val['comprometido'] - $val['ejecutado'];
+    $sal_pagado = $val['ejecutado'] - $val['pagado'];    
+    $this->tableborders=array('LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
+    $this->tablewidths=array(6,53,19,19,19,19,20,19,19,19,19,19,15);    
+    $this->tablenumbers=array(0,0,2,2,2,2,2,2,2,2,2,2,0);
+    $nombre_partida = '';         
+     
+    if($val['nombre_partida'] == 'TOTAL'){        
+        $nombre_partida = $val['nombre_partida']." ".$val['categoria'];
+        $this->SetFont('','B',6);
+        $this->tablealigns=array('R','C','R','R','R','R','R','R','R','R','R','R','C');
+        $this->totales_importe += $val['importe'];
+        $this->totales_importe_aprobado += $val['importe_aprobado'];
+        $this->totales_formulado += $val['formulado'];
+        $this->totales_ajustado += $val['ajustado'];
+        $this->totales_comprometido += $val['comprometido'];
+        $this->totales_ejecutado += $val['ejecutado'];
+        $this->totales_pagado += $val['pagado'];
+        $this->totales_saldoXcomprometer += $sal_comprometido;
+        $this->totales_saldoEjecutado += $sal_ejecutado;
+        $this->totales_saldoXpagar += $sal_pagado;                  
+    }else{  
+        $nombre_partida = $val['nombre_partida'];
+        $this->SetFont('','',5);
+        $this->tablealigns=array('R','L','R','R','R','R','R','R','R','R','R','R','C');
+    }
+        $RowArray = array(
+            's1' => $val['codigo_partida'],
+            's2' => $nombre_partida,
+            's3' => $val['importe'],
+            's4' => $val['importe_aprobado'],
+            's5' => $val['formulado'], 
+            's6' => $val['ajustado'],
+            's7' => $val['comprometido'],
+            's8' => $val['ejecutado'],
+            's9' => $val['pagado'],
+            's10' => $sal_comprometido,
+            's11' => $sal_ejecutado,
+            's12' => $sal_pagado,
+			's13' => $val['porc_ejecucion'].' %');            
+			
+    $this-> MultiRow($RowArray,false,1);    
+  }
 }
 ?>
