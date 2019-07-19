@@ -2548,3 +2548,53 @@ ALTER TABLE pre.tpartida_usuario
     ON UPDATE NO ACTION
     NOT DEFERRABLE;
 /***********************************F-DEP-MAY-PRE-0-24/07/2018*****************************************/
+
+/***********************************I-DEP-BVP-PRE-0-19/07/2019*****************************************/
+CREATE OR REPLACE VIEW pre.vpresup_partida(
+    id_presup_partida,
+    tipo,
+    id_moneda,
+    id_partida,
+    id_centro_costo,
+    fecha_hora,
+    estado_reg,
+    id_presupuesto,
+    importe,
+    desc_partida,
+    desc_gestion,
+    importe_aprobado,
+    formulado,
+    comprometido,
+    ejecutado,
+    pagado,
+    sw_transaccional,
+    id_gestion)
+AS
+  SELECT prpa.id_presup_partida,
+         prpa.tipo,
+         prpa.id_moneda,
+         prpa.id_partida,
+         prpa.id_centro_costo,
+         prpa.fecha_hora,
+         prpa.estado_reg,
+         prpa.id_presupuesto,
+         COALESCE(prpa.importe, 0::numeric) AS importe,
+         ((('('::text || par.codigo::text) || ') '::text) || par.nombre_partida
+           ::text)::character varying AS desc_partida,
+         ges.gestion::character varying AS desc_gestion,
+         prpa.importe_aprobado,
+         pre.f_get_estado_presupuesto_mb(prpa.id_presupuesto, prpa.id_partida,
+           'formulado'::character varying) AS formulado,
+         pre.f_get_estado_presupuesto_mb(prpa.id_presupuesto, prpa.id_partida,
+           'comprometido'::character varying) AS comprometido,
+         pre.f_get_estado_presupuesto_mb(prpa.id_presupuesto, prpa.id_partida,
+           'ejecutado'::character varying) AS ejecutado,
+         pre.f_get_estado_presupuesto_mb(prpa.id_presupuesto, prpa.id_partida,
+           'pagado'::character varying) AS pagado,
+         par.sw_transaccional,
+         ges.id_gestion
+  FROM pre.tpresup_partida prpa
+       JOIN pre.tpartida par ON par.id_partida = prpa.id_partida
+       JOIN pre.tpresupuesto p ON p.id_presupuesto = prpa.id_presupuesto
+       JOIN param.tgestion ges ON ges.id_gestion = par.id_gestion;
+/***********************************F-DEP-BVP-PRE-0-19/07/2019*****************************************/
