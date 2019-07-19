@@ -14,13 +14,13 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'pre.tcategoria_programatica'
  AUTOR: 		 (admin)
  FECHA:	        19-04-2016 15:30:34
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -29,24 +29,24 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'pre.ft_categoria_programatica_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_CPR_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		19-04-2016 15:30:34
 	***********************************/
 
 	if(p_transaccion='PRE_CPR_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
-			v_consulta:='SELECT 
+			v_consulta:='SELECT
                           id_categoria_programatica,
                           id_cp_actividad,
                           id_gestion,
@@ -75,11 +75,14 @@ BEGIN
                           desc_fuente_fin,
                           desc_origen_fin,
                           codigo_categoria,
-                          gestion
-                        FROM 
-                          pre.vcategoria_programatica cpr 
+                          gestion,
+                          codigo_unidad_ejecutora,
+                          desc_unidad_ejecutora,
+                          id_unidad_ejecutora
+                        FROM
+                          pre.vcategoria_programatica cpr
                         WHERE ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
@@ -88,13 +91,13 @@ BEGIN
             raise notice '-- % --', v_consulta;
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_CPR_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		19-04-2016 15:30:34
 	***********************************/
 
@@ -103,26 +106,26 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select count(cpr.id_categoria_programatica)
-					    FROM 
+					    FROM
                           pre.vcategoria_programatica cpr
                         where ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-					
+
 	else
-					     
+
 		raise exception 'Transaccion inexistente';
-					         
+
 	end if;
-					
+
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
@@ -135,4 +138,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

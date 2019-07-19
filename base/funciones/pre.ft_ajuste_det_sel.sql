@@ -14,13 +14,13 @@ $body$
  DESCRIPCION:   Funcion que devuelve conjuntos de registros de las consultas relacionadas con la tabla 'pre.tajuste_det'
  AUTOR: 		 (admin)
  FECHA:	        13-04-2016 13:51:41
- COMENTARIOS:	
+ COMENTARIOS:
 ***************************************************************************
  HISTORIAL DE MODIFICACIONES:
 
- DESCRIPCION:	
- AUTOR:			
- FECHA:		
+ DESCRIPCION:
+ AUTOR:
+ FECHA:
 ***************************************************************************/
 
 DECLARE
@@ -29,21 +29,21 @@ DECLARE
 	v_parametros  		record;
 	v_nombre_funcion   	text;
 	v_resp				varchar;
-			    
+
 BEGIN
 
 	v_nombre_funcion = 'pre.ft_ajuste_det_sel';
     v_parametros = pxp.f_get_record(p_tabla);
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_AJD_SEL'
  	#DESCRIPCION:	Consulta de datos
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		13-04-2016 13:51:41
 	***********************************/
 
 	if(p_transaccion='PRE_AJD_SEL')then
-     				
+
     	begin
     		--Sentencia de la consulta
 			v_consulta:='select
@@ -64,27 +64,28 @@ BEGIN
                             usu2.cuenta as usr_mod,
                             pre.codigo_cc as desc_presupuesto,
                             (par.codigo||'' - '' ||par.nombre_partida)::varchar as desc_partida	,
-                            id_ajuste
+                            id_ajuste,
+                            ajd.descripcion
 						from pre.tajuste_det ajd
                         inner join pre.vpresupuesto_cc pre on pre.id_presupuesto = ajd.id_presupuesto
                         inner join pre.tpartida par on par.id_partida = ajd.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
 				        where  ';
-			
+
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			--Devuelve la respuesta
 			return v_consulta;
-						
+
 		end;
 
-	/*********************************    
+	/*********************************
  	#TRANSACCION:  'PRE_AJD_CONT'
  	#DESCRIPCION:	Conteo de registros
- 	#AUTOR:		admin	
+ 	#AUTOR:		admin
  	#FECHA:		13-04-2016 13:51:41
 	***********************************/
 
@@ -92,7 +93,7 @@ BEGIN
 
 		begin
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select 
+			v_consulta:='select
                             count(id_ajuste_det),
                             COALESCE(sum(ajd.importe),0)::numeric  as total_importe
 					    from pre.tajuste_det ajd
@@ -101,23 +102,23 @@ BEGIN
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
 				        where ';
-			
-			--Definicion de la respuesta		    
+
+			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-					
+
 	else
-					     
+
 		raise exception 'Transaccion inexistente';
-					         
+
 	end if;
-					
+
 EXCEPTION
-					
+
 	WHEN OTHERS THEN
 			v_resp='';
 			v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
@@ -130,4 +131,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

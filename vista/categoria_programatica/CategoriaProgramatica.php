@@ -322,7 +322,51 @@ Phx.vista.CategoriaProgramatica=Ext.extend(Phx.gridInterfaz,{
 			grid: true,
 			form: true
 		},
-		
+
+        {
+            config: {
+                name: 'id_unidad_ejecutora',
+                fieldLabel: 'Unidad Ejecutora',
+                allowBlank: true,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_presupuestos/control/UnidadEjecutora/listarUnidadEjecutora',
+                    id: 'id_unidad_ejecutora',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'codigo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_unidad_ejecutora', 'nombre', 'codigo'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'codigo#nombre'}
+                }),
+                valueField: 'id_unidad_ejecutora',
+                displayField: 'nombre',
+                gdisplayField: 'desc_unidad_ejecutora',
+                hiddenName: 'id_unidad_ejecutora',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '100%',
+                gwidth: 150,
+                minChars: 2,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{nombre}</p> </div></tpl>',
+                renderer : function(value, p, record) {
+                    return String.format('({1})  {0}',record.data['desc_unidad_ejecutora'], record.data['codigo_unidad_ejecutora']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            filters: {pfiltro: 'desc_unidad_ejecutora',type: 'string'},
+            grid: true,
+            form: true
+        },
 		
 		{
 			config:{
@@ -457,7 +501,8 @@ Phx.vista.CategoriaProgramatica=Ext.extend(Phx.gridInterfaz,{
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},
 		'codigo_programa', 'codigo_proyecto','codigo_actividad','codigo_fuente_fin','codigo_origen_fin','desc_programa',
-        'desc_proyecto','desc_actividad','desc_fuente_fin','desc_origen_fin','codigo_categoria','gestion'
+        'desc_proyecto','desc_actividad','desc_fuente_fin','desc_origen_fin','codigo_categoria','gestion',
+        'codigo_unidad_ejecutora','desc_unidad_ejecutora', 'id_unidad_ejecutora'
 		
 	],
 	sortInfo:{
