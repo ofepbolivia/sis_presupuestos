@@ -49,7 +49,11 @@ DECLARE
 	--(franklin.espinoza)[25/6/2019]
 	v_tipo_proceso				varchar;
     v_modificacion				record;
-    v_id_partida_ejecucion		integer;
+    v_id_partida_ejecucion 		integer;
+    v_codigo					varchar;
+    v_id_moneda 				integer;
+    v_oficial					numeric;
+
     v_monto_mb					numeric;
 
 BEGIN
@@ -315,98 +319,130 @@ BEGIN
                         END IF;
 
                         --Inicio->(franklin.espinoza)[25/6/2019]obtener partida_ejecucion
-                        if sw_revertir then
+                        --if sw_revertir then
 
-                          select pm.codigo
-                          into v_tipo_proceso
+                          select pm.codigo, tm.tipo_moneda
+                          into v_tipo_proceso, v_codigo
                           from wf.tproceso_wf pwf
                           inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
                           inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
                           inner join segu.tsubsistema tsub on tsub.id_subsistema = pm.id_subsistema
                           inner join adq.tsolicitud tso on tso.id_proceso_wf = pwf.id_proceso_wf
+                          inner join param.tmoneda tm on tm.id_moneda = tso.id_moneda
                           where pwf.nro_tramite = v_registros.nro_tramite;
 
-                          if v_tipo_proceso is not null then
-                              select tpe.id_partida_ejecucion, tm.codigo, tm.id_moneda, tc.oficial
-                              into v_modificacion
-                              from adq.tsolicitud ts
-                              inner join pre.tpartida_ejecucion tpe on tpe.valor_id_origen = ts.id_solicitud and tpe.columna_origen = 'id_solicitud_compra'
-                              inner join param.tmoneda tm on tm.id_moneda = ts.id_moneda
-                              inner join param.ttipo_cambio tc on tc.id_moneda = tm.id_moneda and tc.fecha = current_date
-                              where ts.num_tramite = v_registros.nro_tramite and /*ts.estado in ('vbrpc', 'aprobado', 'proceso') and */tm.tipo_moneda = 'ref';
-                              if v_modificacion is null then
-                                  raise exception 'El proceso aun no fue certificado en la Unidad de Presupuestos.';
-                              end if;
-                          else
-                              select tpe.id_partida_ejecucion, tm.codigo, tm.id_moneda, tc.oficial
-                              into v_modificacion
-                              from tes.tobligacion_pago top
-                              inner join pre.tpartida_ejecucion tpe on tpe.valor_id_origen = top.id_obligacion_pago and tpe.columna_origen = 'id_obligacion_pago'
-                              inner join param.tmoneda tm on tm.id_moneda = top.id_moneda
-                              inner join param.ttipo_cambio tc on tc.id_moneda = tm.id_moneda and tc.fecha = current_date
-                              where top.num_tramite = v_registros.nro_tramite and tm.tipo_moneda = 'ref';
-                              if v_modificacion is null then
-                                  raise exception 'El proceso aun no fue certificado en la Unidad de Presupuestos.';
-                              end if;
+                          if v_codigo = 'ref' or v_codigo = 'base' then
+                          	if v_tipo_proceso is not null then
+
+                            	if v_codigo = 'ref' then
+                                    select tpe.id_partida_ejecucion, tm.tipo_moneda, tm.id_moneda, tc.oficial
+                                    into v_id_partida_ejecucion, v_codigo, v_id_moneda, v_oficial
+                                    from adq.tsolicitud ts
+                                    inner join pre.tpartida_ejecucion tpe on tpe.valor_id_origen = ts.id_solicitud and tpe.columna_origen = 'id_solicitud_compra'
+                                    inner join param.tmoneda tm on tm.id_moneda = ts.id_moneda
+                                    inner join param.ttipo_cambio tc on tc.id_moneda = tm.id_moneda and tc.fecha = current_date
+                                    where ts.num_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
+                                    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen = 'id_solicitud_compra' and
+                                    tpe.id_partida_ejecucion_fk is null;-- and tm.tipo_moneda = 'ref';
+                                else
+                                	select tpe.id_partida_ejecucion, tm.tipo_moneda, tm.id_moneda
+                                    into v_id_partida_ejecucion, v_codigo, v_id_moneda
+                                    from adq.tsolicitud ts
+                                    inner join pre.tpartida_ejecucion tpe on tpe.valor_id_origen = ts.id_solicitud and tpe.columna_origen = 'id_solicitud_compra'
+                                    inner join param.tmoneda tm on tm.id_moneda = ts.id_moneda
+                                    where ts.num_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
+                                    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen = 'id_solicitud_compra' and
+                                    tpe.id_partida_ejecucion_fk is null;-- and tm.tipo_moneda = 'ref';
+                                end if;
+
+                                if v_id_partida_ejecucion is null then
+                                    raise exception 'El proceso aun no fue certificado en la Unidad de Presupuestos.';
+                                end if;
+                            else
+                            	if v_codigo = 'ref' then
+                                    select tpe.id_partida_ejecucion, tm.tipo_moneda, tm.id_moneda, tc.oficial
+                                    into v_id_partida_ejecucion, v_codigo, v_id_moneda, v_oficial
+                                    from tes.tobligacion_pago top
+                                    inner join pre.tpartida_ejecucion tpe on tpe.valor_id_origen = top.id_obligacion_pago and tpe.columna_origen = 'id_obligacion_pago'
+                                    inner join param.tmoneda tm on tm.id_moneda = top.id_moneda
+                                    inner join param.ttipo_cambio tc on tc.id_moneda = tm.id_moneda and tc.fecha = current_date
+                                    where top.num_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
+                                    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen = 'id_obligacion_pago' and
+                                    tpe.id_partida_ejecucion_fk is null;-- and tm.tipo_moneda = 'ref';
+                                else
+                                	select tpe.id_partida_ejecucion, tm.tipo_moneda, tm.id_moneda
+                                    into v_id_partida_ejecucion, v_codigo, v_id_moneda
+                                    from adq.tsolicitud ts
+                                    inner join pre.tpartida_ejecucion tpe on tpe.valor_id_origen = ts.id_solicitud and tpe.columna_origen = 'id_solicitud_compra'
+                                    inner join param.tmoneda tm on tm.id_moneda = ts.id_moneda
+                                    where ts.num_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
+                                    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen = 'id_solicitud_compra' and
+                                    tpe.id_partida_ejecucion_fk is null;-- and tm.tipo_moneda = 'ref';
+                                end if;
+                                if v_id_partida_ejecucion is null then
+                                    raise exception 'El proceso aun no fue certificado en la Unidad de Presupuestos.';
+                                end if;
+                            end if;
+                            if v_id_partida_ejecucion is not null and  v_codigo = 'ref' then
+                              v_monto_mb =  param.f_convertir_moneda (
+
+                                 v_id_moneda,
+                                 v_id_moneda_base,
+                                 v_registros_det.importe,
+                                 v_registros.fecha,
+                                 'CUS',50,
+                                 v_oficial, 'no');
+                            end if;
                           end if;
-
-                          v_monto_mb =  param.f_convertir_moneda (
-
-                             v_modificacion.id_moneda,
-                             v_id_moneda_base,
-                             v_registros_det.importe,
-                             v_registros.fecha,
-                             'CUS',50,
-                             v_modificacion.oficial, 'no');
-
-                        end if;
+                        --end if;
                         --Fin->(franklin.espinoza)[25/6/2019]
 
-                        -- registras decrementos
-                        v_resultado_ges = pre.f_gestionar_presupuesto_individual(
-                                                p_id_usuario,
-                                                case when v_modificacion is null then NULL else v_modificacion.oficial end,
-                                                v_registros_det.id_presupuesto,
-                                                v_registros_det.id_partida,
-                                                v_registros.id_moneda,  --> moneda del ajuste
-                                                v_registros_det.importe,
-                                                v_registros.fecha,
-                                                'comprometido', --traducido a varchar
-                                                case when v_modificacion is null then NULL else v_modificacion.id_partida_ejecucion end, --p_id_partida_ejecucion
-                                                'id_ajuste_det',
-                                                v_registros_det.id_ajuste_det,
-                                                v_registros.nro_tramite,
-                                                NULL,
-                                                case when v_modificacion is null then v_registros_det.importe else v_monto_mb end);
+						if v_registros_det.importe != 0 then
+                          -- registras decrementos
+                          v_resultado_ges = pre.f_gestionar_presupuesto_individual(
+                                                  p_id_usuario,
+                                                  case when v_oficial is null then NULL else v_oficial end,
+                                                  v_registros_det.id_presupuesto,
+                                                  v_registros_det.id_partida,
+                                                  v_registros.id_moneda,  --> moneda del ajuste
+                                                  v_registros_det.importe,
+                                                  v_registros.fecha,
+                                                  'comprometido', --traducido a varchar
+                                                  case when v_id_partida_ejecucion is null then NULL else v_id_partida_ejecucion end, --p_id_partida_ejecucion
+                                                  'id_ajuste_det',
+                                                  v_registros_det.id_ajuste_det,
+                                                  v_registros.nro_tramite,
+                                                  NULL,
+                                                  case when v_id_partida_ejecucion is not null and  v_codigo = 'ref' then v_monto_mb else v_registros_det.importe end);
 
 
+                           ------------------------
+                           --  ACUMULAR ERRORES
+                           -----------------------
 
-                         ------------------------
-                         --  ACUMULAR ERRORES
-                         -----------------------
+                           --  analizamos respuesta y retornamos error
+                           IF v_resultado_ges[1] = 0 THEN
 
-                         --  analizamos respuesta y retornamos error
-                         IF v_resultado_ges[1] = 0 THEN
+                                   --  recuperamos datos del presupuesto
+                                   v_mensaje_error = v_mensaje_error|| conta.f_armar_error_presupuesto(v_resultado_ges,
+                                                                                 v_registros_det.id_presupuesto,
+                                                                                 v_registros_det.codigo_partida,
+                                                                                 v_id_moneda_base,
+                                                                                 v_id_moneda_base,
+                                                                                 'Comprometer',
+                                                                                 v_registros_det.importe);
+                                   v_sw_error = true;
 
-                                 --  recuperamos datos del presupuesto
-                                 v_mensaje_error = v_mensaje_error|| conta.f_armar_error_presupuesto(v_resultado_ges,
-                                                                               v_registros_det.id_presupuesto,
-                                                                               v_registros_det.codigo_partida,
-                                                                               v_id_moneda_base,
-                                                                               v_id_moneda_base,
-                                                                               'Comprometer',
-                                                                               v_registros_det.importe);
-                                 v_sw_error = true;
+                            ELSE
+                                     -- sino se tiene error almacenamos el id de la aprtida ejecucion
+                                     update pre.tajuste_det a set
+                                             id_partida_ejecucion = v_resultado_ges[2],
+                                             fecha_mod = now(),
+                                             id_usuario_mod = p_id_usuario
+                                     where a.id_ajuste_det  =  v_registros_det.id_ajuste_det;
 
-                          ELSE
-                                   -- sino se tiene error almacenamos el id de la aprtida ejecucion
-                                   update pre.tajuste_det a set
-                                           id_partida_ejecucion = v_resultado_ges[2],
-                                           fecha_mod = now(),
-                                           id_usuario_mod = p_id_usuario
-                                   where a.id_ajuste_det  =  v_registros_det.id_ajuste_det;
-
-                         END IF; --fin id de error
+                           END IF; --fin id de error
+                        end if;
 
                  END LOOP;
 
@@ -440,4 +476,5 @@ LANGUAGE 'plpgsql'
 VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
+PARALLEL UNSAFE
 COST 100;

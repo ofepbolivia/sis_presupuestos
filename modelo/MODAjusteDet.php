@@ -41,7 +41,8 @@ class MODAjusteDet extends MODbase{
 		$this->captura('desc_presupuesto','text');
 		$this->captura('desc_partida','varchar');
 		$this->captura('id_ajuste','int4');
-		
+		$this->captura('descripcion','text');
+
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();

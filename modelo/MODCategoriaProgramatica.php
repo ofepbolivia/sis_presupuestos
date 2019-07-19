@@ -51,7 +51,10 @@ class MODCategoriaProgramatica extends MODbase{
         $this->captura('desc_origen_fin','varchar');
         $this->captura('codigo_categoria','varchar');
         $this->captura('gestion','integer');
-		
+        $this->captura('codigo_unidad_ejecutora','varchar');
+        $this->captura('desc_unidad_ejecutora','varchar');
+        $this->captura('id_unidad_ejecutora','integer');
+
 		
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -76,6 +79,7 @@ class MODCategoriaProgramatica extends MODbase{
 		$this->setParametro('id_cp_fuente_fin','id_cp_fuente_fin','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_cp_proyecto','id_cp_proyecto','int4');
+		$this->setParametro('id_unidad_ejecutora','id_unidad_ejecutora','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -101,6 +105,7 @@ class MODCategoriaProgramatica extends MODbase{
 		$this->setParametro('id_cp_fuente_fin','id_cp_fuente_fin','int4');
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('id_cp_proyecto','id_cp_proyecto','int4');
+		$this->setParametro('id_unidad_ejecutora','id_unidad_ejecutora','int4');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

@@ -118,6 +118,21 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
 		},
+        {
+            config:{
+                name: 'descripcion',
+                fieldLabel: 'Descripción',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200,
+                maxLength:10
+            },
+            type:'TextField',
+            filters:{pfiltro:'ajd.descripcion',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -232,7 +247,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg'
+		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion'
 		
 	],
 	sortInfo:{
