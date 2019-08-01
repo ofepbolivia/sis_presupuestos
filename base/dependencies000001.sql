@@ -2598,3 +2598,11 @@ AS
        JOIN pre.tpresupuesto p ON p.id_presupuesto = prpa.id_presupuesto
        JOIN param.tgestion ges ON ges.id_gestion = par.id_gestion;
 /***********************************F-DEP-BVP-PRE-0-19/07/2019*****************************************/
+
+/***********************************I-DEP-FEA-PRE-0-01/08/2019*****************************************/
+ALTER TABLE pre.tunidad_ejecutora
+  DROP CONSTRAINT tunidad_ejecutora_codigo_key RESTRICT;
+
+ALTER TABLE pre.tunidad_ejecutora
+  DROP CONSTRAINT tunidad_ejecutora_nombre_key RESTRICT;
+/***********************************F-DEP-FEA-PRE-0-01/08/2019*****************************************/

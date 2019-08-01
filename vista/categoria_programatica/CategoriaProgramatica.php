@@ -32,6 +32,9 @@ Phx.vista.CategoriaProgramatica=Ext.extend(Phx.gridInterfaz,{
 	        this.Cmp.id_cp_fuente_fin.modificado = true;
 	        this.Cmp.id_cp_organismo_fin.store.baseParams.id_gestion = id_gestion;
 	        this.Cmp.id_cp_organismo_fin.modificado = true;
+            //(franklin.espinoza)
+            this.Cmp.id_unidad_ejecutora.store.baseParams.id_gestion = id_gestion;
+            this.Cmp.id_unidad_ejecutora.modificado = true;
 			
 			
         },this);

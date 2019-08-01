@@ -14,12 +14,66 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
+        this.initButtons=[this.cmbGestion];
     	//llama al constructor de la clase padre
 		Phx.vista.UnidadEjecutora.superclass.constructor.call(this,config);
+
+        this.cmbGestion.store.load({params:{start:0, limit:this.tam_pag}, scope:this, callback: function (param,op,suc) {
+                this.cmbGestion.setValue(param[0].data.id_gestion);
+                this.cmbGestion.collapse();
+                this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+                this.load({params:{start:0, limit:this.tam_pag}})
+        }});
+        this.cmbGestion.on('select', function(combo, record, index){
+            this.capturaFiltros();
+        },this);
 		this.init();
-		this.load({params:{start:0, limit:this.tam_pag}})
+
 	},
-			
+    capturaFiltros:function(combo, record, index){
+        if(this.validarFiltros()){
+            this.store.baseParams.id_gestion = this.cmbGestion.getValue();
+            this.load();
+        }
+    },
+    validarFiltros:function(){
+        if(this.cmbGestion.validate()){
+            return true;
+        }else{
+            return false;
+        }
+    },
+    cmbGestion: new Ext.form.ComboBox({
+        fieldLabel: 'Gestion',
+        allowBlank: false,
+        emptyText:'Gestion...',
+        blankText: 'Año',
+        store:new Ext.data.JsonStore(
+            {
+                url: '../../sis_parametros/control/Gestion/listarGestion',
+                id: 'id_gestion',
+                root: 'datos',
+                sortInfo:{
+                    field: 'gestion',
+                    direction: 'DESC'
+                },
+                totalProperty: 'total',
+                fields: ['id_gestion','gestion'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams:{par_filtro:'gestion'}
+            }),
+        valueField: 'id_gestion',
+        triggerAction: 'all',
+        displayField: 'gestion',
+        hiddenName: 'id_gestion',
+        mode:'remote',
+        pageSize:50,
+        queryDelay:500,
+        listWidth:'280',
+        width:80
+    }),
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -66,7 +120,7 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
                 minChars: 2,
                 editable: false,
                 renderer : function(value, p, record) {
-                    return String.format('{0}', record.data['gestion']);
+                    return String.format('<div style="color: red; font-weight: bold;">{0}</div>', record.data['gestion']);
                 }
             },
             type: 'ComboBox',
@@ -83,7 +137,10 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
-				maxLength:20
+				maxLength:20,
+                renderer: function (value, p, record){
+                    return String.format('<div style="color: green; font-weight: bold;">{0}</div>', value);
+                }
 			},
 			type:'TextField',
             bottom_filter: true,
@@ -99,8 +156,11 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Nombre',
 				allowBlank: false,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:256
+				gwidth: 250,
+				maxLength:256,
+                renderer: function (value, p, record){
+                    return String.format('<div style="color: green; font-weight: bold;">{0}</div>', value);
+                }
 			},
 				type:'TextField',
                 bottom_filter: true,
@@ -246,7 +306,7 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
 		direction: 'ASC'
 	},
 	bdel:true,
-	bsave:true,
+	bsave:false,
 
     onButtonNew : function () {
         Ext.Ajax.request({
@@ -266,7 +326,7 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.UnidadEjecutora.superclass.onButtonNew.call(this);
     },
 
-    onSubmit: function (o, x, force) {
+    /*onSubmit: function (o, x, force) {
 
         Ext.Ajax.request({
             url:'../../sis_presupuestos/control/UnidadEjecutora/validarCampos',
@@ -294,7 +354,7 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
             timeout:this.timeout,
             scope:this
         });
-    }
+    }*/
 
 	}
 )

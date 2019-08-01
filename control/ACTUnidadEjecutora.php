@@ -13,6 +13,10 @@ class ACTUnidadEjecutora extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_unidad_ejecutora');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("und_eje.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODUnidadEjecutora','listarUnidadEjecutora');
