@@ -164,7 +164,7 @@ BEGIN
 		begin
 
 
-            if (pxp.f_get_variable_global('sincronizar') = 'true') then
+            /*if (pxp.f_get_variable_global('sincronizar') = 'true') then
             	select cig.*,cp.id_partida,cp.id_concepto_partida into v_concepto
                 from param.tconcepto_ingas cig
                 inner join pre.tconcepto_partida cp on cp.id_concepto_ingas = cig.id_concepto_ingas
@@ -215,7 +215,7 @@ BEGIN
 
 
 
-            end if;
+            end if;*/
             --Sentencia de la eliminacion
 			delete from pre.tconcepto_partida
             where id_concepto_partida=v_parametros.id_concepto_partida;
@@ -257,10 +257,10 @@ BEGIN
                raise exception 'La gestión destino no existe (%)', (to_char(now(),'YYYY'))::INTEGER + 1;
              end if;
 
-            if (pxp.f_get_variable_global('sincronizar') = 'true') then
+           /* if (pxp.f_get_variable_global('sincronizar') = 'true') then
 
                 select * into v_nombre_conexion from migra.f_crear_conexion();
-            end if;
+            end if;*/
 
             for v_rec in (
             	select
@@ -330,9 +330,9 @@ BEGIN
 
                 end if;
             end loop;
-            if (pxp.f_get_variable_global('sincronizar') = 'true') then
+            /*if (pxp.f_get_variable_global('sincronizar') = 'true') then
             	select * into v_resp from migra.f_cerrar_conexion(v_nombre_conexion,'exito');
-            end if;
+            end if;*/
 
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Concepto-Partida Replicado');
@@ -365,3 +365,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION pre.f_concepto_partida_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
