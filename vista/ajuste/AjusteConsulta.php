@@ -21,12 +21,49 @@ Phx.vista.AjusteConsulta = {
 	title: 'Ajustes Presupuestarios',
 	nombreVista: 'AjusteConsulta',	
 	constructor: function(config) {
+        this.tbarItems = ['-',
+            this.cmbGestion,'-'
+        ];
 	    Phx.vista.AjusteConsulta.superclass.constructor.call(this,config);
         this.init();
         this.store.baseParams.tipo_interfaz = this.nombreVista;
         this.load({params:{start:0, limit:50}});
-  },
-  preparaMenu:function(n){
+    },
+    cmbGestion: new Ext.form.ComboBox({
+        name: 'gestion',
+        id: 'gestion_ajuste_sel',
+        fieldLabel: 'Gestion',
+        allowBlank: true,
+        emptyText:'Gestion...',
+        blankText: 'Año',
+        editable:false,
+        store:new Ext.data.JsonStore(
+            {
+                url: '../../sis_parametros/control/Gestion/listarGestion',
+                id: 'id_gestion',
+                root: 'datos',
+                sortInfo:{
+                    field: 'gestion',
+                    direction: 'DESC'
+                },
+                totalProperty: 'total',
+                fields: ['id_gestion','gestion'],
+                // turn on remote sorting
+                remoteSort: true,
+                baseParams:{par_filtro:'gestion'}
+            }),
+        valueField: 'id_gestion',
+        triggerAction: 'all',
+        displayField: 'gestion',
+        hiddenName: 'id_gestion',
+        mode:'remote',
+        pageSize:5,
+        queryDelay:500,
+        listWidth:'280',
+        hidden:false,
+        width:80
+    }),
+    preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
           

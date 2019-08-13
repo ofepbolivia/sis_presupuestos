@@ -2606,3 +2606,83 @@ ALTER TABLE pre.tunidad_ejecutora
 ALTER TABLE pre.tunidad_ejecutora
   DROP CONSTRAINT tunidad_ejecutora_nombre_key RESTRICT;
 /***********************************F-DEP-FEA-PRE-0-01/08/2019*****************************************/
+
+/***********************************I-DEP-FEA-PRE-0-07/08/2019*****************************************/
+CREATE OR REPLACE VIEW pre.vcategoria_programatica (
+    id_categoria_programatica,
+    id_cp_actividad,
+    id_gestion,
+    id_cp_organismo_fin,
+    descripcion,
+    id_cp_programa,
+    id_cp_fuente_fin,
+    estado_reg,
+    id_cp_proyecto,
+    id_usuario_ai,
+    fecha_reg,
+    usuario_ai,
+    id_usuario_reg,
+    fecha_mod,
+    id_usuario_mod,
+    usr_reg,
+    usr_mod,
+    codigo_programa,
+    codigo_proyecto,
+    codigo_actividad,
+    codigo_fuente_fin,
+    codigo_origen_fin,
+    desc_programa,
+    desc_proyecto,
+    desc_actividad,
+    desc_fuente_fin,
+    desc_origen_fin,
+    codigo_categoria,
+    gestion,
+    codigo_unidad_ejecutora,
+    desc_unidad_ejecutora,
+    id_unidad_ejecutora)
+AS
+SELECT cpr.id_categoria_programatica,
+    cpr.id_cp_actividad,
+    cpr.id_gestion,
+    cpr.id_cp_organismo_fin,
+    cpr.descripcion,
+    cpr.id_cp_programa,
+    cpr.id_cp_fuente_fin,
+    cpr.estado_reg,
+    cpr.id_cp_proyecto,
+    cpr.id_usuario_ai,
+    cpr.fecha_reg,
+    cpr.usuario_ai,
+    cpr.id_usuario_reg,
+    cpr.fecha_mod,
+    cpr.id_usuario_mod,
+    usu1.cuenta AS usr_reg,
+    usu2.cuenta AS usr_mod,
+    pro.codigo AS codigo_programa,
+    pry.codigo AS codigo_proyecto,
+    act.codigo AS codigo_actividad,
+    ffi.codigo AS codigo_fuente_fin,
+    ofi.codigo AS codigo_origen_fin,
+    pro.descripcion AS desc_programa,
+    pry.descripcion AS desc_proyecto,
+    act.descripcion AS desc_actividad,
+    ffi.descripcion AS desc_fuente_fin,
+    ofi.descripcion AS desc_origen_fin,
+    (((((((((pro.codigo::text || ' - '::text) || pry.codigo::text) ||
+        ' - '::text) || act.codigo::text) || ' - '::text) || ffi.codigo::text) || ' - '::text) || ofi.codigo::text) || COALESCE(' - '::text || tue.codigo::text, ''::text))::character varying AS codigo_categoria,
+    ges.gestion,
+    tue.codigo AS codigo_unidad_ejecutora,
+    tue.nombre AS desc_unidad_ejecutora,
+    tue.id_unidad_ejecutora
+FROM pre.tcategoria_programatica cpr
+     JOIN param.tgestion ges ON ges.id_gestion = cpr.id_gestion
+     LEFT JOIN segu.tusuario usu1 ON usu1.id_usuario = cpr.id_usuario_reg
+     JOIN pre.tcp_programa pro ON pro.id_cp_programa = cpr.id_cp_programa
+     JOIN pre.tcp_proyecto pry ON pry.id_cp_proyecto = cpr.id_cp_proyecto
+     JOIN pre.tcp_actividad act ON act.id_cp_actividad = cpr.id_cp_actividad
+     JOIN pre.tcp_fuente_fin ffi ON ffi.id_cp_fuente_fin = cpr.id_cp_fuente_fin
+     JOIN pre.tcp_organismo_fin ofi ON ofi.id_cp_organismo_fin = cpr.id_cp_organismo_fin
+     LEFT JOIN pre.tunidad_ejecutora tue ON tue.id_unidad_ejecutora = cpr.id_unidad_ejecutora
+     LEFT JOIN segu.tusuario usu2 ON usu2.id_usuario = cpr.id_usuario_mod;
+/***********************************F-DEP-FEA-PRE-0-07/08/2019*****************************************/
