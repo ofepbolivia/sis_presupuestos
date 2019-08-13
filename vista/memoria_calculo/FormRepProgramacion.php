@@ -55,10 +55,10 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
                 mode:'remote',
                 pageSize:10,
                 queryDelay:1000,
-                listWidth:600,
+                listWidth:250,
                 resizable:true,
-                anchor:'100%'
-                
+                width:250
+
             },
             type:'ComboBox',
             id_grupo:0,
@@ -98,9 +98,8 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 				lazyRender : true,
 				mode : 'remote',
 				pageSize : 20,
-				width : 150,
-				anchor : '80%',
-				listWidth : '280',
+                width:250,
+				listWidth : '250',
 				resizable : true,
 				minChars : 2
 			},
@@ -169,8 +168,9 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 			   mode:'remote',
 			   pageSize:10,
 			   queryDelay:1000,
-			   width: 150,
-			   listWidth: 280,
+			   width: 250,
+			   listWidth: 250,
+               resizable:true,
 			   minChars:2,
 			   tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
 			},
@@ -187,8 +187,8 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
                 tinit: false,
                 baseParams: {_adicionar:'si'},
                 origen: 'PRESUPUESTO',
-                width: 350,
-   				listWidth: 350
+                width: 250,
+   				listWidth: 250
             },
             type: 'ComboRec',
             id_grupo: 0,
@@ -223,8 +223,9 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
-				anchor: '100%',
-				minChars: 2,
+                width:250,
+                resizable:true,
+                minChars: 2,
 				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>'
 			},
 			type: 'ComboBox',
