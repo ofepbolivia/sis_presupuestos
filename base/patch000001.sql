@@ -1027,3 +1027,8 @@ CREATE TABLE pre.tunidad_ejecutora_ids (
 WITH (oids = false);
 
 /*****************************F-SCP-FEA-PRE-0-07/08/2019*************/
+
+/*****************************I-SCP-MAY-PRE-0-14/08/2019*************/
+ALTER TABLE pre.tclase_gasto
+  ADD COLUMN tipo_clase VARCHAR(50);
+/*****************************F-SCP-MAY-PRE-0-14/08/2019*************/

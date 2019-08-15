@@ -33,8 +33,8 @@ Phx.vista.ClaseGasto=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'codigo',
-				fieldLabel: 'codigo',
-				allowBlank: true,
+				fieldLabel: 'Código',
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 50,
 				maxLength:5
@@ -48,11 +48,12 @@ Phx.vista.ClaseGasto=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'nombre',
-				fieldLabel: 'nombre',
-				allowBlank: true,
+				fieldLabel: 'Nombre',
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 200,
-				maxLength:200
+				maxLength:200,
+                style:'text-transform:uppercase;',
 			},
 				type:'TextField',
 				filters:{pfiltro:'clg.nombre',type:'string'},
@@ -60,6 +61,33 @@ Phx.vista.ClaseGasto=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:true
 		},
+        {
+            config:{
+                name: 'tipo_clase',
+                fieldLabel: 'Tipo',
+                allowBlank: false,
+                anchor: '80%',
+                gwidth: 100,
+                typeAhead:true,
+                triggerAction:'all',
+                selectOnFocus:true,
+                mode:'local',
+                emptyText:'Tipo de Clase de Gasto',
+                store:new Ext.data.ArrayStore({
+                    fields: ['ID', 'valor'],
+                    data :	[
+                        ['con_imputacion','Con Imputación Presupuestaria'],
+                        ['sin_imputacion','Sin Imputación Presupuestaria']
+                    ]
+                }),
+                valueField:'ID',
+                displayField:'valor'
+            },
+            type:'ComboBox',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'estado_reg',
@@ -180,14 +208,15 @@ Phx.vista.ClaseGasto=Ext.extend(Phx.gridInterfaz,{
 		{name:'nombre', type: 'string'},
 		{name:'codigo', type: 'string'},
 		{name:'id_usuario_reg', type: 'numeric'},
-		{name:'usuario_ai', type: 'string'},
-		{name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-		{name:'id_usuario_ai', type: 'numeric'},
-		{name:'id_usuario_mod', type: 'numeric'},
-		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
-		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},
-		
+        {name:'usuario_ai', type: 'string'},
+        {name:'fecha_reg', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+        {name:'id_usuario_ai', type: 'numeric'},
+        {name:'id_usuario_mod', type: 'numeric'},
+        {name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
+        {name:'usr_reg', type: 'string'},
+        {name:'usr_mod', type: 'string'},
+        {name:'tipo_clase', type: 'string'}
+
 	],
 	
 	tabeast:[

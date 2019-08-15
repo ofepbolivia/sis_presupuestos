@@ -32,7 +32,8 @@ class MODClaseGasto extends MODbase{
 		$this->captura('fecha_mod','timestamp');
 		$this->captura('usr_reg','varchar');
 		$this->captura('usr_mod','varchar');
-		
+		$this->captura('tipo_clase','varchar');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -51,6 +52,7 @@ class MODClaseGasto extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nombre','nombre','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('tipo_clase','tipo_clase','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -71,6 +73,7 @@ class MODClaseGasto extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('nombre','nombre','varchar');
 		$this->setParametro('codigo','codigo','varchar');
+		$this->setParametro('tipo_clase','tipo_clase','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
