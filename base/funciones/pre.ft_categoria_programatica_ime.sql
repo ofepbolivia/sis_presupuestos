@@ -431,6 +431,51 @@ BEGIN
            END LOOP;
 
 
+          -----------------------------------------------
+          -- Duplicar Unidad Ejecutora  pre.tunidad_ejecutora_ids
+          ---------------------------------------------
+
+
+            FOR v_registros in
+                                  select
+                                      p.*
+                                  from pre.tunidad_ejecutora p
+                                  where  p.id_gestion = v_parametros.id_gestion
+                                        and p.estado_reg = 'activo' LOOP
+
+                      -- preguntamos si ya existe en la tabla de ids
+                     IF NOT EXISTS (
+                                     select 1 from pre.tunidad_ejecutora_ids i
+                                     where i.id_unidad_ejecutora_uno = v_registros.id_unidad_ejecutora  )  THEN
+                                   INSERT INTO
+                                              pre.tunidad_ejecutora
+                                            (
+                                              id_usuario_reg,
+                                              fecha_reg,
+                                              estado_reg,
+                                              codigo,
+                                              nombre,
+                                              id_gestion
+                                            )
+                                            VALUES (
+                                              p_id_usuario,
+                                              now(),
+                                              'activo',
+                                              v_registros.codigo,
+                                              v_registros.nombre,
+                                              v_id_gestion_destino
+                                            ) RETURNING id_unidad_ejecutora into v_id_dos;
+
+
+
+                                   INSERT INTO pre.tunidad_ejecutora_ids
+                                       (id_unidad_ejecutora_uno, id_unidad_ejecutora_dos, sw_cambio_gestion )
+                                  VALUES
+                                       ( v_registros.id_unidad_ejecutora, v_id_dos, 'gestion');
+                     END IF;
+           END LOOP;
+
+
           ----------------------------------
           --  CLONAR CATEGORIA PROGRAMATICA
           ---------------------------------
@@ -439,14 +484,14 @@ BEGIN
 
 
             --clonamos presupuestos y centros de costos
-            FOR v_registros in (
-                                  select
+            FOR v_registros in select
                                       p.* ,
                                       pro.id_cp_programa_dos,
                                       py.id_cp_proyecto_dos,
                                       act.id_cp_actividad_dos,
                                       fue.id_cp_fuente_fin_dos,
-                                      org.id_cp_organismo_fin_dos
+                                      org.id_cp_organismo_fin_dos,
+                                      tue.id_unidad_ejecutora
 
                                   from pre.tcategoria_programatica p
                                   inner join pre.tcp_programa_ids pro on pro.id_cp_programa_uno = p.id_cp_programa
@@ -454,8 +499,8 @@ BEGIN
                                   inner join pre.tcp_actividad_ids act on act.id_cp_actividad_uno = p.id_cp_actividad
                                   inner join pre.tcp_fuente_fin_ids fue on fue.id_cp_fuente_fin_uno = p.id_cp_fuente_fin
                                   inner join pre.tcp_organismo_fin_ids org on org.id_cp_organismo_fin_uno = p.id_cp_organismo_fin
-                                  where  p.id_gestion = v_parametros.id_gestion
-                                        and p.estado_reg = 'activo') LOOP
+                                  left  join pre.tunidad_ejecutora tue on tue.id_unidad_ejecutora = p.id_unidad_ejecutora
+                                  where  p.id_gestion = v_parametros.id_gestion and p.estado_reg = 'activo' LOOP
 
 
 
@@ -479,7 +524,8 @@ BEGIN
                                           id_cp_proyecto,
                                           id_cp_actividad,
                                           id_cp_fuente_fin,
-                                          id_cp_organismo_fin
+                                          id_cp_organismo_fin,
+                                          id_unidad_ejecutora
                                         )
                                         VALUES (
                                           p_id_usuario,
@@ -491,7 +537,8 @@ BEGIN
                                           v_registros.id_cp_proyecto_dos,
                                           v_registros.id_cp_actividad_dos,
                                           v_registros.id_cp_fuente_fin_dos,
-                                          v_registros.id_cp_organismo_fin_dos
+                                          v_registros.id_cp_organismo_fin_dos,
+                                          v_registros.id_unidad_ejecutora
                                         )RETURNING id_categoria_programatica   into v_id_dos;
 
                                   INSERT INTO pre.tcategoria_programatica_ids (id_categoria_programatica_uno, id_categoria_programatica_dos, sw_cambio_gestion )

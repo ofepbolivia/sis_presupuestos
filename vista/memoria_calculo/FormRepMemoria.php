@@ -43,10 +43,9 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
                 mode:'remote',
                 pageSize:10,
                 queryDelay:1000,
-                listWidth:600,
+                listWidth:250,
                 resizable:true,
-				width:250,
-                anchor:'100%'
+				width:250
                 
             },
             type:'ComboBox',
@@ -88,7 +87,7 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
 				mode : 'remote',
 				pageSize : 20,
 				width : 250,
-				listWidth : '280',
+				listWidth : '250',
 				resizable : true,
 				minChars : 2
 			},
@@ -157,8 +156,8 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
 			   mode:'remote',
 			   pageSize:10,
 			   queryDelay:1000,
-			   width: 150,
-			   listWidth: 280,
+			   width: 250,
+			   listWidth: 250,
 			   minChars:2,
 			   tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
 			},
@@ -175,8 +174,8 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
                 tinit: false,
                 baseParams: {_adicionar:'si'},
                 origen: 'PRESUPUESTO',
-                width: 350,
-   				listWidth: 350
+                width: 250,
+   				listWidth: 250
             },
             type: 'ComboRec',
             id_grupo: 0,
@@ -211,7 +210,7 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
 				mode: 'remote',
 				pageSize: 15,
 				queryDelay: 1000,
-				anchor: '100%',
+                width: 250,
 				minChars: 2,
 				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>'
 			},
@@ -227,8 +226,8 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
    				fieldLabel:'Partida',
    				gdisplayField:'desc_partida',//mapea al store del grid
    				baseParams: {_adicionar:'si',sw_transaccional: 'movimiento', partida_tipo: 'presupuestaria'},
-   				anchor: '100%',
-   				listWidth: 350
+                width: 250,
+   				listWidth: 250
        	     },
    			type:'ComboRec',
    			id_grupo:0,
@@ -270,8 +269,8 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 					fields: ['ID', 'valor'],
-					data :[ ['general','Memoria de Calculo General'],
-						['periodos','Memoria de Calculo Mensual']]
+					data :[ ['general','Memoria de Cálculo General'],
+						['periodos','Memoria de Cálculo Mensual']]
 				}),
 				valueField:'ID',
 				displayField:'valor',
@@ -291,7 +290,7 @@ Phx.vista.FormRepMemoria = Ext.extend(Phx.frmInterfaz, {
 		topBar : true,
 		botones : false,
 		labelSubmit : 'Generar',
-		tooltipSubmit : '<b>Reporte Memoria de Calculo Presupuestario</b>',
+		tooltipSubmit : '<b>Reporte Memoria de Cálculo Presupuestario</b>',
 		
 		constructor : function(config) {
 			Phx.vista.FormRepMemoria.superclass.constructor.call(this, config);

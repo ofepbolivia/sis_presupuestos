@@ -1017,3 +1017,18 @@ ALTER TABLE pre.tpartida_usuario
 ALTER TABLE pre.tpartida_usuario
   ADD COLUMN id_gestion INTEGER;  
 /*****************************F-SCP-MAY-PRE-0-24/07/2018*************/
+
+/*****************************I-SCP-FEA-PRE-0-07/08/2019*************/
+CREATE TABLE pre.tunidad_ejecutora_ids (
+  id_unidad_ejecutora_uno INTEGER NOT NULL,
+  id_unidad_ejecutora_dos INTEGER NOT NULL,
+  sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
+)
+WITH (oids = false);
+
+/*****************************F-SCP-FEA-PRE-0-07/08/2019*************/
+
+/*****************************I-SCP-MAY-PRE-0-14/08/2019*************/
+ALTER TABLE pre.tclase_gasto
+  ADD COLUMN tipo_clase VARCHAR(50);
+/*****************************F-SCP-MAY-PRE-0-14/08/2019*************/

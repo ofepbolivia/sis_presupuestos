@@ -54,9 +54,9 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 mode:'remote',
                 pageSize:10,
                 queryDelay:1000,
-                listWidth:600,
+                listWidth:250,
                 resizable:true,
-                anchor:'100%'
+                width: 250
 
             },
             type:'ComboBox',
@@ -97,9 +97,8 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 lazyRender : true,
                 mode : 'remote',
                 pageSize : 20,
-                width : 150,
-                anchor : '80%',
-                listWidth : '280',
+                width : 250,
+                listWidth : '250',
                 resizable : true,
                 minChars : 2
             },
@@ -168,8 +167,8 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 mode:'remote',
                 pageSize:10,
                 queryDelay:1000,
-                width: 150,
-                listWidth: 280,
+                width: 250,
+                listWidth: 250,
                 minChars:2,
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
             },
@@ -186,8 +185,8 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 tinit: false,
                 baseParams: {_adicionar:'si'},
                 origen: 'PRESUPUESTO',
-                width: 350,
-                listWidth: 350
+                width: 250,
+                listWidth: 250
             },
             type: 'ComboRec',
             id_grupo: 0,
@@ -222,7 +221,7 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 mode: 'remote',
                 pageSize: 15,
                 queryDelay: 1000,
-                anchor: '100%',
+                width: 250,
                 minChars: 2,
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>'
             },
@@ -297,8 +296,8 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 fieldLabel:'Partida',
                 gdisplayField:'desc_partida',//mapea al store del grid
                 baseParams: {_adicionar:'si',sw_transaccional: 'movimiento', partida_tipo: 'presupuestaria'},
-                anchor: '100%',
-                listWidth: 350
+                width: 250,
+                listWidth: 250
             },
             type:'ComboRec',
             id_grupo:0,
@@ -350,7 +349,7 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 }),
                 valueField:'ID',
                 displayField:'valor',
-                width:150
+                width:250
 
             },
             type:'ComboBox',
