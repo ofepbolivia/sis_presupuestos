@@ -102,6 +102,8 @@ BEGIN
                                  prpa.id_partida = v_registros.id_partida
                                  and (CASE WHEN p_id_presupuesto[1] != 0 THEN 
                                         prpa.id_presupuesto = ANY(p_id_presupuesto)
+                                 	  when p_id_presupuesto is null then 
+                                      	prpa.id_presupuesto is null                                         
                                       ELSE
                                         0 = 0
                                       END)

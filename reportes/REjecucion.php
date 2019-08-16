@@ -28,6 +28,7 @@ class REjecucion extends  ReportePDF {
     var $totales_saldoXcomprometer = 0;
     var $totales_saldoEjecutado = 0;
     var $totales_saldoXpagar = 0;
+    var $desc= '';
             		
 	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa,$fecha_ini, $fecha_fin) {
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
@@ -36,7 +37,8 @@ class REjecucion extends  ReportePDF {
 		$this->datos_entidad = $dataEmpresa;
 		$this->datos_gestion = $gestion;
 		$this->fecha_ini = $fecha_ini;
-		$this->fecha_fin = $fecha_fin;
+        $this->fecha_fin = $fecha_fin;
+        $this->desc = $detalle[0]['desc_cat'];
 
 		$this->subtotal = 0;
 		$this->SetMargins(7, 60, 5);
@@ -58,7 +60,26 @@ class REjecucion extends  ReportePDF {
 		
 		//cabecera del report
 		$this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,35,20);
-		$this->ln(5);
+        $this->ln(5);
+
+        switch ($this->objParam->getParametro('tipo_reporte')) {
+            case 'categoria': $tit = 'CATEGORÍA'; 
+                break;
+            case 'programa': $tit = 'PROGRAMA'; 
+                break;
+            case 'presupuesto': $tit = 'PRESUPUESTO'; 
+                break;
+            case 'proyecto': $tit = 'PROYECTO';
+                break;
+            case 'actividad': $tit = 'ACTIVIDAD';
+                break;
+            case 'orga_financ': $tit = 'ORGANISMO FINANCIADOR';
+                break;
+            case 'fuente_financ': $tit = 'FUENTE DE FINANCIAMIENTO';
+                break;
+            case 'unidad_ejecutora': $tit = 'UNIDAD EJECUTORA';
+                break;
+        }
 		if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
             $this->SetFont('','BU',12);		
             $this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA A NIVEL CENTRO DE COSTO",0,1,'C');
@@ -71,7 +92,7 @@ class REjecucion extends  ReportePDF {
             $this->Ln(2);
         }else{
             $this->SetFont('','BU',12);		
-            $this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA",0,1,'C');
+            $this->Cell(0,5,"EJECUCIÓN PRESUPUESTARIA POR ".$tit,0,1,'C');
             $this->Cell(0,5,mb_strtoupper($this->datos_entidad['nombre'],'UTF-8'),0,1,'C');
             $this->Cell(0,5,"GESTIÓN ".$this->datos_gestion['anho'],0,1,'C');
             //$this->Ln();
@@ -85,30 +106,38 @@ class REjecucion extends  ReportePDF {
     
             $this->SetFont('','',10);
         }
-		
+        
+        $concepto = $this->objParam->getParametro('concepto');
+        $subtitulo = $this->objParam->getParametro('subtitulo');        
+        //var_dump($subtitulo);exit;
 		$height = 3;
         $width1 = 5;
 		$esp_width = 10;
-        $width_c1= 55;
-		$width_c2= 120;
+        $width_c1= 50;
+        $width_c2= 130;        
         $width3 = 40;
         $width4 = 75;
-		
-	    
-		
-		$this->Ln();
+		$fuente = 10;
+        $this->Ln();        
         
-        $concepto = $this->objParam->getParametro('concepto');
-        
-		if($this->objParam->getParametro('tipo_reporte') =='categoria'){
-			$tmp = 'CATEGORÍA';
-		}
-		if($this->objParam->getParametro('tipo_reporte') =='programa'){
-			$tmp = 'PROGRAMA';
-		}
-		if($this->objParam->getParametro('tipo_reporte') =='presupuesto'){
-			$tmp = 'PRESUPUESTO';
-		}
+        switch ($this->objParam->getParametro('tipo_reporte')) {
+            case 'categoria': $tmp = 'CATEGORÍA'; $concepto = $subtitulo; $width_c1=25; $fuente=8;
+                break;
+            case 'programa': $tmp = 'PROGRAMA'; $width_c1=25;
+                break;
+            case 'presupuesto': $tmp = 'PRESUPUESTO'; $width_c1=30;
+                break;
+            case 'proyecto': $tmp = 'PROYECTO'; $concepto = $subtitulo; $width_c1=25;
+                break;
+            case 'actividad': $tmp = 'ACTIVIDAD'; $concepto = $subtitulo; $width_c1=25;
+                break;
+            case 'orga_financ': $tmp = 'ORGANISMO FINANCIADOR'; $concepto = $subtitulo; 
+                break;
+            case 'fuente_financ': $tmp = 'FUENTE DE FINANCIAMIENTO'; $concepto = $subtitulo;$width_c1=55;
+                break;
+            case 'unidad_ejecutora': $tmp = 'UNIDAD EJECUTORA'; $concepto = $subtitulo;$width_c1=40;
+                break;
+        }
         if ($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){ 
             $this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $this->Cell($width_c1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
@@ -119,17 +148,38 @@ class REjecucion extends  ReportePDF {
             $this->Ln();
             //$tmp = 'CATEGORÍA PROGRAMATICA';
             //$concepto = 'Administración Central BoA';            
-        }else{
-				
-            $this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-            $this->Cell($width_c1, $height, $tmp.": ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
-            $this->SetFont('', '');
-            $this->SetFillColor(192,192,192, true);
-            $this->Cell($width_c2, $height, $concepto, $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        }
+        else if($this->objParam->getParametro('tipo_reporte') == 'presupuesto'){
+            $this->Ln(-2);
+            $this->Cell($width1, 1, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');                        
+            $this->SetTextColor(0, 0, 0);                       
+            $this->Cell($width_c1, 1, $tmp.": ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->SetFont('', 'B');
             
-            
+            $this->SetTextColor(0, 0, 255);            
+            $this->Cell($width_c2, 1, $concepto, 0, 0, 'L', false, '', 0, false, 'T', 'C');
             $this->Ln();
-            $this->Ln();        
+            $this->SetFont('', '');
+            $this->Cell($width1, 1, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');                        
+            $this->SetTextColor(0, 0, 0);                       
+            $this->Cell($width_c1, 1, "CATEGORIA: ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->SetFont('', 'B');
+            
+            $this->SetTextColor(0, 0, 255);            
+            $this->Cell($width_c2, 1, $this->desc, 0, 0, 'L', false, '', 0, false, 'T', 'C');                        
+            $this->Ln(7);
+        }
+        else{
+			$this->SetFont('', '',$fuente);	
+            $this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');                        
+            $this->SetTextColor(0, 0, 0);                       
+            $this->Cell($width_c1, $height, $tmp.": ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->SetFont('', 'B',$fuente);
+            $this->SetFillColor(192,192,192, true);
+            $this->SetTextColor(0, 0, 255);            
+            $this->Cell($width_c2, $height, $concepto, 0, 0, 'L', false, '', 0, false, 'T', 'C');            
+            $this->Ln();      
+            $this->Ln();
         }
 		
 		$this->SetFont('','B',6);
@@ -183,7 +233,7 @@ class REjecucion extends  ReportePDF {
                         's11' => 'SALDO POR PAGAR',   
                         's12' => '% EJE');
                          
-        $this-> MultiRow($RowArray,false,1);		        
+        $this-> MultiRow($RowArray,false,1);	        
 		
     }
 	
@@ -253,8 +303,7 @@ class REjecucion extends  ReportePDF {
 		
 	}	
 	
-	function imprimirLinea($val,$count,$fill){
-		
+	function imprimirLinea($val,$count,$fill){		
 		$this->SetFillColor(224, 235, 255);
         $this->SetTextColor(0);
         $tab = '';

@@ -64,7 +64,7 @@ BEGIN
     
     
          --determinar array de presupuestos
-         
+         --raise exception '%',v_parametros.id_cp_organismo_fin;
          
              IF v_parametros.tipo_reporte = 'programa' and v_parametros.id_cp_programa is not null and v_parametros.id_cp_programa != 0 THEN
                  
@@ -89,23 +89,73 @@ BEGIN
                      and p.tipo_pres  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
              
              
-             ELSEIF v_parametros.tipo_reporte = 'presupuesto' and v_parametros.id_presupuesto is not null and v_parametros.id_presupuesto != 0 THEN
+            ELSEIF v_parametros.tipo_reporte = 'presupuesto' and v_parametros.id_presupuesto is not null and v_parametros.id_presupuesto != 0 THEN
                      
-                   va_id_presupuesto[1] = v_parametros.id_presupuesto;
+                 va_id_presupuesto[1] = v_parametros.id_presupuesto;
+                 
+                 select 
+                 	 (cat.codigo_categoria||' '||cat.descripcion)::text
+         		 into 
+	                 v_desc_categ
+                 from pre.tpresupuesto pr 
+                 inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pr.id_categoria_prog
+                 where pr.id_presupuesto = v_parametros.id_presupuesto;                
 
-			ELSEIF v_parametros.tipo_reporte = 'centro_costo' then  
-                    SELECT
-	                     pxp.aggarray(p.id_presupuesto)
-                    into 
-						 va_id_presupuesto
-                    FROM pre.tpresupuesto p
-                    where p.id_categoria_prog in (
-                    							  SELECT 
-                                                    cpr.id_categoria_programatica
-                                                  FROM 
-                                                    pre.vcategoria_programatica cpr 
-                                                  WHERE  cpr.id_gestion = v_parametros.id_gestion)                       
-                     and p.tipo_pres  = ANY (string_to_array(v_parametros.tipo_pres::text,','));                    
+            ELSEIF v_parametros.tipo_reporte = 'proyecto' and v_parametros.id_cp_proyecto is not null and v_parametros.id_cp_proyecto != 0 THEN
+              
+                   SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
+                   where cp.id_cp_proyecto = v_parametros.id_cp_proyecto                                                 
+                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
+     
+            ELSEIF v_parametros.tipo_reporte = 'actividad' and v_parametros.id_cp_actividad is not null and v_parametros.id_cp_actividad != 0 THEN
+
+                   SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
+                   where cp.id_cp_actividad = v_parametros.id_cp_actividad
+                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
+                                 
+            ELSEIF v_parametros.tipo_reporte = 'orga_financ' and v_parametros.id_cp_organismo_fin is not null and v_parametros.id_cp_organismo_fin != 0 THEN            
+
+                   SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
+                   where cp.id_cp_organismo_fin = v_parametros.id_cp_organismo_fin
+                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
+              
+            ELSEIF v_parametros.tipo_reporte = 'fuente_financ' and v_parametros.id_cp_fuente_fin is not null and v_parametros.id_cp_fuente_fin != 0 THEN            
+
+                   SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
+                   where cp.id_cp_fuente_fin = v_parametros.id_cp_fuente_fin                                            
+                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
+                                             
+            ELSEIF v_parametros.tipo_reporte = 'unidad_ejecutora' and v_parametros.id_unidad_ejecutora is not null and v_parametros.id_unidad_ejecutora != 0 THEN                        
+              
+                   SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog                   
+                   where cp.id_unidad_ejecutora = v_parametros.id_unidad_ejecutora
+                   and cp.id_gestion = v_parametros.id_gestion
+                 and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));  
              
              ELSE
                      
@@ -120,41 +170,7 @@ BEGIN
                      
            END IF;
          
-         
-         -- lista las partida basicas de cada presupuesto
-         FOR v_registros in (
-                  select 
-                     par.id_partida,
-                     par.codigo as codigo_partida,
-                     par.nombre_partida,
-                     par.sw_transaccional,
-                     par.nivel_partida
-                  from pre.tpartida par
-                  where       par.id_gestion = v_parametros.id_gestion
-                         and  par.id_partida_fk is null
-                         and  par.tipo in (select
-                                          tipr.movimiento	
-                                          from pre.ttipo_presupuesto tipr
-                                          where tipr.codigo = ANY(string_to_array(v_parametros.tipo_pres::text,','))
-                                          group by 
-                                          tipr.movimiento)                         
-                         ) LOOP
-         
-         
-                 PERFORM pre.f_rep_ejecucion_recursivo(
-                                                 v_registros.id_partida, 
-                                                 v_registros.codigo_partida, 
-                                                 v_registros.nombre_partida, 
-                                                 va_id_presupuesto, 
-                                                 v_parametros.fecha_ini,
-                                                 v_parametros.fecha_fin, 
-                                                 v_registros.sw_transaccional, 
-                                                 v_registros.nivel_partida);                                    
-      
-         
-         END LOOP;
-         
-        
+                          
          -- listado consolidado segun parametros          
        if (v_parametros.tipo_reporte = 'centro_costo') then                                                                           
 
@@ -183,6 +199,7 @@ BEGIN
                 vigente,comprometido,ejecutado,pagado,porc_ejecucion)
                         
             SELECT
+              COALESCE(v_desc_categ,'')::text as desc_cat,
 			  vca.codigo_categoria, 	              
               'TOTAL' as descripcion,
               pro.id_categoria,
@@ -225,9 +242,44 @@ BEGIN
                              RETURN NEXT v_registros;
 			end loop;                             
        else
+         -- lista las partida basicas de cada presupuesto
+         FOR v_registros in (
+                  select 
+                     par.id_partida,
+                     par.codigo as codigo_partida,
+                     par.nombre_partida,
+                     par.sw_transaccional,
+                     par.nivel_partida
+                  from pre.tpartida par
+                  where       par.id_gestion = v_parametros.id_gestion
+                         and  par.id_partida_fk is null
+                         and  par.tipo in (select
+                                          tipr.movimiento	
+                                          from pre.ttipo_presupuesto tipr
+                                          where tipr.codigo = ANY(string_to_array(v_parametros.tipo_pres::text,','))
+                                          group by 
+                                          tipr.movimiento)                         
+                         ) LOOP
+         
+         
+                 PERFORM pre.f_rep_ejecucion_recursivo(
+                                                 v_registros.id_partida, 
+                                                 v_registros.codigo_partida, 
+                                                 v_registros.nombre_partida, 
+                                                 va_id_presupuesto, 
+                                                 v_parametros.fecha_ini,
+                                                 v_parametros.fecha_fin, 
+                                                 v_registros.sw_transaccional, 
+                                                 v_registros.nivel_partida);                                    
+      
+         
+         END LOOP;       
 
          FOR v_registros in (
                               SELECT
+                                case when v_desc_categ = '' then 
+								''::text 
+                                else v_desc_categ::text end as desc_cat,
                                 ''::varchar as categoria,   
                                 id_partida,
                                 codigo_partida,

@@ -23,7 +23,16 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			type:'Field',
 			form:true 
 		},
-		
+		{
+			//configuracion del componente
+			config:{
+					labelSeparator:'',
+					inputType:'hidden',
+					name: 'subtitulo'
+			},
+			type:'Field',
+			form:true 
+		},		
 		{
             config:{
                 name:'id_gestion',
@@ -127,10 +136,15 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
 	        	data :	[
-		        	        ['programa','Programa'],
-		        	        ['categoria','Categoría Programática'],	
-							['presupuesto','Presupuesto'],
-                            ['centro_costo','Centro de Costo']
+		        	        ['programa', 'Programa'],
+                            ['proyecto', 'Proyecto'],
+                            ['actividad', 'Actividad'],
+                            ['orga_financ', 'Organismo Financiador'],
+                            ['fuente_financ', 'Fuente Financiamiento'],
+                            ['unidad_ejecutora', 'Unidad Ejecutora'],
+		        	        ['categoria', 'Categoría Programática'],	
+							['presupuesto', 'Presupuesto'],
+                            ['centro_costo', 'Centro de Costo'],
 						]	        				
 	    		}),
 				valueField:'ID',
@@ -142,6 +156,233 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			id_grupo:1,
 			form:true
 		},
+		{
+			config: {
+				name: 'id_cp_proyecto',
+				fieldLabel: 'Proyecto',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_presupuestos/control/CpProyecto/listarCpProyecto',
+					id: 'id_cp_proyecto',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_cp_proyecto', 'descripcion', 'codigo'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'codigo#descripcion'}
+				}),
+				valueField: 'id_cp_proyecto',
+				displayField: 'descripcion',
+				gdisplayField: 'desc_proyecto',
+				hiddenName: 'id_cp_proyecto',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				gwidth: 150,
+                minChars: 2,
+                resizable:true,
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>',
+				renderer : function(value, p, record) {
+					return String.format('({1})  {0}', record.data['desc_proyecto'],record.data['codigo_proyecto']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'desc_proyecto',type: 'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'id_cp_actividad',
+				fieldLabel: 'Actividad',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_presupuestos/control/CpActividad/listarCpActividad',
+					id: 'id_cp_actividad',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_cp_actividad', 'descripcion', 'codigo'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'codigo#descripcion'}
+				}),
+				valueField: 'id_cp_actividad',
+				displayField: 'descripcion',
+				gdisplayField: 'desc_actividad',
+				hiddenName: 'id_cp_actividad',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				gwidth: 150,
+                minChars: 2,
+                resizable:true,
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>',
+				renderer : function(value, p, record) {
+					return String.format('({1})  {0}', record.data['desc_actividad'],record.data['codigo_actividad']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'desc_actividad',type: 'string'},
+			grid: true,
+			form: true
+		},
+		{
+			config: {
+				name: 'id_cp_organismo_fin',
+				fieldLabel: 'Organismo Financiador',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_presupuestos/control/CpOrganismoFin/listarCpOrganismoFin',
+					id: 'id_cp_organismo_fin',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_cp_organismo_fin', 'descripcion', 'codigo'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'codigo#descripcion'}
+				}),
+				valueField: 'id_cp_organismo_fin',
+				displayField: 'descripcion',
+				gdisplayField: 'desc_origen_fin',
+				hiddenName: 'id_cp_organismo_fin',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				gwidth: 150,
+                minChars: 2,
+                resizable:true,
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>',
+				renderer : function(value, p, record) {
+					return String.format('({1})  {0}', record.data['desc_origen_fin'],record.data['codigo_origen_fin']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'desc_organismo_fin',type: 'string'},
+			grid: true,
+			form: true
+		},
+		
+		{
+			config: {
+				name: 'id_cp_fuente_fin',
+				fieldLabel: 'Fuente Financiador',
+				allowBlank: false,
+				emptyText: 'Elija una opción...',
+				store: new Ext.data.JsonStore({
+					url: '../../sis_presupuestos/control/CpFuenteFin/listarCpFuenteFin',
+					id: 'id_cp_fuente_fin',
+					root: 'datos',
+					sortInfo: {
+						field: 'codigo',
+						direction: 'ASC'
+					},
+					totalProperty: 'total',
+					fields: ['id_cp_fuente_fin', 'descripcion', 'codigo'],
+					remoteSort: true,
+					baseParams: {par_filtro: 'codigo#descripcion'}
+				}),
+				valueField: 'id_cp_fuente_fin',
+				displayField: 'descripcion',
+				gdisplayField: 'desc_fuente_fin',
+				hiddenName: 'id_cp_fuente_fin',
+				forceSelection: true,
+				typeAhead: false,
+				triggerAction: 'all',
+				lazyRender: true,
+				mode: 'remote',
+				pageSize: 15,
+				queryDelay: 1000,
+				anchor: '100%',
+				gwidth: 150,
+                minChars: 2,
+                resizable:true,
+				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>',
+				renderer : function(value, p, record) {
+					return String.format('({1})  {0}', record.data['desc_fuente_fin'],record.data['codigo_fuente_fin']);
+				}
+			},
+			type: 'ComboBox',
+			id_grupo: 0,
+			filters: {pfiltro: 'desc_fuente_fin',type: 'string'},
+			grid: true,
+			form: true
+		},
+
+        {
+            config: {
+                name: 'id_unidad_ejecutora',
+                fieldLabel: 'Unidad Ejecutora',
+                allowBlank: false,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_presupuestos/control/UnidadEjecutora/listarUnidadEjecutora',
+                    id: 'id_unidad_ejecutora',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'codigo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_unidad_ejecutora', 'nombre', 'codigo'],
+                    remoteSort: true,
+                    baseParams: {par_filtro: 'codigo#nombre'}
+                }),
+                valueField: 'id_unidad_ejecutora',
+                displayField: 'nombre',
+                gdisplayField: 'desc_unidad_ejecutora',
+                hiddenName: 'id_unidad_ejecutora',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '100%',
+                gwidth: 150,
+                minChars: 2,
+                resizable:true,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{nombre}</p> </div></tpl>',
+                renderer : function(value, p, record) {
+                    return String.format('({1})  {0}',record.data['desc_unidad_ejecutora'], record.data['codigo_unidad_ejecutora']);
+                }
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            filters: {pfiltro: 'desc_unidad_ejecutora',type: 'string'},
+            grid: true,
+            form: true
+        },                               
 		{
 			config:{
 				name: 'id_categoria_programatica',
@@ -172,8 +413,9 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			   queryDelay:1000,
 			   width: 150,
 			   listWidth: 280,
-			   minChars:2,
-			   tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
+               minChars:2,
+               resizable:true,
+			   tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:green"><b>{codigo_categoria}</b></p><p>{descripcion}</p> </div></tpl>'
 			},
 			type:'ComboBox',
 			id_grupo:1,
@@ -184,7 +426,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
             	sysorigen: 'sis_presupuestos',
                 name: 'id_presupuesto',
                 fieldLabel: 'Presupuesto',
-                allowBlank: true,
+                allowBlank: false,
                 tinit: false,
                 baseParams: {_adicionar:'si'},
                 origen: 'PRESUPUESTO',
@@ -201,7 +443,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			config: {
 				name: 'id_cp_programa',
 				fieldLabel: 'Programa',
-				allowBlank: true,
+				allowBlank: false,
 				emptyText: 'Elija una opción...',
 				store: new Ext.data.JsonStore({
 					url: '../../sis_presupuestos/control/CpPrograma/listarCpPrograma',
@@ -225,7 +467,8 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				pageSize: 15,
 				queryDelay: 1000,
 				anchor: '100%',
-				minChars: 2,
+                minChars: 2,
+                resizable:true,
 				tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{descripcion}</p> </div></tpl>'
 			},
 			type: 'ComboBox',
@@ -328,36 +571,39 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			this.init();
 			
 			this.ocultarComponente(this.Cmp.id_categoria_programatica);
+            this.ocultarComponente(this.Cmp.id_cp_proyecto);            
 			this.ocultarComponente(this.Cmp.id_presupuesto);
 			this.ocultarComponente(this.Cmp.id_cp_programa);
+            this.ocultarComponente(this.Cmp.id_cp_actividad);
+            this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+            this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+            this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
 						
 			this.iniciarEventos();
 		},
-		
+
+		clean: (id, c) => {            
+            id.reset();
+            id.store.baseParams.id_gestion =c.value;				
+            id.modificado=true;            
+        },
 		iniciarEventos:function(){        
 			
-			this.Cmp.id_gestion.on('select',function(c,r,n){
-				
-					this.Cmp.id_categoria_programatica.reset();
-					this.Cmp.id_categoria_programatica.store.baseParams.id_gestion =c.value;				
-					this.Cmp.id_categoria_programatica.modificado=true;
-					
-					this.Cmp.id_presupuesto.reset();
-					this.Cmp.id_presupuesto.store.baseParams.id_gestion = c.value;				
-					this.Cmp.id_presupuesto.modificado=true;
-					
-					this.Cmp.id_cp_programa.reset();
-					this.Cmp.id_cp_programa.store.baseParams.id_gestion = c.value;				
-					this.Cmp.id_cp_programa.modificado=true;
-					
-					
-					console.log('record',r)
-					
-					this.Cmp.fecha_ini.setValue('01/01/'+r.data.gestion);
-					this.Cmp.fecha_fin.setValue('31/12/'+r.data.gestion);
-					
-				
-				
+			this.Cmp.id_gestion.on('select',function(c,r,n){                
+				this.clean(this.Cmp.id_categoria_programatica, c);
+                this.clean(this.Cmp.id_presupuesto, c);
+                this.clean(this.Cmp.id_cp_programa, c);
+                this.clean(this.Cmp.id_cp_proyecto, c);
+                this.clean(this.Cmp.id_cp_actividad, c);
+                this.clean(this.Cmp.id_cp_organismo_fin, c);
+                this.clean(this.Cmp.id_cp_fuente_fin, c);
+                this.clean(this.Cmp.id_unidad_ejecutora, c);
+                    										
+                console.log('record',r)
+                
+                this.Cmp.fecha_ini.setValue('01/01/'+r.data.gestion);
+                this.Cmp.fecha_fin.setValue('31/12/'+r.data.gestion);
+													
 			},this);
 			
 			
@@ -367,40 +613,125 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				this.Cmp.id_categoria_programatica.reset();
 				this.Cmp.id_presupuesto.reset();
 				this.Cmp.id_cp_programa.reset();
+                this.Cmp.id_cp_proyecto.reset();
+                this.Cmp.id_cp_actividad.reset();
+                this.Cmp.id_cp_organismo_fin.reset();
+                this.Cmp.id_cp_fuente_fin.reset();
+                this.Cmp.id_unidad_ejecutora.reset();
                 this.Cmp.nivel.reset();                
 				
 				console.log('--->',record.data.ID)
-				if(record.data.ID == 'programa'){
-					this.ocultarComponente(this.Cmp.id_categoria_programatica);
-					this.ocultarComponente(this.Cmp.id_presupuesto);
-					this.mostrarComponente(this.Cmp.id_cp_programa);					
-                    this.mostrarComponente(this.Cmp.nivel);
-				}
-				
-				if(record.data.ID == 'categoria'){
-					this.mostrarComponente(this.Cmp.id_categoria_programatica);
-					this.ocultarComponente(this.Cmp.id_presupuesto);
-					this.ocultarComponente(this.Cmp.id_cp_programa);                    					
-                    this.mostrarComponente(this.Cmp.nivel);
-				}
-				
-				if(record.data.ID == 'presupuesto'){
-					this.ocultarComponente(this.Cmp.id_categoria_programatica);
-					this.mostrarComponente(this.Cmp.id_presupuesto);
-					this.ocultarComponente(this.Cmp.id_cp_programa);
-                    this.mostrarComponente(this.Cmp.nivel);
-					
-				}
-                if(record.data.ID == 'centro_costo'){
-					this.ocultarComponente(this.Cmp.id_categoria_programatica);
-					this.ocultarComponente(this.Cmp.id_presupuesto);
-					this.ocultarComponente(this.Cmp.id_cp_programa);                    
-                    this.ocultarComponente(this.Cmp.nivel);
-                }
-				
-				
+                switch (record.data.ID) {
+                    case 'programa':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+
+                        this.mostrarComponente(this.Cmp.id_cp_programa);					
+                        this.mostrarComponente(this.Cmp.nivel);                                            
+                        break;
+                    case 'categoria':
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                    
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+
+                        this.mostrarComponente(this.Cmp.id_categoria_programatica);
+                        this.mostrarComponente(this.Cmp.nivel);
+                        break;
+                    case 'presupuesto':                    
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);					
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                    
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+                                            
+                        this.mostrarComponente(this.Cmp.id_presupuesto);
+                        this.mostrarComponente(this.Cmp.nivel); 
+                        break;               
+                    case 'centro_costo':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                    
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);                                                            
+                        this.ocultarComponente(this.Cmp.nivel);    
+                        break;
+                    case 'proyecto':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);                                   
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+
+                        this.mostrarComponente(this.Cmp.id_cp_proyecto);
+                        this.mostrarComponente(this.Cmp.nivel);                    
+                        break;
+                    case 'actividad':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                    
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+
+                        this.mostrarComponente(this.Cmp.id_cp_actividad);                    
+                        this.mostrarComponente(this.Cmp.nivel);                    
+                        break;
+                    case 'orga_financ':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                        
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+
+                        this.mostrarComponente(this.Cmp.id_cp_organismo_fin);                    
+                        this.mostrarComponente(this.Cmp.nivel);
+                        break;
+                    case 'fuente_financ':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                        
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+
+                        this.mostrarComponente(this.Cmp.id_cp_fuente_fin);                    
+                        this.mostrarComponente(this.Cmp.nivel);                    
+                        break;
+                    case 'unidad_ejecutora':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);                        
+                        this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+
+                        this.mostrarComponente(this.Cmp.id_unidad_ejecutora);                    
+                        this.mostrarComponente(this.Cmp.nivel);                    
+                        break;
+                }								
 			}, this);
-			
+
 			this.Cmp.tipo_pres.on('change',function(){				  
 				  this.Cmp.id_presupuesto.reset();
 				  this.Cmp.id_presupuesto.store.baseParams.codigos_tipo_pres = this.Cmp.tipo_pres.getValue();				
@@ -431,23 +762,61 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			}]
 		}],
 		
-	ActSave:'../../sis_presupuestos/control/PresupPartida/reporteEjecucion',
-	
+    ActSave:'../../sis_presupuestos/control/PresupPartida/reporteEjecucion',
+            
 	onSubmit: function(o, x, force){
-		
-		if(this.Cmp.tipo_reporte.getValue()=='categoria'){
-			this.Cmp.concepto.setValue(this.Cmp.id_categoria_programatica.getRawValue());
-		}
-		if(this.Cmp.tipo_reporte.getValue()=='programa'){
-			this.Cmp.concepto.setValue(this.Cmp.id_cp_programa.getRawValue());
-		}
-		if(this.Cmp.tipo_reporte.getValue()=='presupuesto'){
-			this.Cmp.concepto.setValue(this.Cmp.id_presupuesto.getRawValue());
-		}
-        if(this.Cmp.tipo_reporte.getValue()=='centro_costo'){
-            this.Cmp.concepto.setValue(this.Cmp.id_categoria_programatica.getRawValue());
-        }
-		
+        var n;
+        switch (this.Cmp.tipo_reporte.getValue()) {
+            case 'categoria':                
+                id = this.Cmp.id_categoria_programatica.getValue();                                
+                    this.Cmp.id_categoria_programatica.store.data.items.forEach(e => {                                               
+                        e.data.id_categoria_programatica == id && this.Cmp.subtitulo.setValue(`${e.data.codigo_categoria} - ${e.data.descripcion}`);
+                    });      
+                this.Cmp.concepto.setValue(this.Cmp.id_categoria_programatica.getRawValue());                         
+                break;
+            case 'programa':
+                this.Cmp.concepto.setValue(this.Cmp.id_cp_programa.getRawValue());
+                break;
+            case 'presupuesto':
+                this.Cmp.concepto.setValue(this.Cmp.id_presupuesto.getRawValue());
+                break;
+            case 'proyecto':                
+                id = this.Cmp.id_cp_proyecto.getValue();
+                    this.Cmp.id_cp_proyecto.store.data.items.forEach(e => {
+                        e.data.id_cp_proyecto == id && this.Cmp.subtitulo.setValue(`${e.data.codigo} - ${e.data.descripcion}`);
+                    });                 
+                this.Cmp.concepto.setValue(this.Cmp.id_cp_proyecto.getRawValue());
+                break;
+            case 'actividad':
+                id = this.Cmp.id_cp_actividad.getValue();
+                    this.Cmp.id_cp_actividad.store.data.items.forEach(e => {
+                        e.data.id_cp_actividad == id && this.Cmp.subtitulo.setValue(`${e.data.codigo} - ${e.data.descripcion}`);
+                    });                                
+                this.Cmp.concepto.setValue(this.Cmp.id_cp_actividad.getRawValue());            
+                break;
+            case 'orga_financ':
+                    id = this.Cmp.id_cp_organismo_fin.getValue();
+                    this.Cmp.id_cp_organismo_fin.store.data.items.forEach(e => {
+                        e.data.id_cp_organismo_fin == id && this.Cmp.subtitulo.setValue(`${e.data.codigo} - ${e.data.descripcion}`);
+                    });                    
+                this.Cmp.concepto.setValue(this.Cmp.id_cp_organismo_fin.getRawValue());
+                break;
+            case 'fuente_financ':
+                    id = this.Cmp.id_cp_fuente_fin.getValue();
+                    this.Cmp.id_cp_fuente_fin.store.data.items.forEach(e => {
+                        e.data.id_cp_fuente_fin == id && this.Cmp.subtitulo.setValue(`${e.data.codigo} - ${e.data.descripcion}`);
+                    });                
+                this.Cmp.concepto.setValue(this.Cmp.id_cp_fuente_fin.getRawValue());            
+                break;
+            case 'unidad_ejecutora':
+                    id = this.Cmp.id_unidad_ejecutora.getValue();
+                    this.Cmp.id_unidad_ejecutora.store.data.items.forEach(e => {
+                        e.data.id_unidad_ejecutora == id && this.Cmp.subtitulo.setValue(`${e.data.codigo} - ${e.data.nombre}`);
+                    });                
+                this.Cmp.concepto.setValue(this.Cmp.id_unidad_ejecutora.getRawValue());
+                break;            
+        }             
+
 		Phx.vista.FormRepEjecucion.superclass.onSubmit.call(this,o, x, force);
 	},
 	
