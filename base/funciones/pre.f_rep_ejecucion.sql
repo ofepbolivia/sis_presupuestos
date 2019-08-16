@@ -199,8 +199,7 @@ BEGIN
                 ,importe,importe_aprobado,modificado,
                 vigente,comprometido,ejecutado,pagado,porc_ejecucion)
                         
-            SELECT
-              COALESCE(v_desc_categ,'')::text as desc_cat,
+            SELECT              
 			  vca.codigo_categoria, 	              
               'TOTAL' as descripcion,
               pro.id_categoria,
@@ -223,11 +222,12 @@ BEGIN
 		             vca.codigo_categoria;
             
 			FOR v_registros in ( SELECT
-            					 cod_pro as categoria,
-                                 0::integer as id_partida,
-                                 codigo as codigo_partida,       
-                                 descripcion::varchar as nombre_partida,
-                                 0::integer as nivel_partida,
+                                COALESCE(v_desc_categ,'')::text as desc_cat,
+            					cod_pro as categoria,
+                                0::integer as id_partida,
+                                codigo as codigo_partida,       
+                                descripcion::varchar as nombre_partida,
+                                0::integer as nivel_partida,
                                 (importe) as importe,
                                 (importe_aprobado) as importe_aprobado,
                                 (modificado) as formulado,
