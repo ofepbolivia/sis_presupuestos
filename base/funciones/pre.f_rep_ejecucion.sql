@@ -25,6 +25,7 @@ v_total 			numeric;
 v_tipo_cuenta		varchar;
 v_incluir_cierre	varchar;
 va_id_presupuesto	INTEGER[];
+v_desc_categ		text;
  
 
 BEGIN
@@ -67,7 +68,7 @@ BEGIN
          --raise exception '%',v_parametros.id_cp_organismo_fin;
          
              IF v_parametros.tipo_reporte = 'programa' and v_parametros.id_cp_programa is not null and v_parametros.id_cp_programa != 0 THEN
-                 
+
                      SELECT
                          pxp.aggarray(p.id_presupuesto)
                      into 
@@ -277,9 +278,7 @@ BEGIN
 
          FOR v_registros in (
                               SELECT
-                                case when v_desc_categ = '' then 
-								''::text 
-                                else v_desc_categ::text end as desc_cat,
+                                COALESCE(v_desc_categ,'')::text as desc_cat,
                                 ''::varchar as categoria,   
                                 id_partida,
                                 codigo_partida,
