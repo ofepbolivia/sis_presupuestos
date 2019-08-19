@@ -79,7 +79,7 @@ BEGIN
            v_sw_distinc = '';
 
 
-           IF v_parametros.tipo_interfaz = 'PresupuestoInicio' THEN
+           IF v_parametros.tipo_interfaz = 'PresupuestoInicio' or v_parametros.tipo_interfaz = 'PresupuestoReporte'THEN
              v_join_ewf = 'LEFT';
            ELSE
              v_join_ewf = 'INNER';
@@ -120,7 +120,7 @@ BEGIN
             END IF;
 
 
-            IF v_parametros.tipo_interfaz = 'PresupuestoReporte' THEN
+            /*IF v_parametros.tipo_interfaz = 'PresupuestoReporte' THEN
                 IF p_administrador !=1 THEN
                       v_sw_distinc = ' DISTINCT ';
                       -- si noes adminsitrador solo funcionarios autorizados pueden visualizar
@@ -128,7 +128,7 @@ BEGIN
 
                   END IF;
                   v_filadd = ' (lower(pre.estado)  in (''aprobado'')) and ';
-             END IF;
+             END IF;*/
 
             --Sentencia de la consulta
 			v_consulta:='select
@@ -208,7 +208,7 @@ BEGIN
            v_sw_distinc = '';
 
 
-           IF v_parametros.tipo_interfaz = 'PresupuestoInicio' THEN
+           IF v_parametros.tipo_interfaz = 'PresupuestoInicio' or v_parametros.tipo_interfaz = 'PresupuestoReporte' THEN
              v_join_ewf = 'LEFT';
            ELSE
              v_join_ewf = 'INNER';
@@ -243,7 +243,7 @@ BEGIN
             END IF;
 
 
-            IF v_parametros.tipo_interfaz = 'PresupuestoReporte' THEN
+            /*IF v_parametros.tipo_interfaz = 'PresupuestoReporte' THEN
 
                 IF p_administrador !=1 THEN
 
@@ -256,7 +256,7 @@ BEGIN
 
                   v_filadd = ' (lower(pre.estado)  in (''aprobado'')) and ';
 
-             END IF;
+             END IF;*/
 
 
 
