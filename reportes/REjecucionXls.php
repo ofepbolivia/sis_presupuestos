@@ -118,24 +118,62 @@ class REjecucionXls
         );
 
         //titulos
-        $tipo_repo = 'EJECUCIÓN PRESUPUESTARIA';
+        $ati = 'EJECUCIÓN PRESUPUESTARIA ';
         if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
-            $tipo_repo = 'EJECUCIÓN PRESUPUESTARIA A NIVEL CENTRO DE COSTO';
+            $tipo_repo = 'A NIVEL CENTRO DE COSTO';
         }
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $tipo_repo);
+        switch ($this->objParam->getParametro('tipo_reporte')) {
+            case 'categoria': $tipo_repo = 'POR CATEGORÍA'; 
+                break;
+            case 'programa': $tipo_repo = 'POR PROGRAMA'; 
+                break;
+            case 'presupuesto': $tipo_repo = 'POR PRESUPUESTO'; 
+                break;
+            case 'proyecto': $tipo_repo = 'POR PROYECTO';
+                break;
+            case 'actividad': $tipo_repo = 'POR ACTIVIDAD';
+                break;
+            case 'orga_financ': $tipo_repo = 'POR ORGANISMO FINANCIADOR';
+                break;
+            case 'fuente_financ': $tipo_repo = 'POR FUENTE DE FINANCIAMIENTO';
+                break;
+            case 'unidad_ejecutora': $tipo_repo = 'POR UNIDAD EJECUTORA';
+                break;
+        }        
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $ati.$tipo_repo);
         $this->docexcel->getActiveSheet()->getStyle('A2:M2')->applyFromArray($styleTitulos1);
         $this->docexcel->getActiveSheet()->mergeCells('A2:M2');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, 'Del: ' . $this->objParam->getParametro('fecha_ini') . '   Al: ' . $this->objParam->getParametro('fecha_fin'));
-        $this->docexcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitulos3);
+        $this->docexcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitulos3);        
         $this->docexcel->getActiveSheet()->mergeCells('A3:M3');
-
     }
 			
 	function imprimeDatos(){
 		$datos = $this->datos_detalle;
-		
-		$config = $this->objParam->getParametro('config');
-		$columnas = 0;
+		$this->desc = $datos[0]['desc_cat'];
+        $config = $this->objParam->getParametro('config');
+        $subtitulo = $this->objParam->getParametro('subtitulo');        
+        $concepto= $this->objParam->getParametro('concepto');
+        
+        $columnas = 0;
+        switch ($this->objParam->getParametro('tipo_reporte')) {
+            case 'categoria': $tipo_repo = 'CATEGORÍA: '.$concepto; 
+                break;
+            case 'programa': $tipo_repo = 'PROGRAMA: '.$concepto; 
+                break;
+            case 'presupuesto': $tipo_repo = 'PRESUPUESTO: '; 
+                break;
+            case 'proyecto': $tipo_repo = 'PROYECTO: '.$subtitulo;
+                break;
+            case 'actividad': $tipo_repo = 'ACTIVIDAD: '.$subtitulo;
+                break;
+            case 'orga_financ': $tipo_repo = 'ORGANISMO FINANCIADOR: '.$subtitulo;
+                break;
+            case 'fuente_financ': $tipo_repo = 'FUENTE DE FINANCIAMIENTO: '.$subtitulo;
+                break;
+            case 'unidad_ejecutora': $tipo_repo = 'UNIDAD EJECUTORA: '.$subtitulo;
+                break;            
+        }         
 		
 		
 		$styleTitulos = array(
@@ -157,46 +195,63 @@ class REjecucionXls
 								             'style' => PHPExcel_Style_Border::BORDER_THIN
 								         )
                                      ));
-
+        $styleSubtitulo  = array(
+                                    'font' => array(
+                                        'bold' => true, 
+                                        'size' => 12),
+                                    'fill' => array(                                        
+                                        'color' => array( 'rgb' => '#00008B')
+                                    )
+                                );
+        
         if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
             $modificado = 'MODIFICADO';
         }else{
             $modificado = 'AJUSTADO';
-        }
-
-       $this->docexcel->getActiveSheet()->getStyle('A5:M5')->applyFromArray($styleTitulos);
+        }         
+        $this->docexcel->getActiveSheet()->getStyle('A5:I5')->applyFromArray($styleSubtitulo);
+        $this->docexcel->getActiveSheet()->mergeCells('A5:I5');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(40);
+        if($this->objParam->getParametro('tipo_reporte') == 'presupuesto'){            
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,5,$tipo_repo.$concepto);
+            $this->docexcel->getActiveSheet()->getStyle('A6:I6')->applyFromArray($styleSubtitulo);
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,6,"CATEGORIA: ".$this->desc);               
+        }else{
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,5,$tipo_repo);               
+        }        
+        $this->docexcel->getActiveSheet()->getStyle('A7:M7')->applyFromArray($styleTitulos);
 		
 		//*************************************Cabecera*****************************************
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(15);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,5,'CÓDIGO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,7,'CÓDIGO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[1])->setWidth(50);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,5,'PARTIDA');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,7,'PARTIDA');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[2])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,5,'SEGÚN MEMORIA');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,7,'SEGÚN MEMORIA');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,5,'APROBADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,7,'APROBADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,5,$modificado);
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,7,$modificado);
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,5,'VIGENTE');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,7,'VIGENTE');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[6])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,5,'COMPROMETIDO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,7,'COMPROMETIDO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[7])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,5,'EJECUTADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,7,'EJECUTADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[8])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,5,'PAGADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,7,'PAGADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[9])->setWidth(22);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,5,'SALDO POR COMPROMETER');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,7,'SALDO POR COMPROMETER');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[10])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,5,'SALDO POR EJECUTAR');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,7,'SALDO POR EJECUTAR');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[11])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,5,'SALDO POR PAGAR');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,7,'SALDO POR PAGAR');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[12])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,5,'% EJECUCIÓN');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,7,'% EJECUCIÓN');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[13])->setWidth(20);
 		//*************************************Fin Cabecera*****************************************
 		
-		$fila = 6;
+		$fila = 8;
 		$contador = 1;        
 
         if($this->objParam->getParametro('tipo_reporte') == 'centro_costo'){
