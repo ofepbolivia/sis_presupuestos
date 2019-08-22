@@ -35,15 +35,15 @@ BEGIN
     inner join pre.tpresupuesto pr on pr.id_presupuesto = vcc.id_centro_costo
     WHERE vcc.id_gestion = p_id_gestion
     and prpa.sw_transaccional = 'movimiento'
-    and prpa.id_presupuesto IN (SELECT p.id_presupuesto
-                        FROM pre.tpresupuesto p
-                        where p.id_categoria_prog in (
-                              SELECT 
-                                cpr.id_categoria_programatica
-                              FROM 
-                                pre.vcategoria_programatica cpr 
-                              WHERE  cpr.id_gestion = p_id_gestion)                       
-                         and p.tipo_pres = ANY(string_to_array(p_tipo_pres::text,'')))
+    and prpa.id_presupuesto IN (
+                               SELECT
+                                    p.id_presupuesto
+                                FROM pre.tpresupuesto p
+                               inner join pre.tcategoria_programatica cp on 
+                               cp.id_categoria_programatica = p.id_categoria_prog
+                               where cp.id_gestion = p_id_gestion
+                               and p.tipo_pres::text  = ANY (string_to_array(p_tipo_pres::text,','))
+                               )
     group by 
     vcc.codigo_tcc,
     vcc.descripcion_tcc,

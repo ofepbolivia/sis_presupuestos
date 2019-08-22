@@ -6,7 +6,7 @@
 *@date 13-04-2016 13:21:12
 *@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
 */
-
+require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RModificacionPresupuestariaPDF.php');
 class ACTAjuste extends ACTbase{    
 			
 	function listarAjuste(){
@@ -70,6 +70,29 @@ class ACTAjuste extends ACTbase{
         $this->res=$this->objFunc->getImporteTotalProceso($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
    }
+
+    //Reporte Modificación Presupuestaria (franklin.espinoza) 13/08/2019
+    function reporteModificacionP (){
+        $this->objFunc=$this->create('MODAjuste');
+        $dataSource=$this->objFunc->reporteModificacionP();
+        $this->dataSource=$dataSource->getDatos();
+
+        $nombreArchivo = uniqid(md5(session_id()).'[Reporte-ModificaciónPresupuestaria]').'.pdf';
+        $this->objParam->addParametro('orientacion','P');
+        $this->objParam->addParametro('tamano','LETTER');
+        $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+
+        $this->objReporte = new RModificacionPresupuestariaPDF($this->objParam);
+        $this->objReporte->setDatos($this->dataSource);
+        $this->objReporte->generarReporte();
+        $this->objReporte->output($this->objReporte->url_archivo,'F');
+
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado', 'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
 			
 }
 

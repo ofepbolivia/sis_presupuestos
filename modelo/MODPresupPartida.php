@@ -268,7 +268,12 @@ class MODPresupPartida extends MODbase{
           //var_dump($this->objParam->getParametro('id_categoria_programatica'));exit;
 		  $this->setParametro('id_cp_programa','id_cp_programa','int4');
 		  $this->setParametro('id_categoria_programatica','id_categoria_programatica','int4');
-		  $this->setParametro('id_presupuesto','id_presupuesto','int4');
+          $this->setParametro('id_presupuesto','id_presupuesto','int4');
+          $this->setParametro('id_cp_proyecto','id_cp_proyecto','int4');
+          $this->setParametro('id_cp_actividad','id_cp_actividad','int4');
+          $this->setParametro('id_cp_organismo_fin','id_cp_organismo_fin','int4');
+          $this->setParametro('id_cp_fuente_fin','id_cp_fuente_fin','int4');
+          $this->setParametro('id_unidad_ejecutora','id_unidad_ejecutora','int4');
 		  $this->setParametro('id_gestion','id_gestion','int4');
 		  $this->setParametro('tipo_pres','tipo_pres','VARCHAR');
 		  $this->setParametro('tipo_reporte','tipo_reporte','VARCHAR');
@@ -279,6 +284,7 @@ class MODPresupPartida extends MODbase{
 		 
 		
         //Definicion de la lista del resultado del query
+        $this->captura('desc_cat','text');
         $this->captura('categoria','varchar');
 		$this->captura('id_partida','int4');
         $this->captura('codigo_partida','varchar');
@@ -297,7 +303,8 @@ class MODPresupPartida extends MODbase{
 		
 
 		//Ejecuta la instruccion
-		$this->armarConsulta();
+        $this->armarConsulta();
+        //echo($this->consulta);exit;
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta

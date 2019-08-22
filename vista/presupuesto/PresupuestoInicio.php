@@ -145,7 +145,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     root: 'datos',
                     sortInfo: {
                         field: 'gestion',
-                        direction: 'ASC'
+                        direction: 'DESC'
                     },
                     totalProperty: 'total',
                     fields: ['id_gestion', 'gestion'],
