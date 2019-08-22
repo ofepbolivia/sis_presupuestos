@@ -250,7 +250,7 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 	       this.Cmp.id_partida.store.baseParams.id_gestion = this.cmbGestion.getValue();
 		}
 		else{
-			alert('seleccione una gestion primero')
+			alert('Seleccione una Gestión primero')
 		}
 	},
 	onButtonEdit:function(){
@@ -259,7 +259,7 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 	       this.Cmp.id_partida.store.baseParams.id_gestion = this.cmbGestion.getValue();
 		}
 		else{
-			alert('seleccione una gestion primero')
+			alert('Seleccione una Gestión primero')
 		}
 	},
 	onButtonDelete:function(){
