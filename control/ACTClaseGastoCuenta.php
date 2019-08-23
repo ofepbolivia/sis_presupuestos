@@ -45,7 +45,7 @@ class ACTClaseGastoCuenta extends ACTbase{
     }
 
     function eliminarClaseGastoCuenta(){
-        $this->objFunc=$this->create('id_clase_gasto_cuenta');
+        $this->objFunc=$this->create('MODClaseGastoCuenta');
         $this->res=$this->objFunc->eliminarClaseGastoCuenta($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }

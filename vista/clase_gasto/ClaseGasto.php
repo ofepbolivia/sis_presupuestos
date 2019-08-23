@@ -244,7 +244,7 @@ header("content-type: text/javascript; charset=UTF-8");
             bdel: true,
             bsave: true,
 
-            disableTabPartida: function () {
+            disableTabCuenta: function () {
                 if (this.TabPanelEast && this.TabPanelEast.get(0)) {
                     this.TabPanelEast.get(0).disable();
                     this.TabPanelEast.get(1).enable();
@@ -268,11 +268,13 @@ header("content-type: text/javascript; charset=UTF-8");
             },
 
             preparaMenu: function (n) {
+                Phx.vista.ClaseGasto.superclass.preparaMenu.call(this);
                 var data = this.getSelectedData();
                 var tb = this.tbar;
+
                 console.log('llegaa m', data)
                 if (data['tipo_clase'] == 'sin_imputacion') {
-                    this.disableTabPartida();
+                    this.disableTabCuenta();
                 }
                 else {
                     if (data['tipo_clase'] == 'con_imputacion') {
@@ -286,5 +288,4 @@ header("content-type: text/javascript; charset=UTF-8");
         }
     )
 </script>
-		
 		
