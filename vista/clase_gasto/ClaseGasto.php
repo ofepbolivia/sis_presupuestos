@@ -244,7 +244,7 @@ header("content-type: text/javascript; charset=UTF-8");
             bdel: true,
             bsave: true,
 
-            disableTabCuenta: function () {
+            disableTabPartida: function () {
                 if (this.TabPanelEast && this.TabPanelEast.get(0)) {
                     this.TabPanelEast.get(0).disable();
                     this.TabPanelEast.get(1).enable();
@@ -271,10 +271,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 Phx.vista.ClaseGasto.superclass.preparaMenu.call(this);
                 var data = this.getSelectedData();
                 var tb = this.tbar;
-
                 console.log('llegaa m', data)
                 if (data['tipo_clase'] == 'sin_imputacion') {
-                    this.disableTabCuenta();
+                    this.disableTabPartida();
                 }
                 else {
                     if (data['tipo_clase'] == 'con_imputacion') {
