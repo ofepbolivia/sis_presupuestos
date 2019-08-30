@@ -191,7 +191,7 @@ where c.id_gestion = v_gestion.id_gestion  and p.descripcion = v_presupuesto.des
                                   nombre_partida,
                                   nivel_partida,
                                   descripcion,
-                                  gestion,
+                                  v_gestion.gestion,
                                   sum(c1) as c1,
                                   sum(c2) as c2,
                                   sum(c3) as c3,
