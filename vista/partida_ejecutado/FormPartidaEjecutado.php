@@ -170,7 +170,8 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 width: 250,
                 listWidth: 250,
                 minChars:2,
-                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
+                resizable:true,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p style="color:green;"><b>{codigo_categoria}</b></p><p>{descripcion}</p> </div></tpl>'
             },
             type:'ComboBox',
             id_grupo:1,

@@ -660,11 +660,11 @@ BEGIN
    -- lista las partida basicas de cada presupuesto
          FOR v_registros in (
          select	pp.id_partida,
-                            pp.codigo as codigo_partida,
-                            pp.nombre_partida,
-                            pp.id_partida_fk,
-                            pp.nivel_partida,
-                            pp.sw_transaccional,
+                            par.codigo as codigo_partida,
+                            par.nombre_partida,
+                            par.id_partida_fk,
+                            par.nivel_partida,
+                            par.sw_transaccional,
                             (CASE
                              WHEN
                              v_parametros.tipo_reporte = 'programa' THEN
@@ -676,18 +676,18 @@ BEGIN
                              e.descripcion::varchar
                              END::varchar )as cod_prg,
 
-                             (md.importe_enero) as c1,
-                            (md.importe_febrero) as c2,
-                            (md.importe_marzo) as  c3,
-                            (md.importe_abril) as  c4,
-                            (md.importe_mayo) as  c5,
-                            (md.importe_junio) as  c6,
-                            (md.importe_julio) as  c7,
-                            (md.importe_agosto) as  c8,
-                            (md.importe_septiembre) as c9,
-                            (md.importe_octubre) as c10,
-                            (md.importe_noviembre) as c11,
-                            (md.importe_diciembre) as c12,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[1]) as c1,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[2]) as c2,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[3]) as c3,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[4]) as c4,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[5]) as c5,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[6]) as c6,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[7]) as c7,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[8]) as c8,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[9]) as c9,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[10]) as c10,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[11]) as c11,
+                             pre.f_get_total_programado_memoria_x_periodo(pp.id_partida, pp.id_presupuesto, va_id_periodo[12]) as c12,
 
                             (cm.importe_enero) as b1,
                             (cm.importe_febrero) as b2,
@@ -714,19 +714,22 @@ BEGIN
                             (e.importe_octubre) as  f10,
                             (e.importe_noviembre) as  f11,
                             (e.importe_diciembre) as  f12,
-                            pre.f_get_ejecucion_programa_memoria_total(prp.id_partida, prp.id_presupuesto,v_parametros.id_gestion) as total_programado,
-                            round( pre.f_get_presupuesto_aprobado_por_gestion(prp.id_partida,prp.id_presupuesto ,v_parametros.id_gestion) +  pre.f_presupuesto_ajuste_prueba(prp.id_partida,prp.id_presupuesto,v_parametros.id_gestion) )as importe_aprobado,
-							pre.f_presupuesto_ajuste_de_por_gestion(prp.id_partida,prp.id_presupuesto,v_parametros.id_gestion) modificaciones,
-                            pre.f_get_estado_presupuesto_mb_x_fechas(prp.id_presupuesto, prp.id_partida,'comprometido',v_parametros.fecha_ini,v_parametros.fecha_fin) as total_comprometido,
-                            pre.f_get_estado_presupuesto_mb_x_fechas(prp.id_presupuesto, prp.id_partida,'ejecutado',v_parametros.fecha_ini,v_parametros.fecha_fin) as total_ejecutado
-                            from pre.tpartida pp
-                            inner join pre.tpresup_partida prp on prp.id_partida = pp.id_partida
-                           	inner join pre.vpartida_ejecutado_por_periodos e on e.id_presup_partida = prp.id_presup_partida
-                            inner join pre.vpartida_comprometido_por_periodos cm on cm.id_presup_partida = prp.id_presup_partida and cm.id_presupuesto = ANY(va_id_presupuesto)
-                            inner join pre.vprogramando_memoria_por_periodo md on md.id_presup_partida = prp.id_presup_partida  and md.id_presupuesto = ANY(va_id_presupuesto)
-                            inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = e.id_categoria_programatica
-                            inner join pre.tcp_programa ma on ma.id_cp_programa = e.id_cp_programa
-                            where e.id_presupuesto = ANY(va_id_presupuesto) and
+                            pre.f_get_ejecucion_programa_memoria_total(pp.id_partida, pp.id_presupuesto,v_parametros.id_gestion) as total_programado,
+                            round( pre.f_get_presupuesto_aprobado_por_gestion(pp.id_partida,pp.id_presupuesto ,v_parametros.id_gestion) +  
+                            pre.f_presupuesto_ajuste_prueba(pp.id_partida,pp.id_presupuesto,v_parametros.id_gestion) )as importe_aprobado,
+                            pre.f_presupuesto_ajuste_de_por_gestion(pp.id_partida,pp.id_presupuesto,v_parametros.id_gestion) modificaciones,
+                            pre.f_get_estado_presupuesto_mb_x_fechas(pp.id_presupuesto, pp.id_partida,'comprometido',v_parametros.fecha_ini,v_parametros.fecha_fin) as total_comprometido,
+                            pre.f_get_estado_presupuesto_mb_x_fechas(pp.id_presupuesto, pp.id_partida,'ejecutado',v_parametros.fecha_ini,v_parametros.fecha_fin) as total_ejecutado   
+                            from pre.tpresup_partida pp
+                            inner join pre.tpartida par on par.id_partida = pp.id_partida
+                            inner join pre.tpresupuesto p on p.id_presupuesto = pp.id_presupuesto
+                            inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
+                            inner join pre.vpartida_ejecutado_por_periodos e on e.id_presup_partida = pp.id_presup_partida
+                            inner join pre.vpartida_comprometido_por_periodos cm on cm.id_presup_partida = pp.id_presup_partida 
+                            and cm.id_presupuesto = ANY(va_id_presupuesto)
+                            inner join pre.tcp_programa ma on ma.id_cp_programa = e.id_cp_programa  
+                            where e.id_presupuesto = ANY(va_id_presupuesto) 
+                            and          
                                                   CASE
                                                          WHEN COALESCE(v_parametros.id_partida,0) = 0  THEN   -- todos
                                                              0 = 0

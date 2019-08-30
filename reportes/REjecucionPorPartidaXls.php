@@ -155,41 +155,93 @@ class REjecucionPorPartidaXls
 								         'allborders' => array(
 								             'style' => PHPExcel_Style_Border::BORDER_THIN
 								         )
-								     ));
+                                     ));
+        $styleSubtitulo  = array(
+                                    'font' => array(
+                                        'bold' => true, 
+                                        'size' => 12),
+                                    'fill' => array(                                        
+                                        'color' => array( 'rgb' => '#00008B')
+                                    )
+                                );                                     
 
-       $this->docexcel->getActiveSheet()->getStyle('B5:M5')->applyFromArray($styleTitulos);
-		
+        $concepto  = $this->objParam->getParametro('concepto_partida');
+        $concepto1 = $this->objParam->getParametro('concepto');
+        $subtitulo = $this->objParam->getParametro('subtitulo');
+        $cod_cat = $this->datos_detalle[0]['cod_cat'];        
+
+        $str_concepto = ($subtitulo!='')?$subtitulo:$concepto1;
+        
+        $tipo_repo = ''; 
+        switch ($this->objParam->getParametro('tipo_reporte')) {
+        case 'categoria': $tipo_repo = 'CATEGORÍA: '; 
+            break;
+        case 'programa': $tipo_repo = 'PROGRAMA: '; 
+            break;
+        case 'presupuesto': $tipo_repo = 'PRESUPUESTO: '; 
+            break;
+        case 'proyecto': $tipo_repo = 'PROYECTO: ';
+            break;
+        case 'actividad': $tipo_repo = 'ACTIVIDAD: ';
+            break;
+        case 'orga_financ': $tipo_repo = 'ORGANISMO FINANCIADOR: ';
+            break;
+        case 'fuente_financ': $tipo_repo = 'FUENTE DE FINANCIAMIENTO: ';
+            break;
+        case 'unidad_ejecutora': $tipo_repo = 'UNIDAD EJECUTORA: ';
+            break;
+        case 'centro_costo': $tipo_repo = ''; $str_concepto = '';
+            break;            
+        } 
+        
+        $this->docexcel->getActiveSheet()->getStyle('B5:I5')->applyFromArray($styleSubtitulo);
+        $this->docexcel->getActiveSheet()->mergeCells('B5:D5');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(20);  
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,5,"PARTIDA: ".$concepto);
+        $this->docexcel->getActiveSheet()->getStyle('B6:I6')->applyFromArray($styleSubtitulo);
+        $this->docexcel->getActiveSheet()->mergeCells('B6:I6');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(10);  
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,6,$tipo_repo.$str_concepto);
+        if( $this->objParam->getParametro('tipo_reporte')=='presupuesto' ){
+            $this->docexcel->getActiveSheet()->getStyle('B7:I7')->applyFromArray($styleSubtitulo);
+            $this->docexcel->getActiveSheet()->mergeCells('B7:I7');
+            $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(10);  
+            $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,7,'CATEGORIA: '.$cod_cat);            
+        }
+
+        $fi = 8;
+        $this->docexcel->getActiveSheet()->getStyle('B8:M8')->applyFromArray($styleTitulos);        
 		//*************************************Cabecera*****************************************
 		//$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(20);		
 		//$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,1,'Código');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[1])->setWidth(50);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,5,'PRESUPUESTO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fi,'PRESUPUESTO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[2])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,5,'SEGÚN MEMORIA');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fi,'SEGÚN MEMORIA');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,5,'APROBADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$fi,'APROBADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,5,'MODIFICADO');//Ajustado
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$fi,'MODIFICADO');//Ajustado
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,5,'VIGENTE');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$fi,'VIGENTE');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[6])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,5,'COMPROMETIDO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,$fi,'COMPROMETIDO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[7])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,5,'EJECUTADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,$fi,'EJECUTADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[8])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,5,'PAGADO');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,$fi,'PAGADO');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[9])->setWidth(22);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,5,'SALDO POR COMPROMETER');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,$fi,'SALDO POR COMPROMETER');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[10])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,5,'SALDO POR EJECUTAR');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,$fi,'SALDO POR EJECUTAR');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[11])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,5,'SALDO POR PAGAR');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,$fi,'SALDO POR PAGAR');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[12])->setWidth(20);
-		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,5,'% EJECUCIÓN');
+		$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,$fi,'% EJECUCIÓN');
 		$this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[13])->setWidth(20);
 		//*************************************Fin Cabecera*****************************************
 		
-		$fila = 6;
+		$fila = 9;
 		$contador = 1;
 		
 		/////////////////////***********************************Detalle***********************************************
@@ -220,7 +272,30 @@ class REjecucionPorPartidaXls
                     )
                 ));
 
-            $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':'.'M'.$fila)->applyFromArray($styleTitulos);
+            if ($value['id_presupuesto'] == 0 ){
+                $styleCat = array(
+                    'font'  => array(
+                        'bold'  => true,
+                        'size'  => 8,
+                        'name'  => 'Arial'
+                    ),
+                    'alignment' => array(
+                        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                        'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                    ),
+                     'fill' => array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'color' => array('rgb' => 'c5d9f1')
+                     ),
+                     'borders' => array(
+                           'allborders' => array(
+                               'style' => PHPExcel_Style_Border::BORDER_THIN
+                           )
+                       ));                                
+                       $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':'.'M'.$fila)->applyFromArray($styleCat);
+            }else{
+                $this->docexcel->getActiveSheet()->getStyle('B'.$fila.':'.'M'.$fila)->applyFromArray($styleTitulos);
+            }            
             $this->docexcel->getActiveSheet()->getStyle('C:M')->getNumberFormat()->setFormatCode('#,##0.00');
 
 			//$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,$value['codigo_partida']);

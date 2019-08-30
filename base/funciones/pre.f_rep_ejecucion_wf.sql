@@ -16,7 +16,8 @@ v_resp				varchar;
 v_registros 		record;
 v_nivel				integer;
 v_presupuesto		record;
-v_presupuesto_ant		record;
+v_presupuesto_ant	record;
+v_gestion			record;
 
 
 
@@ -73,6 +74,14 @@ from pre.tpresupuesto p
 inner join pre.tcategoria_programatica c on c.id_categoria_programatica = p.id_categoria_prog
 where p.id_proceso_wf = v_parametros.id_proceso_wf;
 
+select id_gestion, gestion into v_gestion  
+from param.tgestion 
+where gestion = (
+                select gestion - 1
+                from param.tgestion
+                where id_gestion = v_presupuesto.id_gestion
+                );
+
 select 	p.id_presupuesto,
 		p.descripcion,
         c.id_gestion,
@@ -81,7 +90,7 @@ select 	p.id_presupuesto,
         v_presupuesto_ant
 from pre.tpresupuesto p
 inner join pre.tcategoria_programatica c on c.id_categoria_programatica = p.id_categoria_prog
-where c.id_gestion = v_presupuesto.id_gestion - 1  and p.descripcion = v_presupuesto.descripcion;
+where c.id_gestion = v_gestion.id_gestion  and p.descripcion = v_presupuesto.descripcion;
 
 
    FOR v_registros in(select 	par.id_partida,
@@ -93,19 +102,19 @@ where c.id_gestion = v_presupuesto.id_gestion - 1  and p.descripcion = v_presupu
                                 p.descripcion,
                                 par.nivel_partida,
                                 par.sw_transaccional,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 1, 'ejecutado') as importe_enero,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 2, 'ejecutado') as importe_febrero,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 3, 'ejecutado') as importe_marzo,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 4, 'ejecutado') as importe_abril,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 5, 'ejecutado') as importe_mayo,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 6, 'ejecutado') as importe_junio,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 7, 'ejecutado') as importe_julio,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 8, 'ejecutado') as importe_agosto,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 9, 'ejecutado') as importe_septiembre,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 10, 'ejecutado') as importe_octubre,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 11, 'ejecutado') as importe_noviembre,
-                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, 15, 12, 'ejecutado') as importe_diciembre,
-                                round( pre.f_get_presupuesto_aprobado_por_gestion(par.id_partida,p.id_presupuesto ,15) +  pre.f_presupuesto_ajuste_prueba(par.id_partida,p.id_presupuesto,15)+ pre.f_presupuesto_ajuste_de_por_gestion(par.id_partida,p.id_presupuesto,15) )as total_programado
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 1, 'ejecutado') as importe_enero,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 2, 'ejecutado') as importe_febrero,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 3, 'ejecutado') as importe_marzo,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 4, 'ejecutado') as importe_abril,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 5, 'ejecutado') as importe_mayo,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 6, 'ejecutado') as importe_junio,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 7, 'ejecutado') as importe_julio,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 8, 'ejecutado') as importe_agosto,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 9, 'ejecutado') as importe_septiembre,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 10, 'ejecutado') as importe_octubre,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 11, 'ejecutado') as importe_noviembre,
+                                pre.f_get_ejecutado_por_periodo(par.id_partida, p.id_presupuesto, g.id_gestion, 12, 'ejecutado') as importe_diciembre,
+                                round( pre.f_get_presupuesto_aprobado_por_gestion(par.id_partida,p.id_presupuesto ,g.id_gestion) +  pre.f_presupuesto_ajuste_prueba(par.id_partida,p.id_presupuesto,g.id_gestion)+ pre.f_presupuesto_ajuste_de_por_gestion(par.id_partida,p.id_presupuesto,g.id_gestion) )as total_programado
                                 from pre.tpresupuesto p
                                 --inner join pre.vpartida_ejecutado_por_periodos me on me.id_proceso_wf = p.id_proceso_wf
                                 inner join pre.tpresup_partida su on su.id_presupuesto = p.id_presupuesto
@@ -170,7 +179,7 @@ where c.id_gestion = v_presupuesto.id_gestion - 1  and p.descripcion = v_presupu
 
         IF 4!= 5 THEN
 
-            PERFORM pre.f_rep_evaluacion_recursivo_wf(15,v_nivel -1);
+            PERFORM pre.f_rep_evaluacion_recursivo_wf(v_gestion.id_gestion,v_nivel -1);
 
         END IF;
 

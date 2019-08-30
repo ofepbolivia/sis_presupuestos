@@ -33,7 +33,7 @@ class REjecucionPorPartida extends  ReportePDF {
 	
 	
 	function datosHeader ( $detalle, $totales, $gestion,$dataEmpresa,$fecha_ini, $fecha_fin) {
-        //var_dump($detalle,$this->totales);exit;
+        //var_dump($detalle);exit;
 		$this->ancho_hoja = $this->getPageWidth()-PDF_MARGIN_LEFT-PDF_MARGIN_RIGHT-10;
 		$this->datos_detalle = $detalle;
 		$this->datos_titulo = $totales;
@@ -77,30 +77,84 @@ class REjecucionPorPartida extends  ReportePDF {
         $width1 = 5;
 		$esp_width = 10;
         $width_c1= 30;
-		$width_c2= 120;
+        $width_c2= 120;
+        $width_c3= 25;
         $width3 = 40;
         $width4 = 75;
-		
-	    
-		
-		$this->Ln();
-		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell($width_c1, $height, "PARTIDA: ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $fuente = 10;
+        
+        $cod_cat = $this->datos_detalle[0]['cod_cat'];        
+        $concepto  = $this->objParam->getParametro('concepto_partida');
+        $concepto1 = $this->objParam->getParametro('concepto');
+        $subtitulo = $this->objParam->getParametro('subtitulo');        
+        $tipo_repo = $this->objParam->getParametro('tipo_reporte');
+        
+        $tipo_subt = '';
+        switch ($tipo_repo) {
+            case 'categoria': $tipo_subt = 'CATEGORIA: '; $width_c1 = 30; $fuente = 8;
+                break;
+            case 'presupuesto': $tipo_subt = 'PRESUPUESTO: '; $width_c1 = 30;($subtitulo!='')?strlen($subtitulo)>100?$fuente = 8: $fuente=10:strlen($concepto1)>100?$fuente=8:$fuente=10;
+                break;
+            case 'programa': $tipo_subt = 'PROGRAMA: '; $width_c1 = 30;
+                break;
+            case 'proyecto': $tipo_subt = 'PROYECTO: '; $width_c1 = 30;
+                break;
+            case 'actividad': $tipo_subt = 'ACTIVIDAD: '; $width_c1 = 30;
+                break;
+            case 'orga_financ': $tipo_subt = 'ORGANISMO FINANCIADOR: '; $width_c1 = 50;
+                break;
+            case 'fuente_financ': $tipo_subt = 'FUENTE DE FINANCIAMIENTO: '; $width_c1 = 50;
+                break;
+            case 'unidad_ejecutora': $tipo_subt = 'UNIDAD EJECUTORA: '; $width_c1 = 40;
+                break;                        
+            case 'centro_costo': $tipo_subt = ''; $concepto1 = '';
+                break;                                        
+        }
+        //var_dump($concepto1.' - '.strlen($concepto1.$cod_cat));exit;
+        
+        
+        $this->Ln();        
         $this->SetFont('', '');
+        $this->SetTextColor(0, 0, 0);
+		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $this->Cell($width_c3, $height, "PARTIDA: ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+        $this->SetFont('', 'B');
+        $this->SetTextColor(0, 0, 255);
         $this->SetFillColor(192,192,192, true);
-        $this->Cell($width_c2, $height, $this->objParam->getParametro('concepto'), $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        $this->Cell($width_c2, $height, $concepto , $white, 0, 'L', false, '', 0, false, 'T', 'C');
         $this->Ln();
+        $this->SetFont('', '',$fuente);
+        $this->SetTextColor(0, 0, 0);
 		$this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->Cell($width_c1, $height, "CATEGORIA: ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
-        $this->SetFont('', '');
+        $this->Cell($width_c1, $height, $tipo_subt, 0, 0, 'L', false, '', 0, false, 'T', 'C');        
+        $this->SetFont('', 'B');
         $this->SetFillColor(192,192,192, true);
-        $this->Cell($width_c2, $height, $this->objParam->getParametro('categoria'), $black, 0, 'L', true, '', 0, false, 'T', 'C');
+        $this->SetTextColor(0, 0, 255);
+        if ($tipo_repo ==  'presupuesto'){
+         if ($cod_cat != null ){
+            $this->Cell($width_c2, $height, ($subtitulo!='')?$subtitulo:$concepto1, $white,0, 'L', false, '', 0, false, 'T', 'C');
+            $this->Ln();        
+            $this->SetFont('', '');
+            $this->SetTextColor(0, 0, 0);
+            $this->Cell($width1, $height, '', 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->Cell($width_c3, $height, "CATEGORIA: ", 0, 0, 'L', false, '', 0, false, 'T', 'C');
+            $this->SetFont('', 'B');
+            $this->SetTextColor(0, 0, 255);
+            $this->SetFillColor(192,192,192, true);                                   
+            $this->Cell($width_c2, $height, $cod_cat, $white, 0, 'L', false, '', 0, false, 'T', 'C');                
+            $this->Cell($width_c2, $height, '', $white, 0, 'L', false, '', 0, false, 'T', 'C');              
+         }else{
+            $this->Cell($width_c2, $height, ($subtitulo!='')?$subtitulo:$concepto1,$white, 0, 'L', false, '', 0, false, 'T', 'C'); 
+         }         
+        }else{
+            $this->Cell($width_c2, $height, ($subtitulo!='')?$subtitulo:$concepto1,$white, 0, 'L', false, '', 0, false, 'T', 'C');
+        }
+        
+        $this->Cell($width_c2, $height, '', $white, 0, 'L', false, '', 0, false, 'T', 'C');    
+        $this->Cell($width_c2, $height, '', $black, 0, 'L', false, '', 0, false, 'T', 'C');
         
         
-        
-		$this->Ln();
-		
-		
+		$this->Ln();		
 		$this->Ln();
 		
 		$this->SetFont('','B',6);
@@ -146,7 +200,6 @@ class REjecucionPorPartida extends  ReportePDF {
     }
 	
 	function generarCuerpo($detalle){
-		
 		$count = 1;
 		$sw = 0;
 		$sw1 = 0;
@@ -159,7 +212,10 @@ class REjecucionPorPartida extends  ReportePDF {
 		$this->s1 = 0;
 		$this->t1 = 0;
 		$this->tg1 = 0;
-		
+        
+        if($this->objParam->getParametro('tipo_reporte') == 'presupuesto' && $this->datos_detalle[0]['cod_cat'] !== null){            
+                $this->Ln(5);                   
+        }  
 		
 		foreach ($detalle as $val) {
 				
@@ -167,7 +223,7 @@ class REjecucionPorPartida extends  ReportePDF {
 			$fill = !$fill;
 			$count = $count + 1;
 			$this->total = $this->total -1;
-			$this->revisarfinPagina();
+            $this->revisarfinPagina();            
         }
         
         //$por_eje = number_format((float)$this->totales_porcentaje_ejecucion, 2, '.', '');
@@ -217,15 +273,17 @@ class REjecucionPorPartida extends  ReportePDF {
 			else{
 				$por_eje = 0;
 			}
-			$por_eje = number_format((float)$por_eje, 2, '.', '');
-			
+			$por_eje = number_format((float)$por_eje, 2, '.', '');        
 			
 			$sal_comprometido = $val['formulado'] - $val['comprometido'];
 			$sal_ejecutado = $val['comprometido'] - $val['ejecutado'];
 			$sal_pagado = $val['ejecutado'] - $val['pagado'];
 		
-		
-			 $this->SetFont('','',5);
+            if ($val['id_presupuesto'] == 0 ){
+                $this->SetFont('','B',5);
+            }else{
+                $this->SetFont('','',5);
+            }			 
 			 $this->tableborders=array('LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB','LRTB');
 			 $conf_par_tablewidths=array(15+53,18,18,18,18,18,18,18,18,18,18,15);
 		     $this->tablealigns=array('L','R','R','R','R','R','R','R','R','R','R','R');
@@ -265,15 +323,14 @@ class REjecucionPorPartida extends  ReportePDF {
 
 
     function revisarfinPagina(){
-		$dimensions = $this->getPageDimensions();
+        $dimensions = $this->getPageDimensions();        
 		$hasBorder = false; //flag for fringe case
 		
 		$startY = $this->GetY();
-		$this->getNumLines($row['cell1data'], 80);
-		
+		$this->getNumLines($row['cell1data'], 80);		
 		if (($startY + 4 * 3) + $dimensions['bm'] > ($dimensions['hk'])) {
-		    if($this->total!= 0){
-				$this->AddPage();
+		    if($this->total!= 0){                
+                $this->AddPage();                                  
 			}
 		} 
 	}
@@ -285,8 +342,7 @@ class REjecucionPorPartida extends  ReportePDF {
   function cerrarCuadro(){
   	
 	   
-	   	    //si noes inicio termina el cuardro anterior
-	   	   
+	   	    //si noes inicio termina el cuardro anterior	   	   
 			$this->tablewidths=array(15+53+18+18+18+18+18+18+18+18+18+18+15);
             $this->tablealigns=array('L');
             $this->tablenumbers=array(0,);

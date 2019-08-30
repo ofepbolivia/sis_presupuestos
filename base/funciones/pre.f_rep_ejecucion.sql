@@ -26,6 +26,7 @@ v_tipo_cuenta		varchar;
 v_incluir_cierre	varchar;
 va_id_presupuesto	INTEGER[];
 v_desc_categ		text;
+v_cod_cate			varchar;
  
 
 BEGIN
@@ -318,11 +319,21 @@ BEGIN
 
 ELSEIF(p_transaccion='PRE_EJEXPAR_REP')then  
 
-     
+
+      if v_parametros.tipo_reporte = 'presupuesto' then
+                  select 
+                  (cat.codigo_categoria ||' - '|| cat.descripcion)::varchar into v_cod_cate 
+                  from pre.tpresupuesto pr
+                  inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pr.id_categoria_prog
+                  where pr.id_presupuesto = v_parametros.id_presupuesto;
+      else v_cod_cate = '';
+      end if;                
       
-      FOR v_registros in (SELECT * FROM(SELECT 
+      if ( v_parametros.tipo_reporte = 'centro_costo') then           
+            FOR v_registros in (SELECT * FROM(SELECT 	v_cod_cate::varchar as cod_cat,
                                                         p.id_presupuesto,
                                                         p.codigo_cc,
+                                                        p.id_categoria_prog,
                                                         sum(COALESCE(prpa.importe, 0::numeric)) AS importe,
                                                         sum(prpa.importe_aprobado) as importe_aprobado,
                                                         sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'formulado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS formulado,
@@ -332,28 +343,161 @@ ELSEIF(p_transaccion='PRE_EJEXPAR_REP')then
                                                                                               
                                               
                                               FROM pre.tpresup_partida prpa
-                                              INNER JOIN pre.vpresupuesto_cc p on p.id_presupuesto = prpa.id_presupuesto
+                                              INNER JOIN pre.vpresupuesto_cc_x_partida p on p.id_presupuesto = prpa.id_presupuesto
+                                              WHERE  
+                                                 p.tipo_pres::text = ANY (string_to_array(v_parametros.tipo_pres::text,',')) and 
+                                              CASE 
+                                                      WHEN v_parametros.id_partida = 0  THEN   -- todos 
+                                                            0 = 0 and p.id_gestion = v_parametros.id_gestion
+                                                      WHEN v_parametros.id_partida is null then 
+                                                          p.id_gestion = v_parametros.id_gestion
+                                                      ELSE  
+                                                            prpa.id_partida = v_parametros.id_partida
+                                                      END                                                                                                                                                  	                                                                                                                                                                                                            
+                                              GROUP BY 
+                                              p.id_presupuesto,
+                                              p.codigo_cc,
+                                              p.id_categoria_prog
+                                              
+											union 
+      
+                                            SELECT
+                                            v_cod_cate::varchar as cod_cat,
+                                            0::integer, 
+                                            'TOTAL CATEGORIA: '|| cat.codigo_categoria::varchar,			
+                                            p.id_categoria_prog,
+                                            sum(COALESCE(prpa.importe, 0::numeric)) AS importe,
+                                            sum(prpa.importe_aprobado) as importe_aprobado,
+                                            sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'formulado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS formulado,
+                                            sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'comprometido',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS comprometido,
+                                            sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'ejecutado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS ejecutado,
+                                            sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida, 'pagado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS pagado                                            
+                                            FROM pre.tpresup_partida prpa
+                                            INNER JOIN pre.vpresupuesto_cc_x_partida p on p.id_presupuesto = prpa.id_presupuesto
+                                            inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = p.id_categoria_prog
+                                            WHERE  
+                                            p.tipo_pres::text = ANY (string_to_array(v_parametros.tipo_pres::text,',')) and
+                                            CASE 
+                                                    WHEN v_parametros.id_partida = 0  THEN   -- todos 
+                                                          0 = 0 and p.id_gestion = v_parametros.id_gestion
+                                                    WHEN v_parametros.id_partida is null then 
+	                                                    p.id_gestion = v_parametros.id_gestion
+                                                    ELSE  
+                                                          prpa.id_partida = v_parametros.id_partida
+                                                    END 
+                                            GROUP BY 
+                                            p.id_categoria_prog,
+                                            cat.codigo_categoria                                                                                                                                         
+                                              
+                                    ) tmp
+                                              WHERE 
+                                                  tmp.importe > 0 or  
+                                                  tmp.importe_aprobado > 0 or
+                                                  tmp.formulado > 0 or
+                                                  tmp.comprometido > 0 or
+                                                  tmp.ejecutado > 0 or
+                                                  tmp.pagado > 0
+                                               order by 
+                                                  id_categoria_prog,
+                                                  tmp.codigo_cc      
+                                             ) LOOP
+                          
+               RETURN NEXT v_registros;
+      
+      
+      END LOOP;
+    else  
+      
+      FOR v_registros in (SELECT * FROM(SELECT 			v_cod_cate::varchar as cod_cat,
+                                                        p.id_presupuesto,
+                                                        p.codigo_cc,
+                                                        p.id_categoria_prog,
+                                                        sum(COALESCE(prpa.importe, 0::numeric)) AS importe,
+                                                        sum(prpa.importe_aprobado) as importe_aprobado,
+                                                        sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'formulado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS formulado,
+                                                        sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'comprometido',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS comprometido,
+                                                        sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'ejecutado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS ejecutado,
+                                                        sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida, 'pagado',v_parametros.fecha_ini,v_parametros.fecha_fin)) AS pagado
+                                                                                              
+                                              
+                                              FROM pre.tpresup_partida prpa
+                                              INNER JOIN pre.vpresupuesto_cc_x_partida p on p.id_presupuesto = prpa.id_presupuesto
                                               WHERE  
                                                  p.tipo_pres::text = ANY (string_to_array(v_parametros.tipo_pres::text,',')) and
-                                                  
-                                                  CASE 
+                                                                                                  
+											  CASE 
+                                               WHEN v_parametros.tipo_reporte = 'categoria' and v_parametros.id_categoria_programatica is not null THEN
+                                                   CASE 
                                                     WHEN v_parametros.id_categoria_programatica = 0   THEN   -- todos 
-                                                           0=0 
+                                                           0=0 and p.id_gestion = v_parametros.id_gestion
                                                         ELSE                                  
                                                             p.id_categoria_prog = v_parametros.id_categoria_programatica
                                                         END 
-                                                  and
-                                                  
-                                                  CASE 
-                                                         WHEN v_parametros.id_partida = 0  THEN   -- todos 
-                                                             0 = 0 
-                                                        ELSE  
-                                                            prpa.id_partida = v_parametros.id_partida
-                                                        END     
-                                                
+                                                        
+                                               WHEN v_parametros.tipo_reporte = 'presupuesto' and v_parametros.id_presupuesto is not null THEN
+                                                   CASE 
+                                                    WHEN v_parametros.id_presupuesto = 0   THEN   -- todos 
+                                                           0=0 and p.id_gestion = v_parametros.id_gestion
+                                                        ELSE                                  
+                                                            p.id_presupuesto = v_parametros.id_presupuesto
+                                                        END 
+                                               WHEN v_parametros.tipo_reporte = 'programa' and v_parametros.id_cp_programa is not null THEN
+                                                    CASE 
+                                                      WHEN v_parametros.id_cp_programa = 0   THEN   -- todos 
+                                                             0=0 and p.id_gestion = v_parametros.id_gestion
+                                                          ELSE                                  
+                                                              p.id_cp_programa = v_parametros.id_cp_programa
+                                                          END                                                                                             
+                                               WHEN v_parametros.tipo_reporte = 'proyecto' and v_parametros.id_cp_proyecto is not null THEN
+                                                    CASE 
+                                                      WHEN v_parametros.id_cp_proyecto = 0   THEN   -- todos 
+                                                             0=0 and p.id_gestion = v_parametros.id_gestion
+                                                          ELSE                                  
+                                                              p.id_cp_proyecto = v_parametros.id_cp_proyecto
+                                                          END                                                                                        
+                                               WHEN v_parametros.tipo_reporte = 'actividad' and v_parametros.id_cp_actividad is not null THEN
+                                                    CASE 
+                                                      WHEN v_parametros.id_cp_actividad = 0   THEN   -- todos 
+                                                             0=0 and p.id_gestion = v_parametros.id_gestion
+                                                          ELSE                                  
+                                                              p.id_cp_actividad = v_parametros.id_cp_actividad
+                                                          END                                                                                       
+                                               WHEN v_parametros.tipo_reporte = 'orga_financ' and v_parametros.id_cp_organismo_fin is not null THEN
+                                                    CASE 
+                                                      WHEN v_parametros.id_cp_organismo_fin = 0   THEN   -- todos 
+                                                             0=0 and p.id_gestion = v_parametros.id_gestion
+                                                          ELSE                                  
+                                                              p.id_cp_organismo_fin = v_parametros.id_cp_organismo_fin
+                                                          END 
+                                               WHEN v_parametros.tipo_reporte = 'fuente_financ' and v_parametros.id_cp_fuente_fin is not null THEN                                                                                            
+                                                    CASE 
+                                                      WHEN v_parametros.id_cp_fuente_fin = 0   THEN   -- todos 
+                                                             0=0 and p.id_gestion = v_parametros.id_gestion
+                                                          ELSE                                  
+                                                              p.id_cp_fuente_fin = v_parametros.id_cp_fuente_fin
+                                                    	  END                                         
+                                               WHEN v_parametros.tipo_reporte = 'unidad_ejecutora' and v_parametros.id_unidad_ejecutora is not null THEN                                               
+                                                    CASE 
+                                                      WHEN v_parametros.id_unidad_ejecutora = 0   THEN   -- todos 
+                                                             0=0 and p.id_gestion = v_parametros.id_gestion
+                                                          ELSE                                  
+                                                              p.id_unidad_ejecutora = v_parametros.id_unidad_ejecutora
+                                                          END
+                                               	END             											    
+                                               AND                                                                                                      
+                                               CASE 
+                                                    WHEN v_parametros.id_partida = 0  THEN   -- todos 
+                                                          0 = 0 
+                                                    WHEN v_parametros.id_partida is null then 
+	                                                    p.id_gestion = v_parametros.id_gestion
+                                                    ELSE  
+                                                          prpa.id_partida = v_parametros.id_partida
+                                                    END     
+                                                                                                                                                                                                            
                                               GROUP BY 
                                               p.id_presupuesto,
-                                              p.codigo_cc
+                                              p.codigo_cc,
+                                              p.id_categoria_prog
                                               
                                     ) tmp
                                               WHERE 
@@ -369,11 +513,9 @@ ELSEIF(p_transaccion='PRE_EJEXPAR_REP')then
                           
                           -- raise exception '... %',v_registros;
                RETURN NEXT v_registros;
-      
-      
+            
       END LOOP;
-
-
+	END IF;
 
 END IF;
 

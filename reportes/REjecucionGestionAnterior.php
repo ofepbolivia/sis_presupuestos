@@ -59,7 +59,7 @@ class REjecucionGestionAnterior
 
     }
     function datosHeader ($detalle,$memoria,$total) {
-
+        
         $this->datos_detalle = $detalle;
         $this->datos_memoria = $memoria;
         $this->total= $total;
@@ -68,7 +68,7 @@ class REjecucionGestionAnterior
     {
         $this->docexcel->createSheet($shit);
         $this->docexcel->setActiveSheetIndex($shit);
-        $this->docexcel->getActiveSheet()->setTitle($tipo);
+        $this->docexcel->getActiveSheet()->setTitle($tipo|'');
 
         $styleTitulos1 = array(
             'font'  => array(
@@ -387,7 +387,8 @@ class REjecucionGestionAnterior
         );
         $this->numero = 7;
         $datos = $this->datos_detalle;
-        $titulo = $datos[0]['descripcion'];
+        //$titulo = $datos[0]['descripcion'];
+        $titulo = 'Ejecucion Gestion Anterior';
         $this->titulo= [0,1,2];
         $sheet = 0;
         $this->codigo =['10000','20000','30000','40000','50000','60000','80000','90000'];
