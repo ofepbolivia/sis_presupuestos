@@ -91,7 +91,7 @@ class REjecucionPorPartida extends  ReportePDF {
         
         $tipo_subt = '';
         switch ($tipo_repo) {
-            case 'categoria': $tipo_subt = 'CATEGORIA: '; $width_c1 = 30; $fuente = 8;
+            case 'categoria': $tipo_subt = 'CATEGORIA: '; $width_c1 = 30; $fuente = 9;
                 break;
             case 'presupuesto': $tipo_subt = 'PRESUPUESTO: '; $width_c1 = 30;($subtitulo!='')?strlen($subtitulo)>100?$fuente = 8: $fuente=10:strlen($concepto1)>100?$fuente=8:$fuente=10;
                 break;
@@ -103,11 +103,11 @@ class REjecucionPorPartida extends  ReportePDF {
                 break;
             case 'orga_financ': $tipo_subt = 'ORGANISMO FINANCIADOR: '; $width_c1 = 50;
                 break;
-            case 'fuente_financ': $tipo_subt = 'FUENTE DE FINANCIAMIENTO: '; $width_c1 = 50;
+            case 'fuente_financ': $tipo_subt = 'FUENTE DE FINANCIAMIENTO: '; $width_c1 = 55;
                 break;
             case 'unidad_ejecutora': $tipo_subt = 'UNIDAD EJECUTORA: '; $width_c1 = 40;
                 break;                        
-            case 'centro_costo': $tipo_subt = ''; $concepto1 = '';
+            case 'centro_costo': $tipo_subt = ''; $concepto1 = '';$subtitulo='';
                 break;                                        
         }
         //var_dump($concepto1.' - '.strlen($concepto1.$cod_cat));exit;
