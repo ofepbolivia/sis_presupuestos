@@ -101,6 +101,81 @@ BEGIN
     where  op.estado not in ('borrador','vbgerencia','vbpresupuestos','anulado')
     AND ((presupuesto_id > 0 AND odi.id_centro_costo in (presupuesto_id))OR(presupuesto_id = 0))
     AND((partida_id > 0 AND odi.id_partida in (partida_id))OR(partida_id = 0))
+
+    
+union 
+
+    select
+    (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, 2)) as comprometido,
+    (select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, 2)) as ejecutado,
+    (select COALESCE(ps_pagado,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, 2)) as pagado,
+    m.codigo,
+    tra.id_centro_costo,
+    ic.nro_tramite,
+    ic.glosa1,
+    ges.gestion,
+    part.nombre_partida,
+    part.codigo,
+    vpresu.codigo_cc, 
+    fp.desc_funcionario1,
+    to_char(ic.fecha,'DD/MM/YYYY'),
+    ic.fecha,
+    usua.desc_persona,
+    tra.id_partida_ejecucion,
+    ic.beneficiario
+    from 
+    conta.tint_comprobante ic 
+    inner join conta.tint_transaccion tra on tra.id_int_comprobante = ic.id_int_comprobante 
+    and ic.estado_reg = 'validado' and tra.estado_reg = 'activo'
+    inner join param.tmoneda m on m.id_moneda = moneda_id
+    inner join param.tcentro_costo tco on tco.id_centro_costo = tra.id_centro_costo
+    inner join param.tgestion ges on ges.id_gestion = tco.id_gestion
+    inner join pre.tpartida part on part.id_partida = tra.id_partida
+    inner join pre.vpresupuesto_cc vpresu on vpresu.id_centro_costo = tra.id_centro_costo
+    inner join segu.vusuario usu on usu.id_usuario = ic.id_usuario_reg
+    inner join orga.vfuncionario_persona fp on fp.id_persona = usu.id_persona
+    inner join segu.vusuario usua on usua.id_usuario = usuario_id
+    where ((presupuesto_id > 0 AND tra.id_centro_costo in (presupuesto_id))OR(presupuesto_id = 0))
+    AND((partida_id > 0 AND tra.id_partida in (partida_id))OR(partida_id = 0))
+    and tra.id_partida_ejecucion is not null
+
+    union 
+
+    select
+    (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, 2)) as comprometido,
+    (select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, 2)) as ejecutado,
+    (select COALESCE(ps_pagado,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, 2)) as pagado,
+    m.codigo,
+    doc.id_centro_costo,
+    docv.nro_tramite,
+    coalesce(doc.descripcion, '') ||' - Desc: '|| coalesce(docv.razon_social, '') as descripcion,
+    ges.gestion,
+    par.nombre_partida,
+    par.codigo as partida_cod, 
+    vpres.codigo_cc,
+    soli.desc_funcionario1,
+    to_char(docv.fecha ,'DD/MM/YYYY') as fechaAux,
+    docv.fecha,
+    usu.desc_persona , 
+    doc.id_partida_ejecucion,
+    pro.desc_proveedor
+    from 
+    conta.tdoc_concepto doc 
+    inner join conta.tdoc_compra_venta docv on docv.id_doc_compra_venta = doc.id_doc_compra_venta
+    and doc.estado_reg = 'activo' and docv.estado_reg = 'activo'
+    inner join param.tmoneda m on m.id_moneda = moneda_id
+    inner join param.tcentro_costo tcco on tcco.id_centro_costo = doc.id_centro_costo
+    inner join param.tgestion ges on ges.id_gestion = tcco.id_gestion
+    inner join pre.tpartida par on par.id_partida = doc.id_partida
+    inner join pre.vpresupuesto_cc vpres on vpres.id_centro_costo = doc.id_centro_costo
+    inner join segu.vusuario usua on usua.id_usuario = doc.id_usuario_reg 
+    inner join orga.vfuncionario_persona soli on soli.id_persona = usua.id_persona
+    inner join segu.vusuario usu on usu.id_usuario = usuario_id
+    left join param.vproveedor pro on pro.id_proveedor = docv.id_proveedor
+    where ((presupuesto_id > 0 AND doc.id_centro_costo in (presupuesto_id))OR(presupuesto_id = 0))
+    AND((partida_id > 0 AND doc.id_partida in (partida_id))OR(partida_id = 0))
+    and doc.id_partida_ejecucion is not null  
+    
     ) as registros
    order by num_tramite,codigo_cc,id_partida_ejecucion,fecha_soli;
 END;
