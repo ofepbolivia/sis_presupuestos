@@ -106,9 +106,9 @@ BEGIN
 union 
 
     select
-    (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, 2)) as comprometido,
-    (select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, 2)) as ejecutado,
-    (select COALESCE(ps_pagado,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, 2)) as pagado,
+    (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, moneda_id)) as comprometido,
+    (select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, moneda_id)) as ejecutado,
+    (select COALESCE(ps_pagado,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, moneda_id)) as pagado,
     m.codigo,
     tra.id_centro_costo,
     ic.nro_tramite,
@@ -142,9 +142,9 @@ union
     union 
 
     select
-    (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, 2)) as comprometido,
-    (select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, 2)) as ejecutado,
-    (select COALESCE(ps_pagado,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, 2)) as pagado,
+    (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, moneda_id)) as comprometido,
+    (select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, moneda_id)) as ejecutado,
+    (select COALESCE(ps_pagado,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, moneda_id)) as pagado,
     m.codigo,
     doc.id_centro_costo,
     docv.nro_tramite,
