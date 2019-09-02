@@ -21,7 +21,8 @@ RETURNS TABLE (
   fecha date,
   user_reporte text,
   partida_ejecucion integer,
-  proveedor varchar
+  proveedor varchar,
+  id_moneda integer
 ) AS
 $body$
 DECLARE
@@ -33,7 +34,7 @@ BEGIN
     registros.comprometido,registros.ejecutado, registros.pagado,registros.codigo,registros.id_centro_costo,
     registros.num_tramite,registros.descripcion, registros.gestion,
     registros.nombre_partida,registros.partida_cod, registros.codigo_cc, registros.desc_funcionario1,registros.fechaAux,
-    registros.fecha_soli, registros.desc_persona, registros.id_partida_ejecucion, registros.desc_proveedor
+    registros.fecha_soli, registros.desc_persona, registros.id_partida_ejecucion, registros.desc_proveedor,registros.id_moneda
 	from (select
     (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(sd.id_partida_ejecucion, moneda_id)) as comprometido,
 	(select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(sd.id_partida_ejecucion, moneda_id)) as ejecutado,
@@ -51,7 +52,8 @@ BEGIN
     s.fecha_soli,
     usu.desc_persona , 
     sd.id_partida_ejecucion,
-    pro.desc_proveedor
+    pro.desc_proveedor,
+    s.id_moneda
     from 
     adq.tsolicitud s
     inner join adq.tsolicitud_det sd on sd.id_solicitud = s.id_solicitud and s.estado_reg = 'activo' and  sd.estado_reg = 'activo'
@@ -86,7 +88,8 @@ BEGIN
     op.fecha,
     usua.desc_persona,
     odi.id_partida_ejecucion_com,
-    pro.desc_proveedor
+    pro.desc_proveedor,
+    op.id_moneda
     from 
     tes.tobligacion_pago op
     inner join tes.tobligacion_det odi on odi.id_obligacion_pago = op.id_obligacion_pago and odi.estado_reg = 'activo' and  op.estado_reg = 'activo'
@@ -122,7 +125,8 @@ union
     ic.fecha,
     usua.desc_persona,
     tra.id_partida_ejecucion,
-    ic.beneficiario
+    ic.beneficiario,
+    ic.id_moneda
     from 
     conta.tint_comprobante ic 
     inner join conta.tint_transaccion tra on tra.id_int_comprobante = ic.id_int_comprobante 
@@ -158,7 +162,8 @@ union
     docv.fecha,
     usu.desc_persona , 
     doc.id_partida_ejecucion,
-    pro.desc_proveedor
+    pro.desc_proveedor,
+    docv.id_moneda
     from 
     conta.tdoc_concepto doc 
     inner join conta.tdoc_compra_venta docv on docv.id_doc_compra_venta = doc.id_doc_compra_venta
@@ -177,6 +182,7 @@ union
     and doc.id_partida_ejecucion is not null  
     
     ) as registros
+    where id_moneda = moneda_id
    order by num_tramite,codigo_cc,id_partida_ejecucion,fecha_soli;
 END;
 $body$
