@@ -182,7 +182,7 @@ union
     and doc.id_partida_ejecucion is not null  
     
     ) as registros
-    where id_moneda = moneda_id
+    where registros.id_moneda = moneda_id
    order by num_tramite,codigo_cc,id_partida_ejecucion,fecha_soli;
 END;
 $body$
