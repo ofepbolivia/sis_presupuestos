@@ -108,7 +108,11 @@ BEGIN
 			where id_memoria_det = v_parametros.id_memoria_det;
 
 
-            v_importe = v_registros_mem.importe_total - v_registros.importe  + v_parametros.importe;
+            --v_importe = v_registros_mem.importe_total - v_registros.importe  + v_parametros.importe;
+            select sum(mdet.importe)
+            	into v_importe
+            from pre.tmemoria_det mdet
+            where mdet.id_memoria_calculo = v_parametros.id_memoria_calculo;
         --raise exception '%, %, %, %', v_importe,v_registros_mem.importe_total, v_registros.importe, v_parametros.importe ;
 
          --control de techo presupuestario
