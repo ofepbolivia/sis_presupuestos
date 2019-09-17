@@ -28,7 +28,20 @@ class RMemoriaProgramacionXls
 	var $datos_entidad;
 	var $datos_periodo;
 	var $ult_codigo_partida;
-	var $ult_concepto;	
+    var $ult_concepto;
+	var $totales_c1 = 0;
+	var $totales_c2 = 0;
+	var $totales_c3 = 0;
+	var $totales_c4 = 0;
+    var $totales_c5 = 0;
+    var $totales_c6 = 0;
+    var $totales_c7 = 0;
+    var $totales_c8 = 0;
+    var $totales_c9 = 0;
+    var $totales_c10 = 0;    
+    var $totales_c11 = 0; 
+    var $totales_c12 = 0;
+    var $total_general = 0;    	
 	
 	
 	
@@ -143,10 +156,24 @@ class RMemoriaProgramacionXls
 		$fila = 2;
 		$contador = 1;
 		
-		/////////////////////***********************************Detalle***********************************************
+        /////////////////////***********************************Detalle***********************************************
+        $this->docexcel->getActiveSheet()->getStyle('C:O')->getNumberFormat()->setFormatCode('#,##0.00');
+
 		foreach($datos as $value) {
-				
-							
+
+            $this->totales_c1 += $value['c1'];
+            $this->totales_c2 += $value['c2'];
+            $this->totales_c3 += $value['c3'];
+            $this->totales_c4 += $value['c4'];
+            $this->totales_c5 += $value['c5'];
+            $this->totales_c6 += $value['c6'];
+            $this->totales_c7 += $value['c7'];
+            $this->totales_c8 += $value['c8'];
+            $this->totales_c9 += $value['c9'];
+            $this->totales_c10 += $value['c10'];    
+            $this->totales_c11 += $value['c11']; 
+            $this->totales_c12 += $value['c12'];                        				
+            							
 			$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,$value['codigo_partida']);
 			$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,$value['nombre_partida']);
 			$this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fila,$value['c1']);
@@ -165,8 +192,27 @@ class RMemoriaProgramacionXls
 			
 			$fila++;
 			$contador++;
-		}
-		//************************************************Fin Detalle***********************************************
+        }
+        if( $this->objParam->getParametro('nivel') == 5){
+
+        $this->docexcel->getActiveSheet()->getStyle('A'.$fila.':O'.$fila.'')->applyFromArray($styleTitulos);        
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(0,$fila,'-');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1,$fila,'TOTALES');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2,$fila,$this->totales_c1);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3,$fila,$this->totales_c2);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4,$fila,$this->totales_c3);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5,$fila,$this->totales_c4);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6,$fila,$this->totales_c5);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7,$fila,$this->totales_c6);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8,$fila,$this->totales_c7);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9,$fila,$this->totales_c8);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10,$fila,$this->totales_c9);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11,$fila,$this->totales_c10);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12,$fila,$this->totales_c11);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(13,$fila,$this->totales_c12);			
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(14,$fila,"=SUM(O2:O".$fila.")");
+        }
+		//************************************************Fin Detalle**********************************************
 		
 	}
 

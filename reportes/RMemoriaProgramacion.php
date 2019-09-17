@@ -15,7 +15,20 @@ class RMemoriaProgramacion extends  ReportePDF {
 	var $datos_entidad;
 	var $datos_periodo;
 	var $ult_codigo_partida;
-	var $ult_concepto;
+    var $ult_concepto;
+	var $totales_c1 = 0;
+	var $totales_c2 = 0;
+	var $totales_c3 = 0;
+	var $totales_c4 = 0;
+    var $totales_c5 = 0;
+    var $totales_c6 = 0;
+    var $totales_c7 = 0;
+    var $totales_c8 = 0;
+    var $totales_c9 = 0;
+    var $totales_c10 = 0;    
+    var $totales_c11 = 0; 
+    var $totales_c12 = 0;
+    var $total_general = 0;
 	
 	
 	
@@ -168,7 +181,28 @@ class RMemoriaProgramacion extends  ReportePDF {
 			$this->revisarfinPagina();
 			
 		}
-		
+        if ($this->objParam->getParametro('nivel')== 5){
+            $this->SetFont('','BU',6);
+            $RowArra = array(
+                's1' => ' - ',
+                's2.0' => '',                
+                's2' => 'TOTALES',
+                's3' => $this->totales_c1,
+                's4' => $this->totales_c2,
+                's5' => $this->totales_c3,
+                's6' => $this->totales_c4,
+                's7' => $this->totales_c5,
+                's8' => $this->totales_c6,
+                's9' => $this->totales_c7,
+                's10' => $this->totales_c8,
+                's11' => $this->totales_c9,
+                's12' => $this->totales_c10,
+                's13' => $this->totales_c11,
+                's14' => $this->totales_c12,
+                's15' => $this->total_general);       
+    
+                $this-> MultiRow($RowArra);
+        }		
 		
 		
 	}	
@@ -180,7 +214,20 @@ class RMemoriaProgramacion extends  ReportePDF {
         $tab = '';
 		$this->tabletextcolor=$conf_tabletextcolor;
 		$total = $val['c1'] + $val['c2'] + $val['c3'] + $val['c4'] + $val['c5'] + $val['c6'] + $val['c7'] + $val['c8'] + $val['c9'] + $val['c10'] + $val['c11'] + $val['c12'];
-		
+        
+        $this->totales_c1 += $val['c1'];
+        $this->totales_c2 += $val['c2'];
+        $this->totales_c3 += $val['c3'];
+        $this->totales_c4 += $val['c4'];
+        $this->totales_c5 += $val['c5'];
+        $this->totales_c6 += $val['c6'];
+        $this->totales_c7 += $val['c7'];
+        $this->totales_c8 += $val['c8'];
+        $this->totales_c9 += $val['c9'];
+        $this->totales_c10 += $val['c10'];    
+        $this->totales_c11 += $val['c11']; 
+        $this->totales_c12 += $val['c12'];
+        $this->total_general += $total;
 		
 		if ($val['nivel_partida'] == 0){
 			 $this->SetFont('','BU',6);
@@ -294,7 +341,7 @@ class RMemoriaProgramacion extends  ReportePDF {
 			  $this->tablewidths=array(10,4,41,16,16,16,16,16,16,16,16,16,16,16,16,20);
 		      $this->tablealigns=array('L','L','L','R','R','R','R','R','R','R','R','R','R','R','R','R');
 		      $this->tablenumbers=array(0,0,0,2,2,2,2,2,2,2,2,2,2,2,2,2);
-			 
+
 		     $tab = "\t\t\t";
 			 $RowArray = array(
             			's1' =>  $tab.$val['codigo_partida'],
@@ -312,8 +359,7 @@ class RMemoriaProgramacion extends  ReportePDF {
                         's12' => $val['c10'],
 						's13' => $val['c11'],
                         's14' => $val['c12'],
-                        's15' => $total);
-			 
+                        's15' => $total);            			 
 		}
 	   
 	   
@@ -325,8 +371,7 @@ class RMemoriaProgramacion extends  ReportePDF {
 						
 		$this-> MultiRow($RowArray,$fill,1);
 		
-	}
-
+    }
 
     function revisarfinPagina(){
 		$dimensions = $this->getPageDimensions();

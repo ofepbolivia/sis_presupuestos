@@ -172,7 +172,7 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 			   listWidth: 250,
                resizable:true,
 			   minChars:2,
-			   tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
+			   tpl:'<tpl for="."><div class="x-combo-list-item"><p style="font-weight:bold; color:green;">{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>'
 			},
 			type:'ComboBox',
 			id_grupo:1,
