@@ -80,13 +80,15 @@ Phx.vista.ConceptoPartida=Ext.extend(Phx.gridInterfaz,{
 				mode: 'remote',
 				pageSize: 20,
 				queryDelay: 200,
-				listWidth:280,
+				listWidth:420,
 				minChars: 2,
+                anchor: '80%',
 				gwidth: 170,
+                resizable: true,
 				renderer: function(value, p, record) {
 					return String.format('{0}', record.data['desc_partida']);
 				},
-				tpl: '<tpl for="."><div class="x-combo-list-item"><p>Codigo: {codigo}</p><strong>{nombre_partida}</strong> <p>{tipo} - {desc_gestion}</p></div></tpl>'
+				tpl: '<tpl for="."><div class="x-combo-list-item"><p><b>Codigo: <span style="color:green;">{codigo}</span></b></p><strong><b>Partida:</b> <span style="color:red;">{nombre_partida}</span></strong> <p><b>{tipo} - <span style="color:blue;">{desc_gestion}</span></b></p></div></tpl>'
 			},
 			type: 'ComboBox',
 			id_grupo: 0,
