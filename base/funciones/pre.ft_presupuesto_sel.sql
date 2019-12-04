@@ -641,7 +641,9 @@ BEGIN
             sum(tsd.precio_total) AS precio_total,tmo.codigo AS codigo_moneda, ts.num_tramite,
             '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
             COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
-            '''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+            --'''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+            coalesce(vcp.desc_unidad_ejecutora::varchar,''Boliviana de Aviación - BoA''::varchar) as unidad_ejecutora,
+            coalesce(vcp.codigo_unidad_ejecutora::varchar,''0''::varchar) as codigo_ue,
             COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
             COALESCE('''||v_record_sol.justificacion||'''::varchar,'''') AS justificacion,
             COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
@@ -689,7 +691,8 @@ BEGIN
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
-            ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud';
+            ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud,
+            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora';
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
@@ -909,7 +912,9 @@ BEGIN
 
               '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
               COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
-              '''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+              --'''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+              coalesce(vcp.desc_unidad_ejecutora::varchar,''Boliviana de Aviación - BoA''::varchar) as unidad_ejecutora,
+              coalesce(vcp.codigo_unidad_ejecutora::varchar,''0''::varchar) as codigo_ue,
               COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
               COALESCE('''||v_record_ajuste.justificacion||'''::varchar,'''') AS justificacion,
 
@@ -951,7 +956,8 @@ BEGIN
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, taj.nro_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
-            taj.fecha, tg.gestion, taj.tipo_ajuste, taj.correlativo, tpf.descripcion';
+            taj.fecha, tg.gestion, taj.tipo_ajuste, taj.correlativo, tpf.descripcion,
+            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora';
 
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta

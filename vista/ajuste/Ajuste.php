@@ -602,12 +602,19 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
        var that = this;
        if (d.tipo_ajuste == "inc_comprometido"){
            //validacion vista
-           if (this.nombreVista == 'AjusteInicio')
+           if (this.nombreVista == 'AjusteInicio') {
                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-1').store;
-           else
+           }else {
                var storeDetalle = Phx.CP.getPagina('docs-VBAJT-east-1').store;
+           }
 
-           var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+           if(storeDetalle.getTotalCount() < 52) {
+               var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount() - 1).get('importe');
+           }else {
+               var importe_total = storeDetalle.getAt(50).data.importe;
+           }
+
+           //
            //validacion bd
            Ext.Ajax.request({
                url:'../../sis_presupuestos/control/AjusteDet/getImporteTotalDetalle',
@@ -637,12 +644,17 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
            });
        }else if(d.tipo_ajuste == "rev_comprometido" || d.tipo_ajuste == "rev_total_comprometido"){
 
-           if (this.nombreVista == 'AjusteInicio')
+           if (this.nombreVista == 'AjusteInicio') {
                var storeDetalle = Phx.CP.getPagina('docs-AJTPRE-east-0').store;
-           else
+           }else {
                var storeDetalle = Phx.CP.getPagina('docs-VBAJT-east-0').store;
+           }
 
-           var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount()-1).get('importe');
+           if(storeDetalle.getTotalCount() < 52) {
+               var importe_total = storeDetalle.getAt(storeDetalle.getTotalCount() - 1).get('importe');
+           }else {
+               var importe_total = storeDetalle.getAt(50).data.importe;
+           }
 
            //validacion bd
            Ext.Ajax.request({

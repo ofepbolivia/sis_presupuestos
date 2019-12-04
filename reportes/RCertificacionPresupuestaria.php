@@ -109,14 +109,21 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             //}
         }
 
-        $tbl = '<table border="0" style="font-size: 7pt;">
+        /*$tbl = '<table border="0" style="font-size: 7pt;">
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
                 <!-- <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA SOLICITUD: </b></td><td>'.$fecha_soli.'</td></tr> -->
                 <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA CERTIFICACION: </b></td><td>'.$fecha.'</td></tr>
-                <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['unidad_ejecutora'].'</td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
+                <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['codigo_ue'].' '.ucwords(strtolower($this->datos[0]['unidad_ejecutora'])).'</td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
                 <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td></td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
                 <tr><td colspan="4"><b>CATEGORIA DE COMPRA: </b> '.($this->datos[0]['codigo_moneda']=='Bs'?'Compra Nacional.':'Compra Internacional.').'</td></tr>
-                '; 
+                ';*/
+
+        $tbl = '<table border="0" style="font-size: 7pt;"> 
+                <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
+                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha.'</td></tr>
+                <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b></td><td>Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
+                <tr><td><b>CATEGORIA:</b></td><td>'.$this->datos[0]['codigo_proceso'].'</td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
+                ';
 
         $this->Ln(5);
         $this->writeHTML ($tbl);
@@ -145,7 +152,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
                     if($id_cp != '' || $cod_partida!=''){
                         $tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
+                               <td colspan="10" align="center"><b> TOTAL PARCIAL</b>['.$codigo.']</td>
                                <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
                            </tr>';
                         $cont_total+=$cont_parcial;
@@ -159,13 +166,13 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                 if($codigo_cg!='') {
 
                     $tbl .= '<tr>
-                               <td colspan="9" align="center" ><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
+                               <td colspan="10" align="center"><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
                                <td align="right" ><b>' . number_format($cont_total, 2, ',', '.') . '</b></td>
                            </tr>';
                     $total_general+=$cont_total;
 
                 }
-                $tbl.='<tr><td colspan="10" align="center"><b>CLASE DE GASTO: ('.$record["codigo_cg"].') '.$record["nombre_cg"].'</b></td></tr>
+                $tbl.='<tr><td colspan="11" align="center"><b>CLASE DE GASTO: ('.$record["codigo_cg"].') '.$record["nombre_cg"].'</b></td></tr>
                          <tr>
                             <td width="7%" align="center"><b>CENTRO DE COSTO</b></td>
                             <td width="5%" align="center"><br><b>PROG.</b></td>
@@ -173,8 +180,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                             <td width="5%" align="center"><br><b>ACT.</b></td>
                             <td width="5%" align="center"><br><b>FTE.</b></td>
                             <td width="5%" align="center" ><b>ORG. FINAN</b></td>
+                            <td width="5%" align="center" ><b>UNI. EJE.</b></td>
                             <td width="10%" align="center" valign="center"><br><b>PARTIDA</b></td>
-                            <td width="36%" align="center"><br><b>DESCRIPCIÓN</b></td>
+                            <td width="31%" align="center"><br><b>DESCRIPCIÓN</b></td>
                             <td width="7%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
                             <td width="15%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$us.').'</b></td>
                         </tr>';
@@ -189,7 +197,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
                 if($id_cp != '' || $cod_partida!=''){
                     $tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
+                               <td colspan="10" align="center"><b> TOTAL PARCIAL</b>['.$codigo.']</td>
                                <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
                            </tr>';
                     $cont_total+=$cont_parcial;
@@ -208,42 +216,43 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                             <td width="5%" align="center">'.$record["codigo_actividad"].'</td>
                             <td width="5%" align="center">'.$record["codigo_fuente_fin"].'</td>
                             <td width="5%" align="center" >'.$record["codigo_origen_fin"].'</td>
+                            <td width="5%" align="center" >'.$record["codigo_ue"].'</td>
                             <td width="10%" align="center" valign="center">'.$record["codigo_partida"].'</td>
-                            <td width="36%" align="left">'.$record["nombre_partidad"].'</td>
+                            <td width="31%" align="left">'.$record["nombre_partidad"].'</td>
                             <td width="7%" align="center">'.$record["codigo_transf"].'</td>
                             <td width="15%" align="right">'.number_format($record["precio_total"],2, ',', '.').'</td>
                         </tr>';
 
             $cont_parcial += $record["precio_total"];
 
-            $codigo = $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
+            $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].'-'.$record["codigo_ue"].', '.$record["codigo_partida"];
 
         }
 
 
         $cont_total += $cont_parcial;
-        $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
+        $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].'-'.$record["codigo_ue"].', '.$record["codigo_partida"];
 
         if($id_cp != '' || $cod_partida != ''){
             $tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
+                               <td colspan="10" align="center"><b> TOTAL PARCIAL</b>['.$codigo.']</td>
                                <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
                            </tr>';
             $total_general+=$cont_total;
         }
 
         $tbl .= '<tr>
-                               <td colspan="9" align="center" ><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
+                               <td colspan="10" align="center" ><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
                                <td align="right" ><b>' . number_format($cont_total, 2, ',', '.') . '</b></td>
                            </tr>';
         $centimos = explode('.', $total_general);
 
         $tbl.='<tr>
-                           <td colspan="9" align="center" ><b> TOTAL GENERAL AUTORIZADO</b></td>
+                           <td colspan="10" align="center" ><b> TOTAL GENERAL AUTORIZADO</b></td>
                            <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
                        </tr>';
         $tbl.='<tr>
-                   <td colspan="10" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+                   <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
 
                </tr>';
 
@@ -253,7 +262,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $tbl = '';
         $this->Ln(1);
         $tbl.='<table border="1"><tr>
-                   <td colspan="10" align="left" style="font-size: 8pt;">&nbsp;<b>JUSTIFICACIÓN:</b><br>&nbsp;'.$this->datos[0]['justificacion'].'</td>
+                   <td colspan="11" align="left" style="font-size: 8pt;">&nbsp;<b>JUSTIFICACIÓN:</b><br>&nbsp;'.$this->datos[0]['justificacion'].'</td>
 
                </tr></table>';
         $this->writeHTML ($tbl);

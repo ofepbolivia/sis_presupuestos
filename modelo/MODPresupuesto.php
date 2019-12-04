@@ -402,6 +402,7 @@ class MODPresupuesto extends MODbase{
         $this->captura('nombre_entidad', 'varchar');
         $this->captura('direccion_admin', 'varchar');
         $this->captura('unidad_ejecutora', 'varchar');
+        $this->captura('codigo_ue', 'varchar');
         $this->captura('firmas', 'varchar');
         $this->captura('justificacion', 'varchar');
         $this->captura('codigo_transf', 'varchar');
@@ -521,6 +522,7 @@ class MODPresupuesto extends MODbase{
         $this->captura('nombre_entidad', 'varchar');
         $this->captura('direccion_admin', 'varchar');
         $this->captura('unidad_ejecutora', 'varchar');
+        $this->captura('codigo_ue', 'varchar');
         $this->captura('firmas', 'varchar');
         $this->captura('justificacion', 'varchar');
         $this->captura('codigo_transf', 'varchar');
