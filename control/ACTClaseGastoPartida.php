@@ -49,7 +49,12 @@ class ACTClaseGastoPartida extends ACTbase{
 		$this->res=$this->objFunc->eliminarClaseGastoPartida($this->objParam);
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-			
+
+    function clonarPartida(){
+        $this->objFunc=$this->create('MODClaseGastoPartida');
+        $this->res=$this->objFunc->clonarPartida($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

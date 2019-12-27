@@ -43,6 +43,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     filters: {pfiltro: 'clg.codigo', type: 'string'},
                     id_grupo: 1,
                     grid: true,
+                    bottom_filter: true,
                     form: true
                 },
                 {
@@ -59,6 +60,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     filters: {pfiltro: 'clg.nombre', type: 'string'},
                     id_grupo: 1,
                     grid: true,
+                    bottom_filter: true,
                     form: true
                 },
                 {

@@ -13,12 +13,26 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
 		this.maestro=config.maestro;
+
 		this.initButtons=[this.cmbGestion];
     	//llama al constructor de la clase padre
 		Phx.vista.ClaseGastoPartida.superclass.constructor.call(this,config);
+
+        this.addButton('clonarPartidas',
+            {
+                //grupo: [0],
+                text: 'clonar partidas',
+                iconCls: 'blist',
+                disabled: false,
+                handler: this.clonarPartida,
+                tooltip: '<b>Cargar Archivo</b><br/>clonar Partidas.'
+            }
+        );
 		this.init();
+
 		this.bloquearMenus();
-		
+
+
 		this.cmbGestion.on('select', function(){
 			    if(this.validarFiltros()){
 	                  this.capturaFiltros();
@@ -26,7 +40,7 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 			},this);
 		
 	},
-	
+
 	cmbGestion: new Ext.form.ComboBox({
 				fieldLabel: 'Gestion',
 				allowBlank: false,
@@ -94,10 +108,12 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro: 'p.codigo_partida#p.nombre_partida',
+		        pfiltro: 'p.codigo#p.nombre_partida',
+                //pfiltro: 'desc_partida',
 				type: 'string'
 			},
-   		    grid:true,   			
+   		    grid:true,
+            bottom_filter: true,
    			form:true
 	   	},
 		
@@ -232,6 +248,22 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 	],
 	onReloadPage:function(m){
 		this.maestro=m;
+        console.log('maestro',this.maestro);
+        var fecha = new Date();
+        Ext.Ajax.request({
+            url: '../../sis_parametros/control/Gestion/obtenerGestionByFecha',
+            params: {fecha: fecha.getDate() + '/' + (fecha.getMonth() + 1) + '/' + fecha.getFullYear()},
+            success: function (resp) {
+                var reg = Ext.decode(Ext.util.Format.trim(resp.responseText));
+                this.cmbGestion.setValue(reg.ROOT.datos.id_gestion);
+                this.cmbGestion.setRawValue(fecha.getFullYear());
+                this.store.baseParams.id_gestion = reg.ROOT.datos.id_gestion;
+                this.load({params: {start: 0, limit: this.tam_pag}});
+            },
+            failure: this.conexionFailure,
+            timeout: this.timeout,
+            scope: this
+        });
 		this.store.baseParams = { id_clase_gasto: this.maestro.id_clase_gasto };
 		this.load({ params: {start:0, limit:50 } });
 		
@@ -253,6 +285,37 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 			alert('Seleccione una Gestión primero')
 		}
 	},
+    clonarPartida: function () {
+        //var rec=this.sm.getSelected();
+        var rec = this.cmbGestion.getValue();
+        var gasto = this.maestro.id_clase_gasto;
+        console.log('datos_plan_cuenta',rec);
+        console.log('gasto',gasto);
+        if(this.cmbGestion.getValue()){
+            Ext.Ajax.request({
+                url: '../../sis_presupuestos/control/ClaseGastoPartida/clonarPartida',
+                params: {
+                    id_gestion: rec,
+                    id_clase_gasto:gasto
+                },
+                success: this.successAnular,
+                failure: this.conexionFailure,
+                timeout: this.timeout,
+                scope: this
+            });
+        }
+        else{
+            alert('primero debe selecionar la gestion origen');
+        }
+
+    },
+    successAnular:function(resp){
+        Phx.CP.loadingHide();
+        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
+        if(!reg.ROOT.error){
+            this.reload();
+        }
+    },
 	onButtonEdit:function(){
 		if(this.validarFiltros()){
 	       Phx.vista.ClaseGastoPartida.superclass.onButtonEdit.call(this);
@@ -284,7 +347,8 @@ Phx.vista.ClaseGastoPartida=Ext.extend(Phx.gridInterfaz,{
 	        else{
 	            return false;
 	        }	        
-	},	
+	},
+
 	bdel:true,
 	bsave:true
 	}

@@ -32,6 +32,13 @@ DECLARE
 	v_nombre_funcion        text;
 	v_mensaje_error         text;
 	v_id_clase_gasto_partida	integer;
+
+	   --------27/12/2019
+    v_registros		record;
+    v_registros_ges	record;
+    v_id_gestion_destino	integer;
+    v_partida_dos	integer;
+
 			    
 BEGIN
 
@@ -130,6 +137,105 @@ BEGIN
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','CGPR eliminado(a)'); 
             v_resp = pxp.f_agrega_clave(v_resp,'id_clase_gasto_partida',v_parametros.id_clase_gasto_partida::varchar);
               
+            --Devuelve la respuesta
+            return v_resp;
+
+		end;
+
+	/*********************************
+ 	#TRANSACCION:  'PRE_CLOPAR_IME'
+ 	#DESCRIPCION:	Clonacion de Partidas a partir de una clase de gasto
+ 	#AUTOR:		Alan Felipez
+ 	#FECHA:		27-12-2019 02:33:23
+	***********************************/
+
+	elsif(p_transaccion='PRE_CLOPAR_IME')then
+
+		begin
+
+             --  definir id de la gestion siguiente
+              select
+              ges.id_gestion,
+              ges.gestion,
+              ges.id_empresa
+           into
+              v_registros_ges
+           from
+           param.tgestion ges
+           where ges.id_gestion = v_parametros.id_gestion;
+
+            select
+              ges.id_gestion
+           into
+              v_id_gestion_destino
+           from
+           param.tgestion ges
+           where       ges.gestion = v_registros_ges.gestion + 1
+                   and ges.id_empresa = v_registros_ges.id_empresa
+                   and ges.estado_reg = 'activo';
+            IF v_id_gestion_destino is null THEN
+                   raise exception 'no se encontró una siguiente gestión preparada (primero cree  gestión siguiente)';
+          END IF;
+          --recuperar informacion de las partidas
+
+
+          for v_registros in (select *
+                              /*cgp.id_clase_gasto_partida,
+                              cgp.id_partida,
+                              p.id_gestion*/
+                              from pre.tclase_gasto_partida cgp
+                              inner join segu.tusuario usu1 on usu1.id_usuario = cgp.id_usuario_reg
+                              inner join  pre.tpartida p on p.id_partida = cgp.id_partida
+                              left join segu.tusuario usu2 on usu2.id_usuario = cgp.id_usuario_mod
+                              where  p.id_gestion = v_parametros.id_gestion)loop
+
+          		--buscamos si existe la relacion de partidas para la siguiente gestion
+               if exists (select 1
+                          from pre.tpartida_ids
+                          where id_partida_uno = v_registros.id_partida) then
+                          --encontramos el id_partida de la gestion siguiente
+                          select pid.id_partida_dos
+                          into v_partida_dos
+                          from pre.tpartida_ids pid
+                          where pid.id_partida_uno = v_registros.id_partida;
+                          --si no existe registrado la relacion de partidas con clases de gasto realizamos la insercion en la tabla
+                          if not exists ( select 1
+                                          from pre.tclase_gasto_partida cgp
+                                          inner join segu.tusuario usu1 on usu1.id_usuario = cgp.id_usuario_reg
+                                          inner join  pre.tpartida p on p.id_partida = cgp.id_partida
+                                          left join segu.tusuario usu2 on usu2.id_usuario = cgp.id_usuario_mod
+                                          where cgp.id_clase_gasto = v_registros.id_clase_gasto and cgp.id_partida =v_partida_dos )then
+                          	insert into pre.tclase_gasto_partida(
+                            	id_usuario_reg,
+                                id_usuario_mod,
+                                fecha_reg,
+                                fecha_mod,
+                                estado_reg,
+                                id_usuario_ai,
+                                usuario_ai,
+                                id_clase_gasto,
+                                id_partida
+                            )values(
+                            	p_id_usuario,
+                                null,
+                                now(),
+                                null,
+                                'activo',
+                                null,
+                                null,
+                                v_registros.id_clase_gasto,
+                                v_partida_dos
+                            );
+                          end if;
+               end if;
+
+
+          end loop;
+
+            --Definicion de la respuesta
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','partidas clonadas');
+            v_resp = pxp.f_agrega_clave(v_resp,'gestion destino',v_id_gestion_destino::varchar);
+
             --Devuelve la respuesta
             return v_resp;
 

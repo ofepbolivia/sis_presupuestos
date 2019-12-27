@@ -34,7 +34,8 @@ class MODClaseGastoPartida extends MODbase{
 		$this->captura('usr_mod','varchar');
 		$this->captura('desc_partida','varchar');
 		$this->captura('id_gestion','int4');
-		
+        $this->captura('codigo','varchar');
+        $this->captura('nombre_partida','varchar');
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
@@ -98,6 +99,22 @@ class MODClaseGastoPartida extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+    function clonarPartida(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_clase_gasto_partida_ime';
+        $this->transaccion='PRE_CLOPAR_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_clase_gasto','id_clase_gasto','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>

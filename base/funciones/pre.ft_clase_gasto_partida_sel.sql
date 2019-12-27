@@ -60,7 +60,9 @@ BEGIN
                             usu1.cuenta as usr_reg,
                             usu2.cuenta as usr_mod,
                            ( p.codigo||'' ''||p.nombre_partida)::varchar as desc_partida,
-                            p.id_gestion
+                            p.id_gestion,
+                            p.codigo,
+                            p.nombre_partida
 						from pre.tclase_gasto_partida cgp
 						inner join segu.tusuario usu1 on usu1.id_usuario = cgp.id_usuario_reg
                         inner join  pre.tpartida p on p.id_partida = cgp.id_partida 
