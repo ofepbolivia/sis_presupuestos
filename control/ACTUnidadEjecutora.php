@@ -49,7 +49,33 @@ class ACTUnidadEjecutora extends ACTbase{
         $this->res=$this->objFunc->validarCampos($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+            
+    function listarUnidadEjecutoraMensual(){
+		$this->objParam->defecto('ordenacion','id_unidad_ejecutora');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("und_eje.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
+        
+		$this->objFunc=$this->create('MODUnidadEjecutora');	
+		$this->res=$this->objFunc->listarUnidadEjecutora($this->objParam);        
+        
+        if($this->objParam->getParametro('_adicionar')!=''){
+		    
+			$respuesta = $this->res->getDatos();
 			
+										
+		    array_unshift ( $respuesta, array(  'id_unidad_ejecutora'=>'0',
+		                                'nombre'=>'Todos',
+									    'codigo'=>'Todos'));
+		    //var_dump($respuesta);
+			$this->res->setDatos($respuesta);
+        }
+        
+		$this->res->imprimirRespuesta($this->res->generarJson());
+	}    
 }
 
 ?>

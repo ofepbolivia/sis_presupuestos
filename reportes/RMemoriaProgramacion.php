@@ -90,6 +90,9 @@ class RMemoriaProgramacion extends  ReportePDF {
 		}
 		if($this->objParam->getParametro('tipo_reporte') =='presupuesto'){
 			$tmp = 'PRESUPUESTO';
+        }
+        if($this->objParam->getParametro('tipo_reporte') =='unidad_ejecutora'){
+			$tmp = 'UNIDAD EJECUTORA';
 		}
 		
 		

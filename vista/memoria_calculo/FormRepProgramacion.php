@@ -128,7 +128,8 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 	        	data :	[
 		        	        ['programa','Programa'],
 		        	        ['categoria','Categoría Programática'],	
-							['presupuesto','Presupuesto']
+							['presupuesto','Presupuesto'],
+                            ['unidad_ejecutora', 'Unidad Ejecutora'],
 						]	        				
 	    		}),
 				valueField:'ID',
@@ -231,6 +232,49 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 			type: 'ComboBox',
 			form: true
 		},
+
+        {
+            config: {
+                name: 'id_unidad_ejecutora',
+                fieldLabel: 'Unidad Ejecutora',
+                allowBlank: false,
+                emptyText: 'Elija una opción...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_presupuestos/control/UnidadEjecutora/listarUnidadEjecutoraMensual',
+                    id: 'id_unidad_ejecutora',
+                    root: 'datos',
+                    sortInfo: {
+                        field: 'codigo',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_unidad_ejecutora', 'nombre', 'codigo'],
+                    remoteSort: true,                    
+                    baseParams: {par_filtro: 'codigo#nombre', _adicionar:'si'}
+                }),
+                valueField: 'id_unidad_ejecutora',
+                displayField: 'nombre',
+                gdisplayField: 'desc_unidad_ejecutora',
+                hiddenName: 'id_unidad_ejecutora',
+                forceSelection: true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender: true,
+                mode: 'remote',
+                pageSize: 15,
+                queryDelay: 1000,
+                anchor: '100%',
+                gwidth: 150,
+                minChars: 2,
+                resizable:true,
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo}-{nombre}</p> </div></tpl>',
+            },
+            type: 'ComboBox',
+            id_grupo: 0,
+            //filters: {pfiltro: 'desc_unidad_ejecutora',type: 'string'},
+            grid: true,
+            form: true
+        },
 	   	
 		{
 			config:{
@@ -304,6 +348,7 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 			this.ocultarComponente(this.Cmp.id_categoria_programatica);
 			this.ocultarComponente(this.Cmp.id_presupuesto);
 			this.ocultarComponente(this.Cmp.id_cp_programa);
+            this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
 						
 			this.iniciarEventos();
 		},
@@ -323,7 +368,10 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 					this.Cmp.id_cp_programa.reset();
 					this.Cmp.id_cp_programa.store.baseParams.id_gestion = c.value;				
 					this.Cmp.id_cp_programa.modificado=true;
-					
+
+                    this.Cmp.id_unidad_ejecutora.reset();
+					this.Cmp.id_unidad_ejecutora.store.baseParams.id_gestion = c.value;				
+					this.Cmp.id_unidad_ejecutora.modificado=true;                    					
 				
 				
 			},this);
@@ -335,12 +383,14 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 				this.Cmp.id_categoria_programatica.reset();
 				this.Cmp.id_presupuesto.reset();
 				this.Cmp.id_cp_programa.reset();
+                this.Cmp.id_unidad_ejecutora.reset();
 				
 				console.log('--->',record.data.ID)
 				if(record.data.ID == 'programa'){
 					this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
 					this.mostrarComponente(this.Cmp.id_cp_programa);
+                    this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
 					
 				}
 				
@@ -348,6 +398,7 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 					this.mostrarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
 					this.ocultarComponente(this.Cmp.id_cp_programa);
+                    this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
 					
 				}
 				
@@ -355,9 +406,15 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 					this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.mostrarComponente(this.Cmp.id_presupuesto);
 					this.ocultarComponente(this.Cmp.id_cp_programa);
+                    this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
 					
 				}
-				
+				if(record.data.ID == 'unidad_ejecutora'){
+                    this.ocultarComponente(this.Cmp.id_categoria_programatica);
+					this.ocultarComponente(this.Cmp.id_presupuesto);
+					this.ocultarComponente(this.Cmp.id_cp_programa);
+                    this.mostrarComponente(this.Cmp.id_unidad_ejecutora);
+                }
 				
 			}, this);
 			
@@ -404,6 +461,9 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 		}
 		if(this.Cmp.tipo_reporte.getValue()=='presupuesto'){
 			this.Cmp.concepto.setValue(this.Cmp.id_presupuesto.getRawValue());
+		}
+        if(this.Cmp.tipo_reporte.getValue()=='unidad_ejecutora'){
+			this.Cmp.concepto.setValue(this.Cmp.id_unidad_ejecutora.getRawValue());
 		}
 		
 		Phx.vista.FormRepProgramacion.superclass.onSubmit.call(this,o, x, force);

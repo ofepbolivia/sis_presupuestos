@@ -179,7 +179,8 @@ class MODMemoriaCalculo extends MODbase{
 		  $this->setParametro('id_gestion','id_gestion','int4');
 		  $this->setParametro('tipo_pres','tipo_pres','VARCHAR');
 		  $this->setParametro('tipo_reporte','tipo_reporte','VARCHAR');
-		  $this->setParametro('nivel','nivel','int4');
+          $this->setParametro('nivel','nivel','int4');
+          $this->setParametro('id_unidad_ejecutora','id_unidad_ejecutora','int4');
 		  
 		 
 		

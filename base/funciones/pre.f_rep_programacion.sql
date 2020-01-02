@@ -109,6 +109,36 @@ BEGIN
                      where p.id_categoria_prog = v_parametros.id_categoria_programatica
                      and p.tipo_pres  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
 
+            --inicio breydi.vasquez 02-01-2020 
+
+            ELSEIF v_parametros.tipo_reporte = 'unidad_ejecutora' and v_parametros.id_unidad_ejecutora is not null  THEN  
+
+	             if v_parametros.id_unidad_ejecutora != 0 then 
+
+                   SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog                   
+                   where cp.id_unidad_ejecutora = v_parametros.id_unidad_ejecutora
+                   and cp.id_gestion = v_parametros.id_gestion
+                 and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));                               
+                 
+            	else 
+                
+                	SELECT
+                       pxp.aggarray(p.id_presupuesto)
+                   into       
+                       va_id_presupuesto
+                   FROM pre.tpresupuesto p
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog                   
+                   where cp.id_gestion = v_parametros.id_gestion
+                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));   
+                   
+                end if;
+			-- fin                      
+
 
              ELSEIF v_parametros.tipo_reporte = 'presupuesto' and v_parametros.id_presupuesto is not null and v_parametros.id_presupuesto != 0 THEN
 
