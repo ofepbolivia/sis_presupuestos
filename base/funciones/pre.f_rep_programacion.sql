@@ -280,6 +280,61 @@ BEGIN
         END IF;
         --listado consolidado segun parametros
 
+        --inicio breydi.vasquez 02-01-2020 
+	 if v_parametros.id_unidad_ejecutora is not null and  v_parametros.id_unidad_ejecutora = 0 then
+
+             FOR v_registros in (
+                              SELECT
+       							  tep.id_partida,
+                                  case when tep.nivel_partida = 0 then
+                                    unje.codigo
+                                  else
+                                  	tep.codigo_partida
+                                  end as codigo_partida,
+							      case when tep.nivel_partida = 0 then 
+                                  	(tep.nombre_partida || ' - UNI. EJEC: '|| unje.nombre)::varchar
+                                  else
+                                  	tep.nombre_partida
+                                  end as nombre_partida, 
+                                  tep.nivel_partida,
+                                  sum(tep.c1) as c1,
+                                  sum(tep.c2) as c2,
+                                  sum(tep.c3) as c3,
+                                  sum(tep.c4) as c4,
+                                  sum(tep.c5) as c5,
+                                  sum(tep.c6) as c6,
+                                  sum(tep.c7) as c7,
+                                  sum(tep.c8) as c8,
+                                  sum(tep.c9) as c9,
+                                  sum(tep.c10) as c10,
+                                  sum(tep.c11) as c11,
+                                  sum(tep.c12) as c12
+                          FROM temp_prog tep
+                          inner join pre.tcategoria_programatica cat on cat.id_categoria_programatica = tep.id_categoria_programatica
+                          inner join pre.tunidad_ejecutora unje on unje.id_unidad_ejecutora = cat.id_unidad_ejecutora                          
+                          WHERE
+
+                              CASE WHEN v_parametros.nivel >= 4  THEN  0=0
+                                  ELSE
+                                    tep.nivel_partida <= v_parametros.nivel
+                                  END
+                          group by
+                             tep.id_partida,
+                             tep.codigo_partida,
+                             tep.nombre_partida,
+                             tep.nivel_partida,
+                            unje.codigo,
+                            unje.nombre
+                            order by unje.codigo asc, tep.codigo_partida ) LOOP
+
+                 -- raise notice 'entra---';
+
+               RETURN NEXT v_registros;
+
+       END LOOP;
+    else 
+        -- fin breydi.vasquez 
+
        --raise exception 'llega';
         FOR v_registros in (
                               SELECT
@@ -318,6 +373,7 @@ BEGIN
                RETURN NEXT v_registros;
 
        END LOOP;
+    end if;
     /*********************************
      #TRANSACCION:    'PRE_PROGR_WF'
      #DESCRIPCION:     reporte de programacion mensual para wf
