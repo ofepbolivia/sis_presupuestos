@@ -69,7 +69,7 @@ DECLARE
     v_funcionarios						record;
     v_id_funcionario_recu				integer;
 
-
+    v_presu_partida						record;
 
 BEGIN
 
@@ -688,6 +688,32 @@ BEGIN
           END IF;
 
 
+          /*--------------------------------------------------------------
+          (may) 07-01-2020
+          update para el importe verificado aprobado y al validarlo sea
+          todos un 100% su importe registrado
+          ----------------------------------------------------------------*/
+
+          IF (v_codigo_estado = 'formulacion') THEN
+
+          			  for v_presu_partida in (  select *
+                                                from pre.tpresup_partida pp
+                                                where  pp.estado_reg = 'activo'
+                                                and pp.id_presupuesto = v_parametros.id_presupuesto
+                                                ) loop
+                     --raise exception 'llegaa % , %', v_presu_partida.importe ,v_presu_partida.id_presup_partida  ;
+                                    UPDATE pre.tpresup_partida SET
+                                    importe_aprobado = v_presu_partida.importe
+                                    WHERE id_presupuesto = v_parametros.id_presupuesto
+                                    and id_presup_partida = v_presu_partida.id_presup_partida;
+
+          			end loop;
+
+
+          END IF;
+
+          ---
+
 
           -- recupera datos del estado
 
@@ -984,5 +1010,3 @@ CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
 
-ALTER FUNCTION pre.ft_presupuesto_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
-  OWNER TO postgres;

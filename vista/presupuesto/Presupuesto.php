@@ -28,7 +28,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: '<b>Pasar al Anterior Estado</b>'
             });
 
-            this.addButton('fin_registro', { grupo:[0], text:'Siguiente', iconCls: 'badelante', disabled:true,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
+            this.addButton('fin_registro', { grupo:[0, 1], text:'Siguiente', iconCls: 'badelante', disabled:true,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
             this.addButton('btnMemoria',{ grupo:[0,1,2], text :'Memoria', iconCls:'bdocuments', disabled: true, handler : this.onButtonMemoria,tooltip : '<b>Memoria de Calculo</b><br/><b>Planificación de gastos o recursos</b>'});
             this.addButton('btnChequeoDocumentosWf',
                 {
