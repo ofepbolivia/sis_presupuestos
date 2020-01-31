@@ -281,13 +281,26 @@ BEGIN
 
 		begin
 
-           v_resp_presu =    pre.f_verificar_presupuesto_partida ( v_parametros.id_presupuesto,
+        /***
+         *** agregado condicion breydi.vaquez (06/01/2020) para reporte solicitud de compra
+         *** primera verificacion a nivel centro de costo 
+         ***/
+         if pxp.f_existe_parametro(p_tabla, 'id_solicitud') then 
+           if ((select presupuesto_aprobado from adq.tsolicitud where id_solicitud =  v_parametros.id_solicitud) in( 'verificar', 'sin_presupuesto_cc') )then
+            	v_resp_presu = pre.f_verificar_presupuesto_partida_centro_costo(v_parametros.id_presupuesto,
+                                                                        v_parametros.id_partida,
+                                                                        v_parametros.id_moneda,
+                                                                        v_parametros.monto_total); 
+           end if;
+           
+         else 
+           -- fin breydi.vaquez (06/01/2020)
+           		v_resp_presu =    pre.f_verificar_presupuesto_partida ( v_parametros.id_presupuesto,
             									v_parametros.id_partida,
                                                 v_parametros.id_moneda,
                                                 v_parametros.monto_total);
 
-
-
+		  end if;
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Presupuesto verificado)');
             v_resp = pxp.f_agrega_clave(v_resp,'presu_verificado',v_resp_presu);
