@@ -357,7 +357,8 @@ BEGIN
                 execute (v_consul); 
                    
                 v_consulta:= ' select * from cosolidado_partida_ejecucion ';
-                v_consulta:= v_consulta || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;    
+				v_consulta:= v_consulta ||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion;
+                v_consulta:= v_consulta || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;                
 				
                 --Devuelve la respuesta
                 return v_consulta;
@@ -478,13 +479,13 @@ BEGIN
                 v_consulta:= 'with recursive totales (com, eje, pag)as
                            (select
                                 case when  pareje.tipo_movimiento = ''comprometido'' then
-                                      pareje.monto
+                                      pareje.monto_mb
                                 else 0.00 end,
                                 case when pareje.tipo_movimiento = ''ejecutado'' then
-                                      pareje.monto
+                                      pareje.monto_mb
                                 else 0.00 end,
                                 case when pareje.tipo_movimiento = ''pagado'' then 
-                                      pareje.monto
+                                      pareje.monto_mb
                                 else 0.00 end
                                 from pre.tpartida_ejecucion pareje
                                 inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto

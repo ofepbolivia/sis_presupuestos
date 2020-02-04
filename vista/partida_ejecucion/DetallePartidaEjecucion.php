@@ -340,6 +340,10 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 	bedit: false,
 	bnew:  false,
     btest: false,
+
+	sortInfo:{
+		field: 'id_partida'		
+	},    
 	arrayDefaultColumHidden:['id_partida_ejecucion','columna_origen','valor_id_origen',
 		,'monto_mb','fecha_mod', 'id_usuario_ai','usr_mod','estado_reg'],
 

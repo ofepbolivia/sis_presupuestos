@@ -132,7 +132,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     triggerAction: 'all',
                     lazyRender: true,
                     mode: 'remote',
-                    pageSize: 10,
+                    pageSize: 20,
                     queryDelay: 1000,
                     width: 150,
                     listWidth: 280,
@@ -409,7 +409,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'total_comprometido',
                     allowBlank: true,
-                    fieldLabel: 'TOTAL COMPROMETIDO',
+                    fieldLabel: 'TOTAL COMPROMETIDO (mb)',
                     width: 180,
                     height: 50,
                     border: false,
@@ -424,7 +424,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'total_ejecutado',
                     allowBlank: true,
-                    fieldLabel: 'TOTAL DEVENGADO',
+                    fieldLabel: 'TOTAL DEVENGADO (mb)',
                     width: 180,
                     height: 50,
                     border: false,
@@ -439,7 +439,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'total_pagado',
                     allowBlank: true,
-                    fieldLabel: 'TOTAL PAGADO',
+                    fieldLabel: 'TOTAL PAGADO (mb)',
                     width: 180,
                     height: 50,
                     border: false,
@@ -454,7 +454,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'total_devengar',
                     allowBlank: true,
-                    fieldLabel: 'SALDO POR DEVENGAR',
+                    fieldLabel: 'SALDO POR DEVENGAR (mb)',
                     width: 180,
                     height: 50,
                     border: false,
