@@ -254,13 +254,13 @@ BEGIN
             if v_parametros.desde is null then
             	v_desde = 'null::date';
             else 
-            	v_desde = ''||v_parametros.desde||''::date;
+            	v_desde = ''''||v_parametros.desde||'''::date';
             end if;
             
             if v_parametros.hasta is null then 
 	            v_hasta = 'null::date';
             else 
-                v_hasta = ''||v_parametros.hasta||''::date;
+                v_hasta = ''''||v_parametros.hasta||'''::date';
             end if;    
 
             	create temp table cosolidado_partida_ejecucion(
