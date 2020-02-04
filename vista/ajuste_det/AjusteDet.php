@@ -133,6 +133,58 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:false
         },
+        {
+            config:{
+                name:'id_concepto_ingas',
+                fieldLabel:'Concepto Ingreso Gasto',
+                allowBlank:false,
+                emptyText:'Concepto Ingreso Gasto...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+                    id: 'id_concepto_ingas',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'desc_ingas',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto' ,autorizacion_nulos: 'no'}
+                }),
+                valueField: 'id_concepto_ingas',
+                displayField: 'desc_ingas',
+                gdisplayField:'nombre_ingas',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><p>TIPO:{tipo}</p><p>MOVIMIENTO:{movimiento}</p> <p>PARTIDA:{desc_partida}</p></div></tpl>',
+                hiddenName: 'id_concepto_ingas',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:600,
+                resizable:true,
+                anchor:'80%',
+                gwidth: 200,
+                renderer:function(value, p, record){if (record.data['nombre_ingas'] != null){
+                     return String.format('{0}', record.data['nombre_ingas']);
+                }else{
+                    return '';
+                 }
+                }
+            },
+            type:'ComboBox',
+            id_grupo:0,
+            filters:{
+                pfiltro:'cig.movimiento#cig.desc_ingas',
+                type:'string'
+            },
+            grid:true,
+            form:false
+        },        
 		{
 			config:{
 				name: 'estado_reg',
@@ -247,7 +299,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion'
+		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion','id_concepto_ingas','nombre_ingas'
 		
 	],
 	sortInfo:{

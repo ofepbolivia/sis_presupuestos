@@ -30,6 +30,11 @@ DECLARE
     v_pre_codigo_proc_macajsutable   varchar;
     v_id_gestion					 integer;
 
+    --breydi.vasquez 10-11-2019
+    v_consul						 varchar;
+    v_desde							 varchar;
+    v_hasta							 varchar;    
+
 BEGIN
 
 	v_nombre_funcion = 'pre.ft_partida_ejecucion_sel';
@@ -236,7 +241,533 @@ BEGIN
 
 		end;
 
+ /*********************************
+        #TRANSACCION:  'PRE_DETPAREJE_SEL'
+        #DESCRIPCION:	Consulta de datos consolidado partida ejecucion
+        #AUTOR:			breydi.vasquez
+        #FECHA:		10-11-2019
+        ***********************************/
 
+        elsif(p_transaccion='PRE_DETPAREJE_SEL')then
+
+            begin
+            if v_parametros.desde is null then
+            	v_desde = 'null::date';
+            else 
+            	v_desde = ''||v_parametros.desde||''::date;
+            end if;
+            
+            if v_parametros.hasta is null then 
+	            v_hasta = 'null::date';
+            else 
+                v_hasta = ''||v_parametros.hasta||''::date;
+            end if;    
+
+            	create temp table cosolidado_partida_ejecucion(
+                  moneda 			 varchar,
+                  descripcion		 varchar,
+                  codigo_cc			 text,
+                  codigo_categoria	 varchar,
+                  nro_tramite		 varchar,
+                  nombre_partida 	 varchar,
+                  codigo 			 varchar,
+                  id_presupuesto 	 integer,
+                  id_partida		 integer,
+                  id_moneda			 integer,
+                  comprometido		 numeric,
+                  ejecutado			 numeric,
+                  pagado			 numeric,
+                  saldo              numeric,
+                  desde				 date,
+                  hasta				 date
+                )on commit drop; 
+                                  
+                v_consul:= 'with recursive detalle (id_int_comprobante, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
+										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado)
+                                                      as 
+                (select 
+                  pareje.id_int_comprobante,
+                  mon.moneda,
+                  pareje.id_moneda,
+                  pareje.id_presupuesto,
+                  pre.descripcion,
+                  vpre.codigo_cc,
+                  cat.codigo_categoria,
+                  pareje.id_partida,
+                  par.codigo,
+                  par.nombre_partida,
+                  pareje.nro_tramite,
+                  case when pareje.tipo_movimiento = ''comprometido'' then
+                          pareje.monto
+                       else 
+                           0.00
+                       end,
+                  case when pareje.tipo_movimiento = ''ejecutado'' then
+                          pareje.monto
+                      else 
+                          0.00
+                      end,
+                  case when pareje.tipo_movimiento = ''pagado'' then
+                          pareje.monto
+                      else
+                          0.00
+                      end      
+                  from pre.tpartida_ejecucion pareje
+                  inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+                  INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
+                  inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
+                  inner join pre.tpartida par on par.id_partida = pareje.id_partida
+                  inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
+                  inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
+                  left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
+                  where ' || v_parametros.filtro || '                                                       
+                  )
+	            insert into cosolidado_partida_ejecucion
+                select
+                  de.moneda,
+                  de.descripcion,
+                  de.codigo_cc,
+                  de.codigo_categoria,
+                  de.nro_tramite,
+                  de.nombre_partida,
+                  de.codigo,
+                  de.id_presupuesto,
+                  de.id_partida,
+                  de.id_moneda,
+                  sum(de.comprometido) as comprometido,
+                  sum(de.ejecutado) as ejecutado,
+                  sum(de.pagado)	as pagado,
+                  (sum(de.comprometido) - sum(de.ejecutado)) as saldo,
+                  '||v_desde||',
+                  '||v_hasta||'
+                from detalle de
+                group by 
+                    de.nro_tramite,
+                    de.moneda,
+                    de.descripcion,
+                    de.codigo_cc,
+                    de.codigo_categoria,
+                    de.nro_tramite,
+                    de.nombre_partida,
+                    de.codigo,
+                    de.id_presupuesto,
+                    de.id_partida,
+                    de.id_moneda';
+
+                execute (v_consul); 
+                   
+                v_consulta:= ' select * from cosolidado_partida_ejecucion ';
+                v_consulta:= v_consulta || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;    
+				
+                --Devuelve la respuesta
+                return v_consulta;
+                
+        end;
+
+	/*********************************
+ 	#TRANSACCION:  'PRE_DETPAREJE_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		breydi.vasquez
+ 	#FECHA:		10-11-2019
+	***********************************/
+
+	elsif(p_transaccion='PRE_DETPAREJE_CONT')then
+    	begin 
+
+          	create temp table cosolidado_partida_ejecucion(
+                  moneda 			 varchar,
+                  descripcion		 varchar,
+                  codigo_cc			 text,
+                  codigo_categoria	 varchar,
+                  nro_tramite		 varchar,
+                  nombre_partida 	 varchar,
+                  codigo 			 varchar,
+                  id_presupuesto 	 integer,
+                  id_partida		 integer,
+                  id_moneda			 integer,
+                  comprometido		 numeric,
+                  ejecutado			 numeric,
+                  pagado			 numeric,
+                  saldo              numeric  
+                )on commit drop;                    
+                v_consul:= 'with recursive detalle (id_int_comprobante, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
+										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado)
+                                                      as 
+                (select 
+                  pareje.id_int_comprobante,
+                  mon.moneda,
+                  pareje.id_moneda,
+                  pareje.id_presupuesto,
+                  pre.descripcion,
+                  vpre.codigo_cc,
+                  cat.codigo_categoria,
+                  pareje.id_partida,
+                  par.codigo,
+                  par.nombre_partida,
+                  pareje.nro_tramite,
+                  case when pareje.tipo_movimiento = ''comprometido'' then
+                          pareje.monto
+                       else 
+                           0.00
+                       end,
+                  case when pareje.tipo_movimiento = ''ejecutado'' then
+                          pareje.monto
+                      else 
+                          0.00
+                      end,
+                  case when pareje.tipo_movimiento = ''pagado'' then
+                          pareje.monto
+                      else
+                          0.00
+                      end      
+                  from pre.tpartida_ejecucion pareje
+                  inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+                  INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
+                  inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
+                  inner join pre.tpartida par on par.id_partida = pareje.id_partida
+                  inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
+                  inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
+                  left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
+                  where ' || v_parametros.filtro|| '                                                       
+                  )
+	            insert into cosolidado_partida_ejecucion
+                select
+                  moneda,
+                  descripcion,
+                  codigo_cc,
+                  codigo_categoria,
+                  nro_tramite,
+                  nombre_partida,
+                  codigo,
+                  id_presupuesto,
+                  id_partida,
+                  id_moneda,
+                  sum(comprometido) as comprometido,
+                  sum(ejecutado) as ejecutado,
+                  sum(pagado)	as pagado,
+                  (sum(comprometido) - sum(ejecutado)) as saldo
+                from detalle
+                group by 
+                    nro_tramite,
+                    moneda,
+                    descripcion,
+                    codigo_cc,
+                    codigo_categoria,
+                    nro_tramite,
+                    nombre_partida,
+                    codigo,
+                    id_presupuesto,
+                    id_partida,
+                    id_moneda';
+                execute (v_consul);        
+                v_consulta:= ' select count(nro_tramite) from cosolidado_partida_ejecucion ';        
+                return v_consulta;
+        end;
+
+	/*********************************
+ 	#TRANSACCION:  'PRE_TOPAREJE_SEL'
+ 	#DESCRIPCION:	captura de totales comprometido-ejecutado-pagado-devengado de filtro partida ejecucion
+ 	#AUTOR:		breydi.vasquez
+ 	#FECHA:		10-11-2019
+	***********************************/
+
+	elsif(p_transaccion='PRE_TOPAREJE_SEL')then
+
+		begin
+
+                v_consulta:= 'with recursive totales (com, eje, pag)as
+                           (select
+                                case when  pareje.tipo_movimiento = ''comprometido'' then
+                                      pareje.monto
+                                else 0.00 end,
+                                case when pareje.tipo_movimiento = ''ejecutado'' then
+                                      pareje.monto
+                                else 0.00 end,
+                                case when pareje.tipo_movimiento = ''pagado'' then 
+                                      pareje.monto
+                                else 0.00 end
+                                from pre.tpartida_ejecucion pareje
+                                inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+                                INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
+                                inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
+                                inner join pre.tpartida par on par.id_partida = pareje.id_partida
+                                inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
+                                inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
+                                left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
+				                where ' || v_parametros.filtro|| '
+                                )
+                                select sum(com),
+                                       sum(eje),
+                                       sum(pag),
+                                       (sum(com) - sum(eje))
+                                from totales ';
+
+			--Devuelve la respuesta
+            raise notice '%',v_consulta;
+			return v_consulta;
+
+	  end;
+
+  /*********************************
+  #TRANSACCION:  'TES_DENTRAM_SEL'
+  #DESCRIPCION:	Listado detalle N° tramite 
+  #AUTOR:	breydi.vasquez
+  #FECHA: 10-11-2019
+  ***********************************/
+
+	elsif(p_transaccion='TES_DENTRAM_SEL')then
+
+      begin
+          --Sentencia pagos con libro de bancos exterior y observacion
+
+            CREATE TEMPORARY TABLE ttemp_eval_det (
+              id_partida_ejecucion	integer,
+              id_partida_ejecucion_fk   integer,                                                                                   
+              moneda					varchar,
+              comprometido				numeric,
+              ejecutado					numeric,
+              pagado					numeric,
+              nro_tramite				varchar,
+              tipo_movimiento			varchar,
+              nombre_partida			varchar, 
+              codigo					varchar, 
+              codigo_categoria			varchar, 
+              fecha						date, 
+              codigo_cc              	varchar,
+              usr_reg					varchar,
+              usr_mod 					varchar,
+              fecha_reg					timestamp,
+              fecha_mod                 timestamp,
+              estado_reg				varchar
+            )ON COMMIT DROP;
+
+		 v_consul:= 'with recursive detalle (id_partida_ejecucion, id_partida_ejecucion_fk, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
+										              id_partida, codigo, nombre_partida, nro_tramite, tipo_movimiento, fecha,
+                                                      usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg, comprometido, ejecutado, pagado)
+                                                      as 
+                (select 
+				  pareje.id_partida_ejecucion,
+                  pareje.id_partida_ejecucion_fk,
+                  mon.moneda,
+                  pareje.id_moneda,
+                  pareje.id_presupuesto,
+                  pre.descripcion,
+                  vpre.codigo_cc,
+                  cat.codigo_categoria,
+                  pareje.id_partida,
+                  par.codigo,
+                  par.nombre_partida,
+                  pareje.nro_tramite,
+                  pareje.tipo_movimiento,
+                  pareje.fecha,
+                  usu1.cuenta,
+                  usu2.cuenta,
+                  pareje.fecha_reg,
+                  pareje.fecha_mod,
+                  pareje.estado_reg,                  
+                  case when pareje.tipo_movimiento = ''comprometido'' then
+                          pareje.monto
+                       else 
+                           0.00
+                       end,
+                  case when pareje.tipo_movimiento = ''ejecutado'' then
+                          pareje.monto
+                      else 
+                          0.00
+                      end,
+                  case when pareje.tipo_movimiento = ''pagado'' then
+                          pareje.monto
+                      else
+                          0.00
+                      end      
+                  from pre.tpartida_ejecucion pareje
+                  inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+                  INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
+                  inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
+                  inner join pre.tpartida par on par.id_partida = pareje.id_partida
+                  inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
+                  inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
+                  left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
+                  where ' || v_parametros.filtro|| '                                                       
+                  )
+                  
+                insert into ttemp_eval_det
+                
+                select
+	              id_partida_ejecucion,
+                  id_partida_ejecucion_fk,
+                  moneda,
+                  comprometido,
+                  ejecutado,
+                  pagado,
+                  nro_tramite,
+                  tipo_movimiento,
+                  nombre_partida,
+                  codigo,
+                  codigo_categoria,
+                  fecha,
+                  codigo_cc,
+                  usr_reg,
+                  usr_mod,
+                  fecha_reg,
+                  fecha_mod,
+                  estado_reg
+                from detalle ';
+                
+            execute(v_consul);
+              
+          v_consulta:='select * from ttemp_eval_det 
+          		where tipo_movimiento = '''||v_parametros.estado_func||''' ';
+                
+		  v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+          --Devuelve la respuesta
+          return v_consulta;
+      end;
+      
+	/*********************************
+ 	#TRANSACCION:  'TES_DENTRAM_CONT'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:	 breydi.vasquez
+ 	#FECHA:		10-11-2019
+	***********************************/
+
+	elsif(p_transaccion='TES_DENTRAM_CONT')then
+
+		begin
+  --Sentencia pagos con libro de bancos exterior y observacion
+
+            CREATE TEMPORARY TABLE ttemp_eval_det (
+              id_partida_ejecucion		integer,
+              id_partida_ejecucion_fk   integer,                                                                                   
+              moneda					varchar,
+              comprometido				numeric,
+              ejecutado					numeric,
+              pagado					numeric,
+              nro_tramite				varchar,
+              tipo_movimiento			varchar,
+              nombre_partida			varchar, 
+              codigo					varchar, 
+              codigo_categoria			varchar, 
+              fecha						date, 
+              codigo_cc              	varchar,
+              usr_reg					varchar,
+              usr_mod 					varchar,
+              fecha_reg					timestamp,
+              fecha_mod                 timestamp,
+              estado_reg				varchar
+            )ON COMMIT DROP;
+
+		 v_consul:= 'with recursive detalle (id_partida_ejecucion, id_partida_ejecucion_fk, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
+										              id_partida, codigo, nombre_partida, nro_tramite, tipo_movimiento, fecha,
+                                                      usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg, comprometido, ejecutado, pagado)
+                                                      as 
+                (select 
+				  pareje.id_partida_ejecucion,
+                  pareje.id_partida_ejecucion_fk,
+                  mon.moneda,
+                  pareje.id_moneda,
+                  pareje.id_presupuesto,
+                  pre.descripcion,
+                  vpre.codigo_cc,
+                  cat.codigo_categoria,
+                  pareje.id_partida,
+                  par.codigo,
+                  par.nombre_partida,
+                  pareje.nro_tramite,
+                  pareje.tipo_movimiento,
+                  pareje.fecha,
+                  usu1.cuenta,
+                  usu2.cuenta,
+                  pareje.fecha_reg,
+                  pareje.fecha_mod,
+                  pareje.estado_reg,                  
+                  case when pareje.tipo_movimiento = ''comprometido'' then
+                          pareje.monto
+                       else 
+                           0.00
+                       end,
+                  case when pareje.tipo_movimiento = ''ejecutado'' then
+                          pareje.monto
+                      else 
+                          0.00
+                      end,
+                  case when pareje.tipo_movimiento = ''pagado'' then
+                          pareje.monto
+                      else
+                          0.00
+                      end      
+                  from pre.tpartida_ejecucion pareje
+                  inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
+                  INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
+                  inner join pre.vcategoria_programatica cat on cat.id_categoria_programatica = pre.id_categoria_prog
+                  inner join pre.tpartida par on par.id_partida = pareje.id_partida
+                  inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
+                  inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
+                  left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
+                  where ' || v_parametros.filtro|| '                                                       
+                  )
+                  
+                insert into ttemp_eval_det
+                
+                select
+	              id_partida_ejecucion,
+                  id_partida_ejecucion_fk,
+                  moneda,
+                  comprometido,
+                  ejecutado,
+                  pagado,
+                  nro_tramite,
+                  tipo_movimiento,
+                  nombre_partida,
+                  codigo,
+                  codigo_categoria,
+                  fecha,
+                  codigo_cc,
+                  usr_reg,
+                  usr_mod,
+                  fecha_reg,
+                  fecha_mod,
+                  estado_reg
+                from detalle ';
+                
+            execute(v_consul);
+              
+          v_consulta:='select count(id_partida_ejecucion),
+          					  sum(comprometido) as total_comprometido,
+                              sum(ejecutado) as total_ejecutado,
+                              sum(pagado) as total_pagado
+          			 from ttemp_eval_det 
+	           		 where tipo_movimiento = '''||v_parametros.estado_func||''' ';
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+      
+
+	/*********************************
+ 	#TRANSACCION:  'TES_GETPRWF_SEL'
+ 	#DESCRIPCION:  obtener id_proceso_wf para ver documentacion de tramite
+ 	#AUTOR:		breydi.vasquez
+ 	#FECHA:		10-11-2019
+	***********************************/
+
+	elsif(p_transaccion='TES_GETPRWF_SEL')then
+
+		begin
+        	
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select max(id_proceso_wf)
+					    from wf.tproceso_wf 
+					    where nro_tramite = '''||v_parametros.nro_tramite||'''
+                         and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
 	else
 
 		raise exception 'Transaccion inexistente';

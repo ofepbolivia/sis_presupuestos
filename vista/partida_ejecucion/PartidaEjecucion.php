@@ -13,14 +13,41 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
+        this.initButtons = ['-','<span style="font-size:14px;color:#2B4364;font-weight:bold;">Tipo Movimiento: </span>',this.cmbTipoMovi];
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.PartidaEjecucion.superclass.constructor.call(this,config);
+        this.cmbTipoMovi.on('select', function () {
+                this.validarFiltros() == true && this.capturarMovimiento();                
+        }, this);        
 		this.grid.getTopToolbar().disable();
 		this.grid.getBottomToolbar().disable();
 		this.init();
 		//this.load({params:{start:0, limit:this.tam_pag}})
-	},
+    },
+    // filtro tipo Movimiento
+    cmbTipoMovi: new Ext.form.ComboBox({
+            fieldLabel: 'movimiento',                
+            allowBlank: true,
+            emptyText: 'Movimiento...',                
+            typeAhead: true,            
+            triggerAction: 'all',            
+            selectOnFocus: false,
+            mode: 'local',
+            store: new Ext.data.ArrayStore({
+                fields: ['ID', 'valor'],              
+                data: [
+                    ['todos', 'Todos'],
+                    ['comprometido', 'Comprometido'],
+                    ['pagado', 'Pagado'],
+                    ['ejecutado', 'Ejecutado'],
+                    ['formulado', 'Formulado']
+                ]
+            }),
+            valueField: 'ID',
+            displayField: 'valor',
+            width: 150,
+        }),         
 			
 	Atributos:[
 		{
@@ -504,11 +531,29 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 		this.store.baseParams=param;
 		this.load( { params: { start:0, limit: this.tam_pag } });
 	},
+    validarFiltros: function () {
+        if (this.cmbTipoMovi.isValid()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
+
+    capturarMovimiento: function (combo, record, index) {    
+        this.getParametrosFiltro();
+        this.load({params: {start: 0, limit:this.tam_pag}});
+    },
+
+    getParametrosFiltro: function () {
+        this.store.baseParams.tipo_movimiento = this.cmbTipoMovi.getValue();
+    },  
 
 	bdel:false,
 	bsave:false,
 	bedit:false,
-	bnew:false
+	bnew:false,
+    btest: false,
 	}
 )
 </script>
