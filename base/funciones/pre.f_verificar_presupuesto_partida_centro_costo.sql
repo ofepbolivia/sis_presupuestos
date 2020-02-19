@@ -31,7 +31,8 @@ DECLARE
   v_verif_pres      varchar[];
   v_disponible		numeric;
   v_gestion			integer;
-  
+  v_moneda			varchar;
+
 BEGIN
 
 v_nombre_funcion = 'pre.f_verificar_presupuesto_partida_centro_costo';
@@ -55,7 +56,14 @@ v_nombre_funcion = 'pre.f_verificar_presupuesto_partida_centro_costo';
            ELSE
               v_monto_mb = p_monto_total;
            END IF;
-      
+
+           if v_monto_mb is null then
+                    select m.moneda
+                      into v_moneda
+                      from param.tmoneda m
+                      where id_moneda = p_id_moneda;
+	        	raise exception 'No existe tipo de cambio para la fecha: % y la moneda: % ', to_char(now()::date,'DD/MM/YYYY'),v_moneda;
+           end if;
       
 
             v_verif_pres  =  pre.f_verificar_presupuesto_individual_centro_costo(

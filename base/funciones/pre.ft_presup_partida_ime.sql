@@ -38,7 +38,7 @@ DECLARE
 
     v_techo_importe			numeric;
     v_total_importe_presu   numeric;
-
+    v_saldo_comprometer		varchar;
 BEGIN
 
     v_nombre_funcion = 'pre.ft_presup_partida_ime';
@@ -285,13 +285,12 @@ BEGIN
          *** agregado condicion breydi.vaquez (06/01/2020) para reporte solicitud de compra
          *** primera verificacion a nivel centro de costo 
          ***/
-         if pxp.f_existe_parametro(p_tabla, 'id_solicitud') then 
-           if ((select presupuesto_aprobado from adq.tsolicitud where id_solicitud =  v_parametros.id_solicitud) in( 'verificar', 'sin_presupuesto_cc') )then
+
+         if ((select presupuesto_aprobado from adq.tsolicitud where id_solicitud =  v_parametros.id_solicitud) in( 'verificar', 'sin_presupuesto_cc') )then
             	v_resp_presu = pre.f_verificar_presupuesto_partida_centro_costo(v_parametros.id_presupuesto,
                                                                         v_parametros.id_partida,
                                                                         v_parametros.id_moneda,
-                                                                        v_parametros.monto_total); 
-           end if;
+                                                                        v_parametros.monto_total);
            
          else 
            -- fin breydi.vaquez (06/01/2020)
@@ -309,7 +308,36 @@ BEGIN
             return v_resp;
 
 		end;
+   /*********************************
+   #TRANSACCION:    'PRE_CAPPRES_REP'
+   #DESCRIPCION:     captura de presupuesto a nivel centro de costo para reporte de solicitud de compra
+   #AUTOR:           breydi vasquez
+   #FECHA:
+  ***********************************/
 
+  ELSEIF(p_transaccion='PRE_CAPPRES_REP')then
+  	begin
+
+            SELECT
+              (sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'formulado',
+              ('01/01/'||extract(year from now()))::date,  ('31/12/'||extract(year from now()))::date )) -
+              sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'comprometido',
+              ('01/01/'||extract(year from now()))::date,  ('31/12/'||extract(year from now()))::date )) )
+            into v_saldo_comprometer
+
+            FROM pre.tpresup_partida prpa
+            INNER JOIN pre.vpresupuesto_cc_x_partida p on p.id_presupuesto = prpa.id_presupuesto
+            WHERE  p.id_presupuesto = v_parametros.id_presupuesto
+            	   and prpa.id_partida = v_parametros.id_partida;
+
+
+            v_resp = pxp.f_agrega_clave(v_resp, 'mensaje', 'Presupuesto');
+            v_resp = pxp.f_agrega_clave(v_resp, 'captura_presupuesto', v_saldo_comprometer);
+
+            --Devuelve la respuesta
+            return v_resp;
+
+ 		end;
 
 
 
