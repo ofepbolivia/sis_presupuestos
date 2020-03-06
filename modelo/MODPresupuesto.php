@@ -228,6 +228,7 @@ class MODPresupuesto extends MODbase{
         $this->setParametro('id_partida','id_partida','int4');
         $this->setParametro('id_moneda','id_moneda','int4');
         $this->setParametro('monto_total','monto_total','numeric');
+        $this->setParametro('sis_origen','sis_origen','varchar');
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -553,8 +554,11 @@ class MODPresupuesto extends MODbase{
         //Define los parametros para la funcion
         $this->setParametro('id_presupuesto','id_presupuesto','int4');
         $this->setParametro('id_partida','id_partida','int4');
+        $this->setParametro('id_moneda','id_moneda','int4');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
+        //echo($this->consulta);exit;
         $this->ejecutarConsulta();
 
         //Devuelve la respuesta

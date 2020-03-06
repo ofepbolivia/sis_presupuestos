@@ -46,8 +46,8 @@ v_nombre_funcion = 'pre.f_verificar_presupuesto_partida_centro_costo';
                   -- tenemos tipo de cambio
                   -- si el tipo de cambio es null utilza el cambio oficial para la fecha
                   v_monto_mb  =   param.f_convertir_moneda (
-                             v_id_moneda_base, 
-                             p_id_moneda,   
+                             p_id_moneda,
+                             v_id_moneda_base,
                              p_monto_total, 
                              now()::date,
                              'CUS',50, 
