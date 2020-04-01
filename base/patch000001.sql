@@ -1044,3 +1044,8 @@ WITH (oids = false);
 ALTER TABLE pre.tclase_gasto_cuenta
   OWNER TO postgres;
 /*****************************F-SCP-MAY-PRE-0-22/08/2019*************/
+
+/*****************************I-SCP-BVP-PRE-0-01/04/2020*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN id_orden_trabajo INTEGER;  
+/*****************************F-SCP-BVP-PRE-0-01/08/2020*************/

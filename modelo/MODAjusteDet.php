@@ -42,9 +42,11 @@ class MODAjusteDet extends MODbase{
 		$this->captura('desc_partida','varchar');
 		$this->captura('id_ajuste','int4');
 		$this->captura('descripcion','text');
+		$this->captura('id_orden_trabajo','int4');
+		$this->captura('desc_orden','varchar');		
 		
 		//Ejecuta la instruccion
-		$this->armarConsulta();
+        $this->armarConsulta();        
 		$this->ejecutarConsulta();
 		
 		//Devuelve la respuesta

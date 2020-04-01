@@ -135,6 +135,19 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         },
         {
             config:{
+                name: 'desc_orden',
+                fieldLabel: 'Orden Trabajo',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200                
+            },
+            type:'TextField',            
+            id_grupo:1,
+            grid:true,
+            form:false
+        },		
+        {
+            config:{
                 name:'id_concepto_ingas',
                 fieldLabel:'Concepto Ingreso Gasto',
                 allowBlank:false,
@@ -184,7 +197,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             },
             grid:true,
             form:false
-        },        
+        },		        
 		{
 			config:{
 				name: 'estado_reg',
@@ -299,7 +312,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion','id_concepto_ingas','nombre_ingas'
+		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion','id_concepto_ingas','nombre_ingas','id_orden_trabajo','desc_orden'
 		
 	],
 	sortInfo:{

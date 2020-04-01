@@ -65,12 +65,15 @@ BEGIN
                             pre.codigo_cc as desc_presupuesto,
                             (par.codigo||'' - '' ||par.nombre_partida)::varchar as desc_partida	,
                             id_ajuste,
-                            ajd.descripcion
+                            ajd.descripcion,
+                            ajd.id_orden_trabajo,
+                            ot.desc_orden
 						from pre.tajuste_det ajd
                         inner join pre.vpresupuesto_cc pre on pre.id_presupuesto = ajd.id_presupuesto
                         inner join pre.tpartida par on par.id_partida = ajd.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo = ajd.id_orden_trabajo                        
 				        where  ';
 
 			--Definicion de la respuesta
@@ -101,6 +104,7 @@ BEGIN
                         inner join pre.tpartida par on par.id_partida = ajd.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo = ajd.id_orden_trabajo                        
 				        where ';
 
 			--Definicion de la respuesta
