@@ -117,7 +117,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 				anchor: '80%',
 				gwidth: 140,
 				mode: 'local',
-				store:['Objetivo Institucional','Objetivo de Gestion', 'Objetivo Específico', 'Operación', 'Actividad']
+				store:['Objetivo Institucional','Objetivo de Gestion', 'Objetivo Específico', 'AMP', 'ACP', 'Operación', 'Actividad']
 			},
 				type:'ComboBox',
 				filters:{pfiltro:'obj.tipo_objetivo',type:'string'},
@@ -309,7 +309,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 				grid:false,
 				form:true
 		},
-		{
+		/*{
 			config:{
 				name: 'sw_transaccional',
 				fieldLabel: 'Transaccional',
@@ -324,7 +324,28 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 				grid:false,
 				form:true
 		},
-		
+        */
+		{
+			config:{
+				name: 'sw_transaccional',
+				fieldLabel: 'Transaccional',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 140,
+				mode: 'local',
+				store:['titular','movimiento']
+			},
+				type:'ComboBox',
+				filters:{pfiltro:'obj.sw_transaccional',type:'string'},
+				id_grupo:1,
+				filters:{
+	       		         type: 'list',
+	       		         pfiltro:'obj.sw_transaccional',
+	       				 options: ['titular','movimiento'],	
+	       		 	},
+				grid:true,
+				form:true
+		},
 		{
 			config:{
 				name: 'estado_reg',
