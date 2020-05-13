@@ -233,9 +233,8 @@ class ACTPresupuesto extends ACTbase{
 	//Reporte Certificación Presupuestaria (FEA) 13/07/2017
 	function reporteCertificacionP (){
 		$this->objFunc=$this->create('MODPresupuesto');
-		$dataSource=$this->objFunc->reporteCertificacionP();
+        $dataSource=$this->objFunc->reporteCertificacionP();
 		$this->dataSource=$dataSource->getDatos();
-
 		$nombreArchivo = uniqid(md5(session_id()).'[Reporte-CertificaciónPresupuestaria]').'.pdf';
 		$this->objParam->addParametro('orientacion','P');
 		$this->objParam->addParametro('tamano','LETTER');

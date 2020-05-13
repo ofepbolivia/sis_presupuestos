@@ -380,11 +380,10 @@ class MODPresupuesto extends MODbase{
         $this->procedimiento='pre.ft_presupuesto_sel';
         $this->transaccion='PR_REPCERPRE_SEL';
         $this->tipo_procedimiento='SEL';
-
+        
         //Define los parametros para la funcion
         $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
-
-
+        
         $this->captura('id_cp', 'int4');
         $this->captura('centro_costo', 'varchar');
         $this->captura('codigo_programa', 'varchar');
@@ -420,7 +419,6 @@ class MODPresupuesto extends MODbase{
         $this->armarConsulta();
         //var_dump($this->consulta);exit;
         $this->ejecutarConsulta();
-
         //Devuelve la respuesta
         return $this->respuesta;
     }
