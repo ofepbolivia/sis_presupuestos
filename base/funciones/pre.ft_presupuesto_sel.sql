@@ -946,7 +946,8 @@ BEGIN
 
               COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
               (case when substring(tpf.descripcion,12) = ''inc_comprometido'' then ''AUMENTO'' when substring(tpf.descripcion,12) = ''rev_comprometido'' then ''DISMINUCIÓN'' else ''REVERSIÓN'' end)::varchar as tipo_ajuste,
-              taj.correlativo
+              taj.correlativo,
+              COALESCE(taj.tipo_proceso,''normal'') as tipo_proceso
               FROM pre.tajuste taj
               INNER JOIN pre.tajuste_det tad ON tad.id_ajuste = taj.id_ajuste
               inner join wf.tproceso_wf tpf on tpf.id_proceso_wf = taj.id_proceso_wf
@@ -977,7 +978,7 @@ BEGIN
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, taj.nro_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
             taj.fecha, tg.gestion, taj.tipo_ajuste, taj.correlativo, tpf.descripcion,
-            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora';
+            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, taj.tipo_proceso';
 
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta

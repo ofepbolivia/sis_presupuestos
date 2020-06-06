@@ -190,6 +190,8 @@ class RCertificacionPresupuestariaMod extends  ReportePDF{
 
         }
 
+        $tipo_proceso = $this->datos[0]['tipo_proceso'];
+
 
         $cont_total += $cont_parcial;
         $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
@@ -231,7 +233,7 @@ class RCertificacionPresupuestariaMod extends  ReportePDF{
         if($this->GetY() == 220)
             $this->SetY(250);
 
-        if($firma_fecha[0]=='aprobado') {
+        if($firma_fecha[0]=='aprobado' && 'exterior'!=$tipo_proceso) {
             $tbl = '<table>
                     <tr>
                     <td style="width: 15%"></td>
@@ -256,6 +258,31 @@ class RCertificacionPresupuestariaMod extends  ReportePDF{
                     </table>
                     </td>
                     <td style="width:15%;"></td>
+                    </tr>
+                    </table>
+
+                ';
+            $this->Ln(5);
+            $this->writeHTML($tbl, true, false, false, false, '');
+        }else if('exterior' == $tipo_proceso){
+            $tbl = '<table>
+                    <tr>
+                    <td style="width: 30%"></td>
+                    <td style="width: 40%">
+                    <table cellspacing="0" cellpadding="1" border="1">
+                        <tr>
+                            <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> ' . $firma_aprobado[2] . '</td>
+                        </tr>
+                        <tr>
+                            <td align="center" >
+                                <br><br>
+                                <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_aprobado[2], $firma_aprobado[3],$firma_aprobado[4]) . '" alt="Logo">
+
+                            </td>
+                         </tr>
+                    </table>
+                    </td>
+                    <td style="width:30%;"></td>
                     </tr>
                     </table>
 

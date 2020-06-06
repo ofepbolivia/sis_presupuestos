@@ -99,96 +99,82 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
         $total_general = 0;
         $cod_moneda = $this->datos[0]['codigo_moneda'];
         $codigo = '';
-        $tipo_juste = '';
+        $tipo_juste = $this->datos[0]['tipo_ajuste_det'];
         $tipo_aj    = '';
-        foreach( $this->datos as $record){
 
-            if ($tipo_juste == '') {
-                if ($record['tipo_ajuste_det'] == 'incremento'){
-                    $tipo = 'Incrementadas';
-                    $tipo_aj = 'INCREMENTADO';
-                }else {
-                    $tipo = 'Disminuidas';
-                    $tipo_aj = 'DISMINUIDA';
-                }
-
-                $tbl = '<table border="1" style="font-size: 12px;"><tr><td><b>Gastos</b></td></tr> <tr><td><b>Partidas Presupuestarias a ser ' . $tipo . '</b></td></tr></table><br>';
-                $tbl .= '<table border="1" style="font-size: 6pt;">';
-            }
-
-            if ($tipo_juste !=  $record['tipo_ajuste_det'] && $tipo_juste!=''){
-                $cont_total += $cont_parcial;
-                $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
-
-                if($id_cp != '' || $cod_partida != ''){
-                    /*$tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
-                               <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
-                           </tr>';*/
-                    $total_general+=$cont_total;
-                }
-
-                /*$tbl .= '<tr>
-                               <td colspan="9" align="center" ><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
-                               <td align="right" ><b>' . number_format($cont_total, 2, ',', '.') . '</b></td>
-                           </tr>';*/
-                $centimos = explode('.', $total_general);
-
-                $tbl.='<tr>
-                           <td colspan="10" align="center" ><b> TOTAL GENERAL '.$tipo_aj.'</b></td>
-                           <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
-                       </tr>';
-                $tbl.='<tr>
-                   <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
-
-               </tr>';
-
-                $tbl.='</table><br><br>';
-
-                $cont_parcial = 0;
-                $cont_total = 0;
-                $total_general = 0;
-                if ($record['tipo_ajuste_det'] == 'incremento'){
-                    $tipo = 'Incrementadas';
-                    $tipo_aj = 'INCREMENTADO';
-                }else {
-                    $tipo = 'Disminuidas';
-                    $tipo_aj = 'DISMINUIDA';
-                }
-
-                $tbl .= '<table border="1" style="font-size: 12px;"><tr><td><b>Gastos</b></td></tr> <tr><td><b>Partidas Presupuestarias a ser ' . $tipo . '</b></td></tr></table><br>';
-
-                $tbl .= '<table border="1" style="font-size: 6pt;">';
-            }
-
-
-            if($tipo_juste !=  $record['tipo_ajuste_det'] || $tipo_juste==''){
-
-                if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
-
-                    if(($id_cp != '' || $cod_partida!='') && $total_general!=0){
-                        /*$tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
-                               <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
-                           </tr>';*/
-                        $cont_total+=$cont_parcial;
-                        $cont_parcial = 0;
-                        $id_cp = $record["id_cp"];
-                        $cod_partida = $record["codigo_partida"];
+        $tipo = '';
+        foreach( $this->datos as $key => $record){
+            if($record['tipo'] == 'gasto'){
+                if ($this->datos[$key-1]['tipo_ajuste_det'] == null) {
+                    if ($record['tipo_ajuste_det'] == 'incremento'){
+                        $tipo = 'Incrementadas';
+                        $tipo_aj = 'INCREMENTADO';
+                    }else {
+                        $tipo = 'Disminuidas';
+                        $tipo_aj = 'DISMINUIDA';
                     }
 
-
+                    $tbl = '<table border="1" style="font-size: 12px;"><tr><td><b>'.ucfirst($record['tipo']).'s</b></td></tr> <tr><td><b>Partidas Presupuestarias a ser ' . $tipo . '</b></td></tr></table><br>';
+                    $tbl .= '<table border="1" style="font-size: 6pt;">';
                 }
-                if($cont_parcial!=0) {
 
-                    /*$tbl .= '<tr>
-                               <td colspan="9" align="center" ><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
-                               <td align="right" ><b>' . number_format($cont_total, 2, ',', '.') . '</b></td>
-                           </tr>';*/
-                    $total_general+=$cont_total;
+                if ($tipo_juste != $record['tipo_ajuste_det']){
+                    $cont_total += $cont_parcial;
+                    if($id_cp != '' || $cod_partida != ''){
+                        $total_general+=$cont_total;
+                    }
 
+                    $centimos = explode('.', $total_general);
+
+                    $tbl.='<tr>
+                               <td colspan="10" align="center" ><b> TOTAL GENERAL '.$tipo_aj.'</b></td>
+                               <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
+                           </tr>';
+                    $tbl.='<tr>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+    
+                   </tr>';
+
+                    $tbl.='</table><br>';
+
+                    $this->writeHTML ($tbl);
+                    $this->ln(1);
+                    $tbl = '';
+
+                    $cont_parcial = 0;
+                    $cont_total = 0;
+                    $total_general = 0;
+                    if ($record['tipo_ajuste_det'] == 'incremento'){
+                        $tipo = 'Incrementadas';
+                        $tipo_aj = 'INCREMENTADO';
+                    }else{
+                        $tipo = 'Disminuidas';
+                        $tipo_aj = 'DISMINUIDA';
+                    }
+
+                    $tbl .= '<table border="1" style="font-size: 12px;"><tr><td><b>'.ucfirst($record['tipo']).'s</b></td></tr> <tr><td><b>Partidas Presupuestarias a ser ' . $tipo . '</b></td></tr></table><br>';
+
+                    $tbl .= '<table border="1" style="font-size: 6pt;">';
                 }
-                $tbl.='
+
+
+                if($tipo_juste !=  $record['tipo_ajuste_det'] || $this->datos[$key-1]['tipo_ajuste_det'] == null){
+
+                    if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
+
+                        if(($id_cp != '' || $cod_partida!='') && $total_general!=0){
+
+                            $cont_total+=$cont_parcial;
+                            $cont_parcial = 0;
+                            $id_cp = $record["id_cp"];
+                            $cod_partida = $record["codigo_partida"];
+                        }
+                    }
+                    if($cont_parcial!=0) {
+                        $total_general+=$cont_total;
+                    }
+
+                    $tbl.='
                          <tr>
                             <td width="7%" align="center"><b>CENTRO DE COSTO</b></td>
                             <td width="5%" align="center"><br><b>PROG.</b></td>
@@ -203,75 +189,204 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                             <td width="12%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$us.').'</b></td>
                         </tr>';
 
-
-                $codigo_cg = $record["codigo_cg"];
-                //$cont_parcial = 0;
-                $cont_total = 0;
-            }
-            $tipo_juste = $record['tipo_ajuste_det'];
-            if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
-
-                if($id_cp != '' || $cod_partida!=''){
-                    /*$tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
-                               <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
-                           </tr>';*/
-                    $cont_total+=$cont_parcial;
-                    $cont_parcial = 0;
+                    $codigo_cg = $record["codigo_cg"];
+                    $cont_total = 0;
                 }
 
-                //$cont_parcial += $record["precio_total"];
-                $id_cp = $record["id_cp"];
-                $cod_partida = $record["codigo_partida"];
-            }
+                $tipo_juste = $record['tipo_ajuste_det'];
+                if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
 
-            $tbl.='<tr >
-                            <td width="7%" align="center">'.$record["centro_costo"].'</td>
-                            <td width="5%" align="center">'.$record["codigo_programa"].'</td>
-                            <td width="5%" align="center">'.$record["codigo_proyecto"].'</td>
-                            <td width="5%" align="center">'.$record["codigo_actividad"].'</td>
-                            <td width="5%" align="center">'.$record["codigo_fuente_fin"].'</td>
-                            <td width="5%" align="center" >'.$record["codigo_origen_fin"].'</td>
-                            <td width="5%" align="center" >'.$record["codigo_unidad_ejecutora"].'</td>
-                            <td width="8%" align="center" valign="center">'.$record["codigo_partida"].'</td>
-                            <td width="36%" align="left">'.$record["nombre_partidad"].'</td>
-                            <td width="7%" align="center">'.$record["codigo_transf"].'</td>
-                            <td width="12%" align="right">'.number_format($record["precio_total"],2, ',', '.').'</td>
+                    if($id_cp != '' || $cod_partida!=''){
+                        $cont_total+=$cont_parcial;
+                        $cont_parcial = 0;
+                    }
+
+                    $id_cp = $record["id_cp"];
+                    $cod_partida = $record["codigo_partida"];
+                }
+
+                $tbl.='<tr >
+                                <td width="7%" align="center">'.$record["centro_costo"].'</td>
+                                <td width="5%" align="center">'.$record["codigo_programa"].'</td>
+                                <td width="5%" align="center">'.$record["codigo_proyecto"].'</td>
+                                <td width="5%" align="center">'.$record["codigo_actividad"].'</td>
+                                <td width="5%" align="center">'.$record["codigo_fuente_fin"].'</td>
+                                <td width="5%" align="center" >'.$record["codigo_origen_fin"].'</td>
+                                <td width="5%" align="center" >'.$record["codigo_unidad_ejecutora"].'</td>
+                                <td width="8%" align="center" valign="center">'.$record["codigo_partida"].'</td>
+                                <td width="36%" align="left">'.$record["nombre_partidad"].'</td>
+                                <td width="7%" align="center">'.$record["codigo_transf"].'</td>
+                                <td width="12%" align="right">'.number_format($record["precio_total"],2, ',', '.').'</td>
+                            </tr>';
+
+                $cont_parcial += $record["precio_total"];
+            }else{
+
+                if ($this->datos[$key-1]['tipo']=='gasto'){
+
+                    $cont_total += $cont_parcial;
+                    if($id_cp != '' || $cod_partida != ''){
+                        $total_general+=$cont_total;
+                    }
+
+                    $centimos = explode('.', $total_general);
+
+                    $tbl.='<tr>
+                               <td colspan="10" align="center" ><b> TOTAL GENERAL '.$tipo_aj.'</b></td>
+                               <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
+                           </tr>';
+                    $tbl.='<tr>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+    
+                   </tr>';
+
+                    $tbl.='</table><br>';
+
+                    $this->writeHTML ($tbl);
+                    $tbl = '';
+                   // $this->Ln(1);
+
+                    $cont_parcial = 0;
+                    $cont_total = 0;
+                    $total_general = 0;
+
+                    if ($record['tipo_ajuste_det'] == 'incremento'){
+                        $tipo = 'Incrementados';
+                        $tipo_aj = 'INCREMENTADO';
+                    }else {
+                        $tipo = 'Disminuidos';
+                        $tipo_aj = 'DISMINUIDA';
+                    }
+
+                    $tbl = '<table border="1" style="font-size: 12px;"><tr><td><b>'.ucfirst($record['tipo']).'s</b></td></tr> <tr><td><b>Rubros Presupuestarios a ser ' . $tipo . '</b></td></tr></table><br>';
+                    $tbl .= '<table border="1" style="font-size: 6pt;">';
+                }
+
+
+
+                if ($tipo_juste !=  $record['tipo_ajuste_det'] && $tipo_juste!=''){
+                    $cont_total += $cont_parcial;
+                    $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
+                    if($id_cp != '' || $cod_partida != ''){
+                        $total_general+=$cont_total;
+                    }
+
+                    $centimos = explode('.', $total_general);
+
+                    $tbl.='<tr>
+                               <td colspan="10" align="center" ><b> TOTAL GENERAL '.$tipo_aj.'</b></td>
+                               <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
+                           </tr>';
+                    $tbl.='<tr>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+    
+                   </tr>';
+
+                    $tbl.='</table><br>';
+
+                    $cont_parcial = 0;
+                    $cont_total = 0;
+                    $total_general = 0;
+                    if ($record['tipo_ajuste_det'] == 'incremento'){
+                        $tipo = 'Incrementadas';
+                        $tipo_aj = 'INCREMENTADO';
+                    }else {
+                        $tipo = 'Disminuidas';
+                        $tipo_aj = 'DISMINUIDA';
+                    }
+
+                    $tbl .= '<table border="1" style="font-size: 12px;"><tr><td><b>'.ucfirst($record['tipo']).'s</b></td></tr> <tr><td><b>Rubros Presupuestarios a ser ' . $tipo . '</b></td></tr></table><br>';
+
+                    $tbl .= '<table border="1" style="font-size: 6pt;">';
+                }
+
+
+                if($tipo_juste !=  $record['tipo_ajuste_det'] || $this->datos[$key-1]['tipo']=='gasto'){
+
+                    if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
+
+                        if(($id_cp != '' || $cod_partida!='') && $total_general!=0){
+
+                            $cont_total+=$cont_parcial;
+                            $cont_parcial = 0;
+                            $id_cp = $record["id_cp"];
+                            $cod_partida = $record["codigo_partida"];
+                        }
+                    }
+                    if($cont_parcial!=0) {
+                        $total_general+=$cont_total;
+                    }
+
+                    $tbl.='
+                         <tr>
+                            <td width="10%" align="center"><b>CENTRO DE COSTO</b></td>
+                            <td width="8%" align="center"><br><b>FTE.</b></td>
+                            <td width="8%" align="center" ><b>ORG. FINAN</b></td>
+                            <td width="11%" align="center" valign="center"><br><b>RUBRO</b></td>
+                            <td width="10%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
+                            <td width="38%" align="center"><br><b>DESCRIPCIÓN</b></td>
+                            <td width="15%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$us.').'</b></td>
                         </tr>';
 
-            $cont_parcial += $record["precio_total"];
+                    $codigo_cg = $record["codigo_cg"];
+                    $cont_total = 0;
+                }
+                $tipo_juste = $record['tipo_ajuste_det'];
+                if($record["id_cp"] != $id_cp || $record["codigo_partida"] != $cod_partida){
 
-            $codigo = $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
+                    if($id_cp != '' || $cod_partida!=''){
+                        $cont_total+=$cont_parcial;
+                        $cont_parcial = 0;
+                    }
 
+                    $id_cp = $record["id_cp"];
+                    $cod_partida = $record["codigo_partida"];
+                }
+
+                $tbl .= '<tr >
+                                <td width="10%" align="center">' . $record["centro_costo"] . '</td>
+                                <td width="8%" align="center">' . $record["codigo_fuente_fin"] . '</td>
+                                <td width="8%" align="center" >' . $record["codigo_origen_fin"] . '</td>
+                                <td width="11%" align="center" valign="center">' . $record["codigo_partida"] . '</td>
+                                <td width="10%" align="center">' . $record["codigo_transf"] . '</td>
+                                <td width="38%" align="left">' . $record["nombre_partidad"] . '</td>
+                                <td width="15%" align="right">' . number_format($record["precio_total"], 2, ',', '.') . '</td>
+                            </tr>';
+
+                $cont_parcial += $record["precio_total"];
+                $codigo = $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
+            }
+
+            $tipo = $record["tipo"];
         }
 
-
         $cont_total += $cont_parcial;
-        $codigo = $record["codigo_programa"].'-'.$record["codigo_proyecto"].'-'.$record["codigo_actividad"].'-'.$record["codigo_fuente_fin"].'-'.$record["codigo_origen_fin"].', '.$record["codigo_partida"];
 
         if($id_cp != '' || $cod_partida != ''){
-            /*$tbl.='<tr>
-                               <td colspan="9" align="center" colspan="9" ><b> TOTAL PARCIAL</b>['.$codigo.']</td>
-                               <td align="right" ><b>'.number_format($cont_parcial,2, ',', '.').'</b></td>
-                           </tr>';*/
             $total_general+=$cont_total;
         }
 
-        /*$tbl .= '<tr>
-                               <td colspan="9" align="center" ><b> SUB - TOTAL CLASE DE GASTOS (' . $record["codigo_cg"] . ') ' . $record["nombre_cg"] . '</b></td>
-                               <td align="right" ><b>' . number_format($cont_total, 2, ',', '.') . '</b></td>
-                           </tr>';*/
         $centimos = explode('.', $total_general);
 
-        $tbl.='<tr>
-                           <td colspan="10" align="center" ><b> TOTAL GENERAL '.$tipo_aj.'</b></td>
-                           <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
-                       </tr>';
-        $tbl.='<tr>
-                   <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
-
-               </tr>';
-
+        if($tipo == 'gasto') {
+            $tbl .= '<tr>
+                               <td colspan="10" align="center" ><b> TOTAL GENERAL ' . $tipo_aj . '</b></td>
+                               <td align="right" ><b>' . number_format($total_general, 2, ',', '.') . '</b></td>
+                           </tr>';
+            $tbl .= '<tr>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this->convertir((integer)$total_general > 0 ? (integer)$total_general : (integer)$total_general * (-1)) . ' ' . ($centimos[1] == '' ? '00' : $centimos[1]) . '/100 ........................................................' . ($cod_moneda == 'Bs' ? 'Bolivianos.' : 'Dolares.') . '</b></td>
+    
+                   </tr>';
+        }else{
+            $tbl .= '<tr>
+                               <td colspan="6" align="center" ><b> TOTAL GENERAL ' . $tipo_aj . '</b></td>
+                               <td align="right" ><b>' . number_format($total_general, 2, ',', '.') . '</b></td>
+                           </tr>';
+            $tbl .= '<tr>
+                       <td colspan="7" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this->convertir((integer)$total_general > 0 ? (integer)$total_general : (integer)$total_general * (-1)) . ' ' . ($centimos[1] == '' ? '00' : $centimos[1]) . '/100 ........................................................' . ($cod_moneda == 'Bs' ? 'Bolivianos.' : 'Dolares.') . '</b></td>
+    
+                   </tr>';
+        }
         $tbl.='</table>';
         $this->writeHTML ($tbl);
 

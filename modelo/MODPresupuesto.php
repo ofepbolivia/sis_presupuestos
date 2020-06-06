@@ -535,6 +535,7 @@ class MODPresupuesto extends MODbase{
 
         $this->captura('tipo_ajuste', 'varchar');
         $this->captura('correlativo', 'integer');
+        $this->captura('tipo_proceso', 'varchar');
 
 
         //Ejecuta la instruccion
