@@ -184,7 +184,9 @@ BEGIN
         from wf.tproceso_wf pwf
         inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
         inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
-        where pwf.nro_tramite = v_parametros.nro_tramite_aux limit 1;
+        where pwf.nro_tramite = v_parametros.nro_tramite_aux
+        order by pwf.id_proceso_wf asc
+        limit 1;
 
         if v_tipo_proceso in ('CINTPD','CNAPD','CINTBR','GM-RM','GA-RM','GO-RM','GC-RM') then
           insert into pre.tajuste_det(
