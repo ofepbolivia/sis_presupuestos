@@ -18,9 +18,6 @@ header("content-type: text/javascript; charset=UTF-8");
 
         constructor: function (config) {
             //this.maestro = config.maestro;
-            //this.maestro = config;
-            this.maestro=config.maestro;
-
             this.tbarItems = ['-',
                 'Gestión:', this.cmbGestion, '-'
             ];
@@ -43,13 +40,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 scope: this
             });
 
-
+            this.maestro = config;
 
 
 
             //llama al constructor de la clase padre
-            //Phx.vista.SubirFormulacionPresupuesto.superclass.constructor.call(this, config);
-            Phx.vista.SubirFormulacionPresupuesto.superclass.constructor.call(this, request.arguments);
+            Phx.vista.SubirFormulacionPresupuesto.superclass.constructor.call(this, config);
             this.init();
 
             //carga de grilla
