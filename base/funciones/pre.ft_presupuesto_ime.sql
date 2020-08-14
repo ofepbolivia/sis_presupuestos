@@ -71,6 +71,27 @@ DECLARE
 
     v_presu_partida						record;
 
+    --(may)
+    v_id_memoria_calculo				integer;
+
+    v_registros_cig						record;
+    v_centro_costo						varchar;
+    v_id_partida						integer;
+    v_des_partida						varchar;
+    v_id_gestion						integer;
+    v_importe							numeric;
+    v_id_usuario_resp					integer;
+    v_id_formulacion_presu				integer;
+    v_desc_funcionario1_res				varchar;
+    v_desc_persona_reg					varchar;
+    v_fecha_reg							varchar;
+    v_estado_pre						varchar;
+    v_id_memoria_calculo_det_presu		integer;
+    v_id_memoria_calculo_presu			integer;
+    v_registros_det						record;
+    v_importe_presu_par					numeric;
+
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_presupuesto_ime';
@@ -987,6 +1008,478 @@ BEGIN
 
 
         end;
+
+      /*********************************
+      #TRANSACCION:  'PRE_FORMUPRE_INS'
+      #DESCRIPCION:	Insercion detalle Formulacion Presupuestaria
+      #AUTOR:		Maylee Perez Pastor
+      #FECHA:		05-08-2020
+      ***********************************/
+
+      elsif(p_transaccion='PRE_FORMUPRE_INS')then
+
+           begin
+
+          --raise EXCEPTION 'llegabd % ',v_parametros.id_gestion;
+
+          	 v_centro_costo = (select substring(v_parametros.centro_costo from 1 for 3));
+             v_id_gestion = v_parametros.id_gestion::integer;
+
+
+             --CENTRO DE COSTO
+            /* SELECT cc.id_centro_costo
+             into v_id_centro_costo
+             from param.vcentro_costo cc
+             where (trim(cc.codigo_cc))::varchar = (trim(v_parametros.centro_costo))::varchar;   */
+
+             SELECT cc.id_centro_costo
+             into v_id_centro_costo
+             from param.tcentro_costo cc
+             join param.ttipo_cc tcc on tcc.id_tipo_cc = cc.id_tipo_cc
+             --where (trim(tcc.codigo))::varchar = (trim(v_centro_costo))::varchar
+             where (tcc.codigo)::varchar = (v_centro_costo)::varchar
+             and cc.id_gestion =  v_id_gestion;
+
+             IF (v_id_centro_costo is null)THEN
+             	RAISE EXCEPTION 'No se encuentra parametrizado el Centro de Costo %',v_parametros.centro_costo;
+             END IF;
+
+             --CONCEPTO DE GASTO
+             select cig.id_concepto_ingas, cig.desc_ingas
+             into v_registros_cig
+             from param.tconcepto_ingas cig
+             where upper(trim(cig.desc_ingas)) =  upper(trim(v_parametros.concepto_gasto));
+
+             IF (v_registros_cig.id_concepto_ingas is null)THEN
+             	RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto %',v_parametros.concepto_gasto;
+             END IF;
+
+
+
+             --FUNCIONARIO RESPONSABLE
+             SELECT usu.id_usuario, fun.desc_funcionario1
+             INTO v_id_usuario_resp, v_desc_funcionario1_res
+             FROM segu.vusuario usu
+             join orga.vfuncionario_persona fun on fun.id_persona= usu.id_persona
+             WHERE fun.id_funcionario= v_parametros.id_responsable;
+
+             --
+             SELECT usu.desc_persona, (p.fecha_reg::date||' '|| to_char(p.fecha_reg, 'HH12:MI:SS'))::varchar as fecha
+             INTO v_desc_persona_reg, v_fecha_reg
+             FROM pre.tformulacion_presu p
+             left join pre.tformulacion_presu_detalle pd on pd.id_formulacion_presu = p.id_formulacion_presu
+             left join segu.vusuario usu on usu.id_usuario = p.id_usuario_reg
+             WHERE  pd.id_concepto_gasto = v_registros_cig.id_concepto_ingas
+             and pd.id_centro_costo = v_id_centro_costo
+             and p.estado_reg = 'activo' and pd.estado_reg= 'activo';
+
+
+             select pres.id_presupuesto, pres.estado
+             into v_id_presupuesto, v_estado_pre
+             from pre.tpresupuesto pres
+             where pres.id_centro_costo = v_id_centro_costo
+             and pres.estado_reg = 'activo';
+
+
+              --CONTROL NO REGISTRE DE UN PRESUPUESTO APROBADO
+              IF v_estado_pre = 'aprobado' THEN
+               raise exception 'No puede agregar Conceptos de Gasto a la Memoria de Cálculo de un presupuesto aprobado';
+           	  END IF;
+
+               --recupera partida a partir del presupuesto y concepto de gasto
+               SELECT par.id_partida, par.codigo||' - '|| par.nombre_partida
+               into v_id_partida, v_des_partida
+               FROM pre.tpresupuesto pre
+               JOIN param.tcentro_costo cc ON cc.id_centro_costo = pre.id_centro_costo
+               JOIN pre.tpartida par ON par.id_gestion = cc.id_gestion
+               JOIN pre.tconcepto_partida cp ON cp.id_partida = par.id_partida
+               JOIN param.tconcepto_ingas cig ON cig.id_concepto_ingas = cp.id_concepto_ingas
+               where pre.id_presupuesto = v_id_presupuesto
+               and cig.id_concepto_ingas = v_registros_cig.id_concepto_ingas;
+
+               IF (v_id_partida is null)THEN
+               		RAISE EXCEPTION 'No se encuentra parametrizado la Partida para el Concepto de Gasto %',v_registros_cig.desc_ingas;
+               END IF;
+
+
+
+               --CONTROL NO REPITA EN EL MISMO PRESUPUESTO UN CONCEPTO DE GASTO
+               IF EXISTS (SELECT 1
+                          FROM pre.tformulacion_presu_detalle pd
+                          join pre.tformulacion_presu p on p.id_formulacion_presu = pd.id_formulacion_presu
+                          WHERE pd.id_concepto_gasto = v_registros_cig.id_concepto_ingas
+                          and pd.id_centro_costo = v_id_centro_costo
+                          and p.id_gestion = v_id_gestion
+                          and pd.estado_reg= 'activo' and p.estado_reg = 'activo'
+                          and (trim(pd.justificacion))::varchar = (trim(v_parametros.justificacion))::varchar) THEN
+
+                          SELECT p.id_formulacion_presu
+                          into v_id_memoria_calculo_presu
+                          FROM pre.tformulacion_presu p
+                          WHERE upper(p.observaciones) = upper(v_parametros.observaciones)
+                          and p.id_usuario_responsable=v_id_usuario_resp
+                          and p.estado_reg != 'inactivo';
+
+                          delete from pre.tformulacion_presu
+                          where id_formulacion_presu = v_id_memoria_calculo_presu;
+
+                          FOR v_id_memoria_calculo_det_presu in (SELECT id_memoria_det
+                                                                  FROM pre.tmemoria_det
+                                                                  WHERE id_memoria_calculo = v_id_memoria_calculo_presu) LOOP
+
+                           			 --Sentencia de la eliminacion
+                                    delete from pre.tmemoria_det
+                                    where id_memoria_det = v_id_memoria_calculo_det_presu;
+
+                           END LOOP;
+
+                          RAISE EXCEPTION 'El documento ya fue registrado para el Centro de Costo % con el Concepto de Gasto %, por el usuario % el día %.',v_parametros.centro_costo,v_registros_cig.desc_ingas ,v_desc_persona_reg,v_fecha_reg ;
+
+
+                END IF;
+
+
+                --INSERTAR TABLA FORMULACION
+                IF NOT EXISTS (SELECT 1
+                              FROM pre.tformulacion_presu p
+                              WHERE upper(p.observaciones) = upper(v_parametros.observaciones)
+                              and p.id_usuario_responsable=v_id_usuario_resp
+                              and p.estado_reg != 'inactivo'  ) THEN
+
+                               --CONTROL NO REPITA EN EL MISMO PRESUPUESTO UN CONCEPTO DE GASTO
+                               IF EXISTS (SELECT 1
+                                          FROM pre.tformulacion_presu p
+                                          join pre.tformulacion_presu_detalle pd on pd.id_formulacion_presu = p.id_formulacion_presu
+                                          WHERE upper(p.observaciones) = upper(v_parametros.observaciones)
+                                          and p.id_usuario_responsable= v_id_usuario_resp
+                                          and p.id_gestion = v_id_gestion
+                                          and pd.id_concepto_gasto = v_registros_cig.id_concepto_ingas
+                                          and pd.id_centro_costo = v_id_centro_costo
+                                          and p.estado_reg = 'activo' and pd.estado_reg= 'activo'
+                                          and (trim(pd.justificacion))::varchar = (trim(v_parametros.justificacion))::varchar) THEN
+
+                                          RAISE EXCEPTION 'El documento ya fue registrado por el usuario % el dia %. ',v_desc_persona_reg,v_fecha_reg ;
+                                END IF;
+
+
+                         insert into pre.tformulacion_presu(
+                                          id_usuario_responsable,
+                                          observaciones,
+                                          id_gestion,
+
+                                          fecha_reg,
+                                          fecha_mod,
+                                          estado_reg,
+                                          id_usuario_reg,
+                                          id_usuario_mod
+
+                                   ) values(
+
+                                          v_id_usuario_resp,
+                                          v_parametros.observaciones,
+                                          v_id_gestion,
+
+                                          now(),
+                                          null,
+                                          'activo',
+                                          p_id_usuario,
+                                          null
+
+
+
+                                   )RETURNING id_formulacion_presu into v_id_formulacion_presu;
+                 END IF;
+                 ----
+
+
+          -- raise exception 'llegabd1 % - %',v_id_presupuesto, v_registros_cig.id_concepto_ingas;
+
+
+
+                 --INSERTAR TABLA PRESUP-PARTIDA
+                 IF NOT EXISTS (select 1
+                 				from pre.tpresup_partida
+           						where id_partida = v_id_partida
+                                and id_presupuesto = v_id_presupuesto) THEN
+
+
+                      INSERT INTO pre.tpresup_partida(id_presupuesto,
+                      								  id_partida,
+                                                      id_centro_costo,
+                                                      id_usuario_reg
+                                                      )VALUES(
+                                                      v_id_presupuesto,
+                                                      v_id_partida,
+                                                      v_id_centro_costo,
+                                                      v_id_usuario_resp);
+
+          		 END IF;
+
+                 ----
+
+
+
+                   --  validar que exista el presupuesto
+                  IF  EXISTS (select 1
+                              from pre.tpresupuesto pres
+                              where pres.id_centro_costo = v_id_centro_costo
+                              and pres.estado_reg = 'activo') THEN
+
+                  			  --insercion MEMORIA DE CALCULO
+                              insert into pre.tmemoria_calculo(
+                                id_concepto_ingas,
+                                importe_total,
+                                obs,
+                                id_presupuesto,
+                                estado_reg,
+                                id_usuario_ai,
+                                fecha_reg,
+                                usuario_ai,
+                                id_usuario_reg,
+                                fecha_mod,
+                                id_usuario_mod,
+                                id_partida
+                              ) values(
+                                v_registros_cig.id_concepto_ingas,
+                                v_parametros.importe_total,
+                                v_parametros.justificacion, --replace(v_parametros.obs, '\n', ' '),
+                                v_id_presupuesto,
+                                'activo',
+                                v_parametros._id_usuario_ai,
+                                now(),
+                                v_parametros._nombre_usuario_ai,
+                                v_id_usuario_resp, --p_id_usuario,
+                                null,
+                                null,
+                                v_id_partida
+
+                              )RETURNING id_memoria_calculo into v_id_memoria_calculo;
+
+
+                             --inserta MEMORIA DET
+                             -- inserta valores para todos los periodos de la gestion con valor 0
+
+                             FOR v_registros in (select per.id_periodo, per.periodo
+                                                  from param.tperiodo per
+                                                  where per.id_gestion = v_id_gestion
+                                                  and per.estado_reg = 'activo'
+                                                  order by per.fecha_ini) LOOP
+
+                                               IF (v_registros.periodo = 1) THEN
+                                                  v_importe = v_parametros.periodo_enero;
+                                               ELSIF (v_registros.periodo = 2) THEN
+                                                  v_importe = v_parametros.periodo_febrero;
+                                               ELSIF (v_registros.periodo = 3) THEN
+                                                  v_importe = v_parametros.periodo_marzo;
+                                               ELSIF (v_registros.periodo = 4) THEN
+                                                  v_importe = v_parametros.periodo_abril;
+                                               ELSIF (v_registros.periodo = 5) THEN
+                                                  v_importe = v_parametros.periodo_mayo;
+                                               ELSIF (v_registros.periodo = 6) THEN
+                                                  v_importe = v_parametros.periodo_junio;
+                                               ELSIF (v_registros.periodo = 7) THEN
+                                                  v_importe = v_parametros.periodo_julio;
+                                               ELSIF (v_registros.periodo = 8) THEN
+                                                  v_importe = v_parametros.periodo_agosto;
+                                               ELSIF (v_registros.periodo = 9) THEN
+                                                  v_importe = v_parametros.periodo_septiembre;
+                                               ELSIF (v_registros.periodo = 10) THEN
+                                                  v_importe = v_parametros.periodo_octubre;
+                                               ELSIF (v_registros.periodo = 11) THEN
+                                                  v_importe = v_parametros.periodo_noviembre;
+                                               ELSIF (v_registros.periodo = 12) THEN
+                                                  v_importe = v_parametros.periodo_diciembre;
+                                               END IF;
+
+                                              insert into pre.tmemoria_det(
+                                                  importe,
+                                                  importe_unitario,
+                                                  estado_reg,
+                                                  id_periodo,
+                                                  id_memoria_calculo,
+                                                  usuario_ai,
+                                                  fecha_reg,
+                                                  id_usuario_reg,
+                                                  id_usuario_ai
+                                                )
+                                                values
+                                                (
+                                                  v_importe,
+                                                  v_importe,
+                                                  'activo',
+                                                  v_registros.id_periodo,
+                                                  v_id_memoria_calculo,
+                                                  v_parametros._nombre_usuario_ai,
+                                                  now(),
+                                                  v_id_usuario_resp, --p_id_usuario,
+                                                  v_parametros._id_usuario_ai);
+
+                              END LOOP;
+
+                              --INSERTAR TABLA FORMULACION DETALLE
+                  			  --v_id_formulacion_presu = v_id_formulacion_presu ;
+                  			 FOR v_id_formulacion_presu in (SELECT p.id_formulacion_presu
+                                      FROM pre.tformulacion_presu p
+                                      WHERE upper(p.observaciones) = upper(v_parametros.observaciones)
+                                      and p.id_usuario_responsable=v_id_usuario_resp) LOOP
+
+                                      insert into pre.tformulacion_presu_detalle(
+                                                    id_centro_costo,
+                                                    id_concepto_gasto,
+                                                    justificacion,
+                                                    nro_contrato,
+                                                    proveedor,
+                                                    hoja_respaldo,
+                                                    periodo_enero,
+                                                    periodo_febrero,
+                                                    periodo_marzo,
+                                                    periodo_abril,
+                                                    periodo_mayo,
+                                                    periodo_junio,
+                                                    periodo_julio,
+                                                    periodo_agosto,
+                                                    periodo_septiembre,
+                                                    periodo_octubre,
+                                                    periodo_noviembre,
+                                                    periodo_diciembre,
+                                                    importe_total,
+                                                    id_partida,
+                                                    id_formulacion_presu,
+                                                    id_memoria_calculo,
+
+                                                    id_usuario_reg,
+                                                    id_usuario_mod,
+                                                    fecha_reg,
+                                                    fecha_mod,
+                                                    estado_reg
+                                                    )
+                                                    values
+                                                    (
+                                                    v_id_centro_costo,
+                                                    v_registros_cig.id_concepto_ingas,
+                                                    v_parametros.justificacion,
+                                                    COALESCE(v_parametros.nro_contrato, ''),
+                                                    COALESCE(v_parametros.proveedor, ''),
+                                                    COALESCE(v_parametros.hoja_respaldo, ''),
+                                                    v_parametros.periodo_enero,
+                                                    v_parametros.periodo_febrero,
+                                                    v_parametros.periodo_marzo,
+                                                    v_parametros. periodo_abril,
+                                                    v_parametros.periodo_mayo,
+                                                    v_parametros.periodo_junio,
+                                                    v_parametros.periodo_julio,
+                                                    v_parametros.periodo_agosto,
+                                                    v_parametros.periodo_septiembre,
+                                                    v_parametros.periodo_octubre,
+                                                    v_parametros.periodo_noviembre,
+                                                    v_parametros.periodo_diciembre,
+                                                    v_parametros.importe_total,
+                                                    v_id_partida,
+                                                    v_id_formulacion_presu,
+                                                    v_id_memoria_calculo,
+
+                                                    p_id_usuario,
+                                                    null,
+                                                    now(),
+                                                    null,
+                                                    'activo'
+                                                      );
+
+                              			END LOOP;
+
+                 ELSE
+                  		raise exception 'No existe el registro para el Centro de Costo %', v_parametros.centro_costo;
+                  END IF;
+
+              --Definicion de la respuesta
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle almacenado(a) con exito (id_formulacion_presu'||v_id_formulacion_presu||')');
+              v_resp = pxp.f_agrega_clave(v_resp,'id_formulacion_presu',v_id_formulacion_presu::varchar);
+
+              --Devuelve la respuesta
+              return v_resp;
+
+          end;
+      /*********************************
+      #TRANSACCION:  'PRE_FORMUPRE_ELI'
+      #DESCRIPCION:	Eliminar detalle Formulacion Presupuestaria
+      #AUTOR:		Maylee Perez Pastor
+      #FECHA:		05-08-2020
+      ***********************************/
+
+      elsif(p_transaccion='PRE_FORMUPRE_ELI')then
+
+          begin
+
+              /*IF v_registros.estado = 'aprobado' THEN
+              	raise exception 'no puede eliminar Conceptos de Gasto de un Presupuesto aprobado';
+              END IF;*/
+
+              update pre.tformulacion_presu  set
+              estado_reg = 'inactivo'
+              where id_formulacion_presu = v_parametros.id_formulacion_presu;
+
+              update pre.tformulacion_presu_detalle set
+              estado_reg = 'inactivo'
+              where id_formulacion_presu = v_parametros.id_formulacion_presu;
+
+
+              FOR v_registros_det in (  SELECT fp.id_centro_costo, fp.id_partida,  fp.importe_total
+                                                     FROM pre.tformulacion_presu_detalle fp
+                                                    WHERE fp.id_formulacion_presu = v_parametros.id_formulacion_presu) LOOP
+
+                 		/*delete from  pre.tpresup_partida
+                              where id_centro_costo = v_registros_det.id_centro_costo
+                              and id_partida = v_registros_det.id_partida;*/
+                              SELECT prp.importe
+                              INTO v_importe_presu_par
+                              FROM pre.tpresup_partida prp
+                              where prp.id_centro_costo = v_registros_det.id_centro_costo
+                              and prp.id_partida = v_registros_det.id_partida;
+
+                              update pre.tpresup_partida set
+              					importe = COALESCE(COALESCE(v_importe_presu_par,0)::numeric - COALESCE(v_registros_det.importe_total,0)::numeric, 0)
+                              where id_centro_costo = v_registros_det.id_centro_costo
+                              and id_partida = v_registros_det.id_partida;
+
+               END LOOP;
+
+
+              FOR v_id_memoria_calculo_presu in (SELECT fp.id_memoria_calculo
+                                                FROM pre.tformulacion_presu_detalle fp
+                                                WHERE fp.id_formulacion_presu = v_parametros.id_formulacion_presu) LOOP
+
+
+
+                           FOR v_id_memoria_calculo_det_presu in (SELECT id_memoria_det
+                                                                  FROM pre.tmemoria_det
+                                                                  WHERE id_memoria_calculo = v_id_memoria_calculo_presu) LOOP
+
+                           			 --Sentencia de la eliminacion
+                                    delete from pre.tmemoria_det
+                                    where id_memoria_det = v_id_memoria_calculo_det_presu;
+
+                           END LOOP;
+
+                           --Sentencia de la eliminacion
+                          delete from pre.tmemoria_calculo
+                          where id_memoria_calculo = v_id_memoria_calculo_presu;
+
+
+              END LOOP;
+
+
+
+
+              --Definicion de la respuesta
+              v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Detalle de gastos de formulacion eliminados');
+              v_resp = pxp.f_agrega_clave(v_resp,'id_formulacion_presu',v_parametros.id_formulacion_presu::varchar);
+
+              --Devuelve la respuesta
+              return v_resp;
+          end;
+
+
+
 	else
 
     	raise exception 'Transaccion inexistente: %',p_transaccion;

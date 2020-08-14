@@ -1049,3 +1049,53 @@ ALTER TABLE pre.tclase_gasto_cuenta
 ALTER TABLE pre.tajuste_det
   ADD COLUMN id_orden_trabajo INTEGER;  
 /*****************************F-SCP-BVP-PRE-0-01/08/2020*************/
+
+/*****************************I-SCP-MAY-PRE-0-11/08/2020*************/
+CREATE TABLE pre.tformulacion_presu (
+  id_formulacion_presu SERIAL,
+  id_usuario_responsable INTEGER,
+  observaciones TEXT,
+  id_memoria_calculo INTEGER,
+  id_gestion INTEGER,
+  CONSTRAINT tformulacion_presu_pkey PRIMARY KEY(id_formulacion_presu)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE pre.tformulacion_presu
+  OWNER TO postgres;
+
+CREATE TABLE pre.tformulacion_presu_detalle (
+  id_formulacion_presu_detalle SERIAL,
+  id_centro_costo INTEGER,
+  id_concepto_gasto INTEGER,
+  justificacion VARCHAR,
+  nro_contrato VARCHAR(200),
+  proveedor VARCHAR,
+  hoja_respaldo VARCHAR,
+  periodo_enero NUMERIC,
+  periodo_febrero NUMERIC,
+  periodo_marzo NUMERIC,
+  periodo_abril NUMERIC,
+  periodo_mayo NUMERIC,
+  periodo_junio NUMERIC,
+  periodo_julio NUMERIC,
+  periodo_agosto NUMERIC,
+  periodo_septiembre NUMERIC,
+  periodo_octubre NUMERIC,
+  periodo_noviembre NUMERIC,
+  periodo_diciembre NUMERIC,
+  importe_total NUMERIC,
+  id_partida INTEGER,
+  id_formulacion_presu INTEGER,
+  id_memoria_calculo INTEGER,
+  CONSTRAINT tformulacion_presu_detalle_pkey PRIMARY KEY(id_formulacion_presu_detalle)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE pre.tformulacion_presu_detalle
+  ALTER COLUMN id_partida SET STATISTICS 0;
+
+ALTER TABLE pre.tformulacion_presu_detalle
+  OWNER TO postgres;
+
+/*****************************F-SCP-MAY-PRE-0-11/08/2020*************/

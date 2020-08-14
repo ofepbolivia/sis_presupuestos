@@ -17,6 +17,8 @@ require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RPoaPDF.php');
 require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RNotaIntern.php');
 require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RCertificacionPresupuestariaMod.php');
 
+include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
+
 class ACTPresupuesto extends ACTbase{    
 			
 	function listarPresupuesto(){
@@ -319,6 +321,274 @@ class ACTPresupuesto extends ACTbase{
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
+
+    // (may) aprueba todos los registros para pasar al estado aprobado
+    function pasarTodosAprobado(){
+        //$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
+        $this->objFunc=$this->create('MODPresupuesto');
+        $this->res=$this->objFunc->pasarTodosAprobado();
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    //(may) subir detalle de la formulacion presupuestaria
+    function subirDetalleFormulacion(){
+        //validar extension del archivo
+
+        //$id_solicitud = $this->objParam->getParametro('id_solicitud');
+        $id_responsable = $this->objParam->getParametro('id_funcionario');
+        $observaciones = $this->objParam->getParametro('observaciones');
+        $id_gestion = $this->objParam->getParametro('id_gestion');
+
+        $codigoArchivo = $this->objParam->getParametro('codigo');
+
+        $arregloFiles = $this->objParam->getArregloFiles();
+        $ext = pathinfo($arregloFiles['archivo']['name']);
+        $nombreArchivo = $ext['filename'];
+        $extension = $ext['extension'];
+
+        $error = 'no';
+        $mensaje_completo = '';
+
+        //validar errores unicos del archivo: existencia, copia y extension
+        if(isset($arregloFiles['archivo']) && is_uploaded_file($arregloFiles['archivo']['tmp_name'])){
+
+            //procesa Archivo
+            $archivoExcel = new ExcelInput($arregloFiles['archivo']['tmp_name'], $codigoArchivo);
+            $archivoExcel->recuperarColumnasExcel();
+            //var_dump('llegactr', $archivoExcel->recuperarColumnasExcel());
+
+            $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
+            //var_dump('llegactr',$arrayArchivo);
+            foreach ($arrayArchivo as $fila) {
+
+                //if ($fila['centro_costo'] == '' || $fila['centro_costo'] == NULL || $fila['centro_costo'] == ' ' || $fila['centro_costo'] == '  ') {
+                if ($fila['centro_costo'] !== '' &&  $fila['centro_costo'] !== ' ' && $fila['centro_costo'] !== '  ' && $fila['centro_costo'] !== null) {
+
+                    //var_dump('llegactr2', $fila['centro_costo']);
+                    $centro_costo = $fila['centro_costo'] ;
+
+                    if ($fila['concepto_gasto'] == '' || $fila['concepto_gasto'] == NULL) {
+                        $concepto_gasto = '';
+                    }else{
+                        $concepto_gasto = $fila['concepto_gasto'] ;
+                    }
+
+                    if ($fila['nro_contrato'] == '' || $fila['nro_contrato'] == NULL) {
+                        $nro_contrato = '';
+                    }else{
+                        $nro_contrato = $fila['nro_contrato'] ;
+                    }
+                    if ($fila['proveedor'] == '' || $fila['proveedor'] == NULL) {
+                        $proveedor = '';
+                    }else{
+                        $proveedor = $fila['proveedor'] ;
+                    }
+                    if ($fila['hoja_respaldo'] == '' || $fila['hoja_respaldo'] == NULL) {
+                        $hoja_respaldo = '';
+                    }else{
+                        $hoja_respaldo = $fila['hoja_respaldo'] ;
+                    }
+                    if ($fila['periodo_enero'] == '' || $fila['periodo_enero'] == NULL) {
+                        $periodo_enero = 0;
+                    }else{
+                        $periodo_enero = $fila['periodo_enero'] ;
+                    }
+                    if ($fila['periodo_febrero'] == '' || $fila['periodo_febrero'] == NULL) {
+                        $periodo_febrero = 0;
+                    }else{
+                        $periodo_febrero = $fila['periodo_febrero'] ;
+                    }
+                    if ($fila['periodo_marzo'] == '' || $fila['periodo_marzo'] == NULL) {
+                        $periodo_marzo = 0;
+                    }else{
+                        $periodo_marzo = $fila['periodo_marzo'] ;
+                    }
+                    if ($fila['periodo_abril'] == '' || $fila['periodo_abril'] == NULL) {
+                        $periodo_abril = 0;
+                    }else{
+                        $periodo_abril = $fila['periodo_abril'] ;
+                    }
+                    if ($fila['periodo_mayo'] == '' || $fila['periodo_mayo'] == NULL) {
+                        $periodo_mayo = 0;
+                    }else{
+                        $periodo_mayo = $fila['periodo_mayo'] ;
+                    }
+                    if ($fila['periodo_junio'] == '' || $fila['periodo_junio'] == NULL) {
+                        $periodo_junio = 0;
+                    }else{
+                        $periodo_junio = $fila['periodo_junio'] ;
+                    }
+                    if ($fila['periodo_julio'] == '' || $fila['periodo_julio'] == NULL) {
+                        $periodo_julio = 0;
+                    }else{
+                        $periodo_julio = $fila['periodo_julio'] ;
+                    }
+                    if ($fila['periodo_agosto'] == '' || $fila['periodo_agosto'] == NULL) {
+                        $periodo_agosto = 0;
+                    }else{
+                        $periodo_agosto = $fila['periodo_agosto'] ;
+                    }
+                    if ($fila['periodo_septiembre'] == '' || $fila['periodo_septiembre'] == NULL) {
+                        $periodo_septiembre = 0;
+                    }else{
+                        $periodo_septiembre = $fila['periodo_septiembre'] ;
+                    }
+                    if ($fila['periodo_octubre'] == '' || $fila['periodo_octubre'] == NULL) {
+                        $periodo_octubre = 0;
+                    }else{
+                        $periodo_octubre = $fila['periodo_octubre'] ;
+                    }
+                    if ($fila['periodo_noviembre'] == '' || $fila['periodo_noviembre'] == NULL) {
+                        $periodo_noviembre = 0;
+                    }else{
+                        $periodo_noviembre = $fila['periodo_noviembre'] ;
+                    }
+                    if ($fila['periodo_diciembre'] == '' || $fila['periodo_diciembre'] == NULL) {
+                        $periodo_diciembre = 0;
+                    }else{
+                        $periodo_diciembre = $fila['periodo_diciembre'] ;
+                    }
+
+
+
+
+                            $this->objParam->addParametro('id_responsable', $id_responsable);
+                            $this->objParam->addParametro('observaciones', $observaciones);
+                            $this->objParam->addParametro('id_gestion', $id_gestion);
+
+                            $this->objParam->addParametro('centro_costo', $centro_costo);
+                            $this->objParam->addParametro('concepto_gasto', $concepto_gasto);
+                            $this->objParam->addParametro('partida', ' ');
+                            $this->objParam->addParametro('justificacion', $fila['justificacion']);
+                            $this->objParam->addParametro('nro_contrato', $nro_contrato );
+                            $this->objParam->addParametro('proveedor', $proveedor);
+                            $this->objParam->addParametro('hoja_respaldo', $hoja_respaldo);
+                            $this->objParam->addParametro('periodo_enero', $periodo_enero);
+                            $this->objParam->addParametro('periodo_febrero', $periodo_febrero);
+                            $this->objParam->addParametro('periodo_marzo', $periodo_marzo);
+                            $this->objParam->addParametro('periodo_abril', $periodo_abril);
+                            $this->objParam->addParametro('periodo_mayo', $periodo_mayo);
+                            $this->objParam->addParametro('periodo_junio', $periodo_junio);
+                            $this->objParam->addParametro('periodo_julio', $periodo_julio);
+                            $this->objParam->addParametro('periodo_agosto', $periodo_agosto);
+                            $this->objParam->addParametro('periodo_septiembre', $periodo_septiembre);
+                            $this->objParam->addParametro('periodo_octubre', $periodo_octubre);
+                            $this->objParam->addParametro('periodo_noviembre', $periodo_noviembre);
+                            $this->objParam->addParametro('periodo_diciembre', $periodo_diciembre);
+                            $this->objParam->addParametro('importe_total', $periodo_enero+$periodo_febrero+$periodo_marzo+$periodo_abril+$periodo_mayo+$periodo_junio+$periodo_julio+$periodo_agosto+
+                                $periodo_septiembre+$periodo_octubre+$periodo_noviembre+$periodo_diciembre);
+
+                    //var_dump('llegaarray', $this->objParam);
+
+
+
+                        $this->objFunc = $this->create('sis_presupuestos/MODPresupuesto');
+
+                        $this->res = $this->objFunc->insertarDetalleFormulacion($this->objParam);
+                }
+                        if($this->res->getTipo()=='ERROR'){
+                            //(may)para que las filas parametrizadas del excel no cuenten como un registro porque da null y error en esa fila
+
+                            $error = 'error';
+                            $mensaje_completo = $this->res->getMensajeTec();
+                        }
+
+            }
+
+            $file_path = $arregloFiles['archivo']['name'];
+
+        } else {
+            $mensaje_completo = "No se subio ningun archivo seleccionado";
+            $error = 'error_fatal';
+        }
+
+
+        //armar respuesta en error fatal
+        if ($error == 'error_fatal') {
+
+            $this->mensajeRes=new Mensaje();
+            $this->mensajeRes->setMensaje('ERROR','ACTPresupuesto.php',$mensaje_completo,
+                $mensaje_completo,'control');
+            //si no es error fatal proceso el archivo
+        }
+        //15-07-2020 (may) modificacion no mostraba el incidente desde la bd en producccion
+        if ($error == 'error') {
+
+            $this->mensajeRes=new Mensaje();
+
+            $this->mensajeRes->setMensaje('ERROR','ACTPresupuesto.php','Ocurrieron los siguientes incidentes: ' . $mensaje_completo,
+                $mensaje_completo,'control');
+
+        }else if ($error == 'no') {
+            $this->mensajeRes=new Mensaje();
+            $this->mensajeRes->setMensaje('EXITO','ACTPresupuesto.php','El archivo fue ejecutado con éxito',
+                'El archivo fue ejecutado con éxito','control');
+        }
+
+        //devolver respuesta
+        $this->mensajeRes->imprimirRespuesta($this->mensajeRes->generarJson());
+        //return $this->respuesta;
+    }
+
+    function eliminarDetalleFormulacion(){
+        $this->objFunc=$this->create('MODPresupuesto');
+        $this->res=$this->objFunc->eliminarDetalleFormulacion();
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function listarFormulacionPresu(){
+        $this->objParam->defecto('ordenacion','id_formulacion_presu');
+        $this->objParam->defecto('dir_ordenacion','asc');
+       // $this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
+
+        if($this->objParam->getParametro('id_gestion')!=''){
+            $this->objParam->addFiltro("fp.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+        }
+
+
+        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODPresupuesto', 'listarFormulacionPresu');
+        } else {
+            $this->objFunc = $this->create('MODPresupuesto');
+
+            $this->res = $this->objFunc->listarFormulacionPresu($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    function listarFormulacionPresuDet(){
+        $this->objParam->defecto('ordenacion','id_formulacion_presu');
+        $this->objParam->defecto('dir_ordenacion','asc');
+
+        if($this->objParam->getParametro('id_formulacion_presu')!=''){
+            $this->objParam->addFiltro("fpd.id_formulacion_presu = ".$this->objParam->getParametro('id_formulacion_presu'));
+        }
+
+
+        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODPresupuesto', 'listarFormulacionPresuDet');
+        } else {
+            $this->objFunc = $this->create('MODPresupuesto');
+
+            $this->res = $this->objFunc->listarFormulacionPresuDet($this->objParam);
+        }
+
+        $temp = Array();
+        $temp['hoja_respaldo'] ='TOTAL';
+        $temp['importe_total'] = $this->res->extraData['importe_total'];
+
+        $temp['tipo_reg'] = 'summary';
+        $temp['id_centro_costo'] = 0;
+
+        $this->res->total++;
+        $this->res->addLastRecDatos($temp);
+
+
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+
 
 }
 

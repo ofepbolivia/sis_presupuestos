@@ -987,6 +987,192 @@ BEGIN
 
         end;
 
+        /*********************************
+        #TRANSACCION:  'PRE_LISFORMU_SEL'
+        #DESCRIPCION:	Consulta de datos
+        #AUTOR:		maylee.perez
+        #FECHA:		05-08-2020 21:35:35
+        ***********************************/
+
+        elsif(p_transaccion='PRE_LISFORMU_SEL')then
+
+            begin
+
+            	v_filadd='';
+
+                IF (v_parametros.tipo_interfaz = 'FormulacionPresupuesto') THEN
+                	v_filadd = v_filadd ||'(fp.id_usuario_responsable = '||p_id_usuario||' or fp.id_usuario_reg = '||p_id_usuario||' or
+                	(fun.id_funcionario  IN (select *
+                						  FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))))  and ';
+
+
+                END IF;
+
+
+
+                --Sentencia de la consulta
+                v_consulta:='select
+                                  fp.id_formulacion_presu,
+                                  fp.observaciones,
+                                  fp.id_usuario_responsable,
+                                  usures.desc_persona,
+                                  fp.id_usuario_reg,
+                                  fp.id_usuario_mod,
+                                  fp.fecha_reg,
+                                  fp.fecha_mod,
+                                  fp.estado_reg,
+                                  usu1.cuenta as usr_reg,
+                                  usu2.cuenta as usr_mod,
+                                  fp.id_gestion
+
+                            from pre.tformulacion_presu fp
+                            inner join segu.tusuario usu1 on usu1.id_usuario = fp.id_usuario_reg
+                            left join segu.tusuario usu2 on usu2.id_usuario = fp.id_usuario_mod
+                            left join segu.vusuario usures on usures.id_usuario = fp.id_usuario_responsable
+                            left join orga.vfuncionario fun on fun.id_persona = usures.id_persona
+                            where  '||v_filadd ;
+
+
+                --Definicion de la respuesta
+                v_consulta:=v_consulta||v_parametros.filtro;
+                v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+                 raise notice 'v_consulta %',v_consulta ;
+
+                --Devuelve la respuesta
+                return v_consulta;
+
+            end;
+
+
+
+        /*********************************
+        #TRANSACCION:  'PRE_LISFORMU_CONT'
+        #DESCRIPCION:	Conteo de registros
+        #AUTOR:		maylee.perez
+        #FECHA:		05-08-2020 21:35:35
+        ***********************************/
+
+        elsif(p_transaccion='PRE_LISFORMU_CONT')then
+
+            begin
+
+                --Sentencia de la consulta de conteo de registros
+                v_consulta:='select count(fp.id_formulacion_presu)
+                            from pre.tformulacion_presu fp
+                            inner join segu.tusuario usu1 on usu1.id_usuario = fp.id_usuario_reg
+                            left join segu.tusuario usu2 on usu2.id_usuario = fp.id_usuario_mod
+                            left join segu.vusuario usures on usures.id_usuario = fp.id_usuario_responsable
+                            left join orga.vfuncionario fun on fun.id_persona = usures.id_persona
+                            where  ';
+
+                --Definicion de la respuesta
+                v_consulta:=v_consulta||v_parametros.filtro;
+
+                --Devuelve la respuesta
+                return v_consulta;
+
+            end;
+
+            /*********************************
+            #TRANSACCION:  'PRE_LISFORDET_SEL'
+            #DESCRIPCION:	Consulta de datos
+            #AUTOR:		maylee.perez
+            #FECHA:		05-08-2020 21:35:35
+            ***********************************/
+
+            elsif(p_transaccion='PRE_LISFORDET_SEL')then
+
+                begin
+
+                    --Sentencia de la consulta
+                    v_consulta:='select
+                                        fpd.id_formulacion_presu_detalle,
+                                        fpd.id_centro_costo,
+                                        cen.codigo_cc::varchar,
+                                        fpd.id_concepto_gasto,
+                                        cig.desc_ingas::varchar as nombre_ingas,
+                                        fpd.justificacion::varchar,
+                                        fpd.nro_contrato,
+                                        fpd.proveedor,
+                                        fpd.hoja_respaldo,
+                                        fpd.periodo_enero,
+                                        fpd.periodo_febrero,
+                                        fpd.periodo_marzo,
+                                        fpd.periodo_abril,
+                                        fpd.periodo_mayo,
+                                        fpd.periodo_junio,
+                                        fpd.periodo_julio,
+                                        fpd.periodo_agosto,
+                                        fpd.periodo_septiembre,
+                                        fpd.periodo_octubre,
+                                        fpd.periodo_noviembre,
+                                        fpd.periodo_diciembre,
+                                        fpd.importe_total,
+                                        fpd.id_partida,
+                                        (par.codigo||'' - ''|| par.nombre_partida)::varchar as nombre_partida,
+                                        fpd.id_formulacion_presu,
+                                        fpd.id_memoria_calculo,
+
+                                        fpd.id_usuario_reg,
+                                        fpd.id_usuario_mod,
+                                        fpd.fecha_reg,
+                                        fpd.fecha_mod,
+                                        fpd.estado_reg,
+                                        usu1.cuenta as usr_reg,
+                                        usu2.cuenta as usr_mod
+
+
+                                  from pre.tformulacion_presu_detalle fpd
+                                  inner join segu.tusuario usu1 on usu1.id_usuario = fpd.id_usuario_reg
+                                  left join segu.tusuario usu2 on usu2.id_usuario = fpd.id_usuario_mod
+                                  join param.vcentro_costo cen on cen.id_centro_costo = fpd.id_centro_costo
+                                  join param.tconcepto_ingas cig on cig.id_concepto_ingas = fpd.id_concepto_gasto
+                                  join pre.tpartida par ON par.id_partida = fpd.id_partida
+                                  where   ';
+
+
+                    --Definicion de la respuesta
+                    v_consulta:=v_consulta||v_parametros.filtro;
+                    v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+                     raise notice 'v_consulta %',v_consulta ;
+
+                    --Devuelve la respuesta
+                    return v_consulta;
+
+                end;
+
+
+
+            /*********************************
+            #TRANSACCION:  'PRE_LISFORDET_CONT'
+            #DESCRIPCION:	Conteo de registros
+            #AUTOR:		maylee.perez
+            #FECHA:		05-08-2020 21:35:35
+            ***********************************/
+
+            elsif(p_transaccion='PRE_LISFORDET_CONT')then
+
+                begin
+
+                    --Sentencia de la consulta de conteo de registros
+                    v_consulta:='select count(fpd.id_formulacion_presu_detalle),
+                    					COALESCE(sum(fpd.importe_total),0)::numeric as importe_total
+                                from pre.tformulacion_presu_detalle fpd
+                                  inner join segu.tusuario usu1 on usu1.id_usuario = fpd.id_usuario_reg
+                                  left join segu.tusuario usu2 on usu2.id_usuario = fpd.id_usuario_mod
+                                  join param.vcentro_costo cen on cen.id_centro_costo = fpd.id_centro_costo
+                                  join param.tconcepto_ingas cig on cig.id_concepto_ingas = fpd.id_concepto_gasto
+                                  join pre.tpartida par ON par.id_partida = fpd.id_partida
+                                where  ';
+
+                    --Definicion de la respuesta
+                    v_consulta:=v_consulta||v_parametros.filtro;
+
+                    --Devuelve la respuesta
+                    return v_consulta;
+
+                end;
+
 
     else
 

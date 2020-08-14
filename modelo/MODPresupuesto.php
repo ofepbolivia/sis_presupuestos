@@ -565,5 +565,147 @@ class MODPresupuesto extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+
+
+    //(may) subir detalle de la formulacion presupuestaria
+    function eliminarDetalleFormulacion(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_FORMUPRE_ELI';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_formulacion_presu','id_formulacion_presu','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    //(may) subir detalle de la formulacion presupuestaria
+    function insertarDetalleFormulacion(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_ime';
+        $this->transaccion='PRE_FORMUPRE_INS';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_responsable','id_responsable','int4');
+        $this->setParametro('observaciones','observaciones','varchar');
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('centro_costo','centro_costo','varchar');
+        $this->setParametro('concepto_gasto','concepto_gasto','varchar');
+        $this->setParametro('partida','partida','varchar');
+        $this->setParametro('justificacion','justificacion','varchar');
+        $this->setParametro('nro_contrato','nro_contrato','varchar');
+        $this->setParametro('proveedor','proveedor','varchar');
+        $this->setParametro('hoja_respaldo','hoja_respaldo','varchar');
+        $this->setParametro('periodo_enero','periodo_enero','numeric');
+        $this->setParametro('periodo_febrero','periodo_febrero','numeric');
+        $this->setParametro('periodo_marzo','periodo_marzo','numeric');
+        $this->setParametro('periodo_abril','periodo_abril','numeric');
+        $this->setParametro('periodo_mayo','periodo_mayo','numeric');
+        $this->setParametro('periodo_junio','periodo_junio','numeric');
+        $this->setParametro('periodo_julio','periodo_julio','numeric');
+        $this->setParametro('periodo_agosto','periodo_agosto','numeric');
+        $this->setParametro('periodo_septiembre','periodo_septiembre','numeric');
+        $this->setParametro('periodo_octubre','periodo_octubre','numeric');
+        $this->setParametro('periodo_noviembre','periodo_noviembre','numeric');
+        $this->setParametro('periodo_diciembre','periodo_diciembre','numeric');
+        $this->setParametro('importe_total','importe_total','numeric');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+//var_dump('llegamod', $this->respuesta);
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function listarFormulacionPresu(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='pre.ft_presupuesto_sel';
+        $this->transaccion='PRE_LISFORMU_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        $this->setParametro('tipo_interfaz','tipo_interfaz','varchar');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_formulacion_presu','int4');
+        $this->captura('observaciones','text');
+        $this->captura('id_usuario_responsable','int4');
+        $this->captura('desc_persona','text');
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('estado_reg','varchar');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+        $this->captura('id_gestion','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta;exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function listarFormulacionPresuDet(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='pre.ft_presupuesto_sel';
+        $this->transaccion='PRE_LISFORDET_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        $this->capturaCount('importe_total', 'numeric');
+
+        //Definicion de la lista del resultado del query
+        $this->captura('id_formulacion_presu_detalle','int4');
+        $this->captura('id_centro_costo','int4');
+        $this->captura('codigo_cc','varchar');
+        $this->captura('id_concepto_gasto','int4');
+        $this->captura('nombre_ingas','varchar');
+        $this->captura('justificacion','varchar');
+        $this->captura('nro_contrato','varchar');
+        $this->captura('proveedor','varchar');
+        $this->captura('hoja_respaldo','varchar');
+        $this->captura('periodo_enero','numeric');
+        $this->captura('periodo_febrero','numeric');
+        $this->captura('periodo_marzo','numeric');
+        $this->captura('periodo_abril','numeric');
+        $this->captura('periodo_mayo','numeric');
+        $this->captura('periodo_junio','numeric');
+        $this->captura('periodo_julio','numeric');
+        $this->captura('periodo_agosto','numeric');
+        $this->captura('periodo_septiembre','numeric');
+        $this->captura('periodo_octubre','numeric');
+        $this->captura('periodo_noviembre','numeric');
+        $this->captura('periodo_diciembre','numeric');
+        $this->captura('importe_total','numeric');
+        $this->captura('id_partida','int4');
+        $this->captura('nombre_partida','varchar');
+        $this->captura('id_formulacion_presu','int4');
+        $this->captura('id_memoria_calculo','int4');
+
+        $this->captura('id_usuario_reg','int4');
+        $this->captura('id_usuario_mod','int4');
+        $this->captura('fecha_reg','timestamp');
+        $this->captura('fecha_mod','timestamp');
+        $this->captura('estado_reg','varchar');
+        $this->captura('usr_reg','varchar');
+        $this->captura('usr_mod','varchar');
+
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();//echo $this->consulta;exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
 }
 ?>
