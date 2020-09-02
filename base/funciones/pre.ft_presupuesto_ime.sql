@@ -1048,7 +1048,7 @@ BEGIN
              select cig.id_concepto_ingas, cig.desc_ingas
              into v_registros_cig
              from param.tconcepto_ingas cig
-             where upper(trim(cig.desc_ingas)) =  upper(trim(v_parametros.concepto_gasto));
+             where regexp_replace(upper(trim(cig.desc_ingas)), E'(^[\\n\\r]+)|([\\n\\r]+$) |(.)','','g') =  regexp_replace(upper(trim(v_parametros.concepto_gasto)), E'(^[\\n\\r]+)|([\\n\\r]+$)|(.)','','g');
 
              IF (v_registros_cig.id_concepto_ingas is null)THEN
              	RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto %',v_parametros.concepto_gasto;
@@ -1502,4 +1502,3 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
-

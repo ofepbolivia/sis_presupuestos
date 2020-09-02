@@ -48,8 +48,9 @@ header("content-type: text/javascript; charset=UTF-8");
 
             successSave:function(resp)
             {
+                // Phx.CP.loadingHide();
+                Phx.CP.getPagina(this.idContenedorPadre).reload();
                 Phx.CP.loadingHide();
-                //Phx.CP.getPagina(this.idContenedorPadre).reload();
                 this.panel.close();
             },
 

@@ -19,8 +19,8 @@ require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RCertificacionP
 
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
 
-class ACTPresupuesto extends ACTbase{    
-			
+class ACTPresupuesto extends ACTbase{
+
 	function listarPresupuesto(){
 		$this->objParam->defecto('ordenacion','id_presupuesto');
 
@@ -37,20 +37,20 @@ class ACTPresupuesto extends ACTbase{
 		if(strtolower($this->objParam->getParametro('estado'))=='finalizados'){
              $this->objParam->addFiltro("(pre.estado in (''aprobado''))");
         }
-		
+
 		if($this->objParam->getParametro('id_gestion')!=''){
-	    	$this->objParam->addFiltro("vcc.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
+	    	$this->objParam->addFiltro("vcc.id_gestion = ".$this->objParam->getParametro('id_gestion'));
 		}
-		
+
 		if($this->objParam->getParametro('codigos_tipo_pres')!=''){
-	    	$this->objParam->addFiltro("(pre.tipo_pres::integer in (".$this->objParam->getParametro('codigos_tipo_pres').") or pre.tipo_pres is null or pre.tipo_pres = '''')");	
+	    	$this->objParam->addFiltro("(pre.tipo_pres::integer in (".$this->objParam->getParametro('codigos_tipo_pres').") or pre.tipo_pres is null or pre.tipo_pres = '''')");
 		}
-		
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam, $this);
 			$this->res = $this->objReporte->generarReporteListado('MODPresupuesto','listarPresupuesto');
 		} else{
-			$this->objFunc=$this->create('MODPresupuesto');	
+			$this->objFunc=$this->create('MODPresupuesto');
 			$this->res=$this->objFunc->listarPresupuesto();
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
@@ -68,23 +68,23 @@ class ACTPresupuesto extends ACTbase{
 		$this->objParam->defecto('ordenacion','id_presupuesto');
 
 		$this->objParam->defecto('dir_ordenacion','asc');
-		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
-		
-		
-		
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
+
+
+
         if($this->objParam->getParametro('estado')!=''){
-	    	$this->objParam->addFiltro("estado = ''".$this->objParam->getParametro('estado')."''");	
+	    	$this->objParam->addFiltro("estado = ''".$this->objParam->getParametro('estado')."''");
 		}
-		
-		
+
+
 		if($this->objParam->getParametro('id_gestion')!=''){
-	    	$this->objParam->addFiltro("id_gestion = ".$this->objParam->getParametro('id_gestion'));	
+	    	$this->objParam->addFiltro("id_gestion = ".$this->objParam->getParametro('id_gestion'));
 		}
-		
+
 		if($this->objParam->getParametro('codigos_tipo_pres')!=''){
-	    	$this->objParam->addFiltro("(tipo_pres::integer in (".$this->objParam->getParametro('codigos_tipo_pres').") or tipo_pres is null or tipo_pres = '''')");	
+	    	$this->objParam->addFiltro("(tipo_pres::integer in (".$this->objParam->getParametro('codigos_tipo_pres').") or tipo_pres is null or tipo_pres = '''')");
 		}
-		
+
 		if($this->objParam->getParametro('movimiento_tipo_pres')!=''){
 	    	//$this->objParam->addFiltro("movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."''");
             $this->objParam->addFiltro("((movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."'' or movimiento_tipo_pres=''gasto'')or movimiento_tipo_pres=''recurso'')" );
@@ -93,40 +93,40 @@ class ACTPresupuesto extends ACTbase{
             //$this->objParam->addFiltro("(movimiento_tipo_pres = ''".$this->objParam->getParametro('movimiento_tipo_pres')."'' == ''recurso-gasto'') " );
         }
 
-		
+
 		if($this->objParam->getParametro('sw_oficial')!=''){
-	    	$this->objParam->addFiltro("sw_oficial = ''".$this->objParam->getParametro('sw_oficial')."''");	
+	    	$this->objParam->addFiltro("sw_oficial = ''".$this->objParam->getParametro('sw_oficial')."''");
 		}
-		
+
 		if($this->objParam->getParametro('sw_consolidado')!=''){
-	    	$this->objParam->addFiltro("sw_consolidado = ''".$this->objParam->getParametro('sw_consolidado')."''");	
+	    	$this->objParam->addFiltro("sw_consolidado = ''".$this->objParam->getParametro('sw_consolidado')."''");
 		}
-		
-		if($this->objParam->getParametro('tipo_ajuste')!='' && 
-		   $this->objParam->getParametro('nro_tramite')!='' && 
+
+		if($this->objParam->getParametro('tipo_ajuste')!='' &&
+		   $this->objParam->getParametro('nro_tramite')!='' &&
 		   $this->objParam->getParametro('id_gestion')!=''){
-	    	  	
-	    	  $this->objParam->addFiltro("id_presupuesto in (select x.id_presupuesto from pre.vpartida_ejecucion_check x where   x.id_gestion =  ".$this->objParam->getParametro('id_gestion')." and  x.nro_tramite = ''".$this->objParam->getParametro('nro_tramite')."'')");	
-	    	
-	    	  
+
+	    	  $this->objParam->addFiltro("id_presupuesto in (select x.id_presupuesto from pre.vpartida_ejecucion_check x where   x.id_gestion =  ".$this->objParam->getParametro('id_gestion')." and  x.nro_tramite = ''".$this->objParam->getParametro('nro_tramite')."'')");
+
+
 		}
-		
-		
-		
-		
-		
+
+
+
+
+
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam, $this);
 			$this->res = $this->objReporte->generarReporteListado('MODPresupuesto','listarPresupuestoCmb');
 		} else{
-			$this->objFunc=$this->create('MODPresupuesto');	
+			$this->objFunc=$this->create('MODPresupuesto');
 			$this->res=$this->objFunc->listarPresupuestoCmb();
 		}
 
        if($this->objParam->getParametro('_adicionar')!=''){
-		    
+
 			$respuesta = $this->res->getDatos();
-			
+
 			array_unshift ( $respuesta, array(  'id_presupuesto'=>'0',
 		                                'codigo_cc'=>'Todos',
 									    'descripcion'=>'Todos',
@@ -141,23 +141,23 @@ class ACTPresupuesto extends ACTbase{
 
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-				
+
 	function insertarPresupuesto(){
-		$this->objFunc=$this->create('MODPresupuesto');	
+		$this->objFunc=$this->create('MODPresupuesto');
 		if($this->objParam->insertar('id_presupuesto')){
-			$this->res=$this->objFunc->insertarPresupuesto();			
-		} else{			
+			$this->res=$this->objFunc->insertarPresupuesto();
+		} else{
 			$this->res=$this->objFunc->modificarPresupuesto();
 		}
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-						
+
 	function eliminarPresupuesto(){
-		$this->objFunc=$this->create('MODPresupuesto');	
+		$this->objFunc=$this->create('MODPresupuesto');
 		$this->res=$this->objFunc->eliminarPresupuesto();
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-    
+
     function reportePresupuesto(){
         $dataSource = new DataSource();
         $idPresupuesto = $this->objParam->getParametro('id_presupuesto');
@@ -169,20 +169,20 @@ class ACTPresupuesto extends ACTbase{
         $this->objFunc = $this->create('MODPresupuesto');
         $resultPresupuesto = $this->objFunc->reportePresupuesto();
         $datosPresupuesto = $resultPresupuesto->getDatos();
-        
+
         $dataSource->putParameter('moneda', $datosPresupuesto[0]['moneda']);
-        
+
         $presupuestoDataSource = new DataSource();
         $presupuestoDataSource->setDataSet($resultPresupuesto->getDatos());
         $dataSource->putParameter('presupuestoDataSource', $presupuestoDataSource);
-        
+
         //build the report
         $reporte = new RPresupuesto();
         $reporte->setDataSource($dataSource);
         $nombreArchivo = 'ReportePresupuesto.pdf';
         $reportWriter = new ReportWriter($reporte, dirname(__FILE__).'/../../reportes_generados/'.$nombreArchivo);
         $reportWriter->writeReport(ReportWriter::PDF);
-        
+
         $mensajeExito = new Mensaje();
         $mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
                                         'Se generó con éxito el reporte: '.$nombreArchivo,'control');
@@ -193,44 +193,44 @@ class ACTPresupuesto extends ACTbase{
 
     function graficaPresupuesto(){
         $idPresupuesto = $this->objParam->getParametro('id_presupuesto');
-        
+
         $this->objParam->defecto('ordenacion','id_presupuesto');
         $this->objParam->defecto('id_presupuesto',$idPresupuesto);
         $this->objParam->defecto('dir_ordenacion','asc');
         $this->objParam->defecto('cantidad',1000);
         $this->objParam->defecto('puntero',0);
-        
+
         $this->objFunc=$this->create('MODPresupuesto');
-        $this->objFunc->setCount(false); 
-        $this->res=$this->objFunc->reportePresupuesto();        
-        $this->res->imprimirRespuesta($this->res->generarJson());        
+        $this->objFunc->setCount(false);
+        $this->res=$this->objFunc->reportePresupuesto();
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
-	
+
 	function clonarPresupuestosGestion(){
-		$this->objFunc=$this->create('MODPresupuesto');	
+		$this->objFunc=$this->create('MODPresupuesto');
 		$this->res=$this->objFunc->clonarPresupuestosGestion();
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-	
+
 	function iniciarTramite(){
-		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]); 
-		$this->objFunc=$this->create('MODPresupuesto');	
+		$this->objParam->addParametro('id_funcionario_usu',$_SESSION["ss_id_funcionario"]);
+		$this->objFunc=$this->create('MODPresupuesto');
 		$this->res=$this->objFunc->iniciarTramite();
 		$this->res->imprimirRespuesta($this->res->generarJson());
 	}
-	
+
 	function siguienteEstadoPresupuesto(){
-        $this->objFunc=$this->create('MODPresupuesto');  
+        $this->objFunc=$this->create('MODPresupuesto');
         $this->res=$this->objFunc->siguienteEstadoPresupuesto($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
    function anteriorEstadoPresupuesto(){
-        $this->objFunc=$this->create('MODPresupuesto');  
+        $this->objFunc=$this->create('MODPresupuesto');
         $this->res=$this->objFunc->anteriorEstadoPresupuesto($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
-	
+
 
 	//Reporte Certificación Presupuestaria (FEA) 13/07/2017
 	function reporteCertificacionP (){
@@ -358,7 +358,7 @@ class ACTPresupuesto extends ACTbase{
             //var_dump('llegactr', $archivoExcel->recuperarColumnasExcel());
 
             $arrayArchivo = $archivoExcel->leerColumnasArchivoExcel();
-            //var_dump('llegactr',$arrayArchivo);
+            // var_dump('llegactr',$arrayArchivo);exit;
             foreach ($arrayArchivo as $fila) {
 
                 //if ($fila['centro_costo'] == '' || $fila['centro_costo'] == NULL || $fila['centro_costo'] == ' ' || $fila['centro_costo'] == '  ') {
@@ -457,7 +457,8 @@ class ACTPresupuesto extends ACTbase{
                             $this->objParam->addParametro('id_gestion', $id_gestion);
 
                             $this->objParam->addParametro('centro_costo', $centro_costo);
-                            $this->objParam->addParametro('concepto_gasto', $concepto_gasto);
+                            // $this->objParam->addParametro('concepto_gasto', html_entity_decode(preg_replace('/_x([0-9a-fA-F]{4})_/','&#x$1;', $concepto_gasto)));
+														$this->objParam->addParametro('concepto_gasto', $concepto_gasto);
                             $this->objParam->addParametro('partida', ' ');
                             $this->objParam->addParametro('justificacion', $fila['justificacion']);
                             $this->objParam->addParametro('nro_contrato', $nro_contrato );
