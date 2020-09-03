@@ -48,6 +48,7 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.SubirFormulacionPresupuesto.superclass.constructor.call(this, config);
             this.init();
 
+
             //carga de grilla
             this.load({params: {start: 0, limit: this.tam_pag}});
 
@@ -59,6 +60,15 @@ header("content-type: text/javascript; charset=UTF-8");
                 disabled: false,
                 handler: this.onDetalleFormulacion,
                 tooltip: 'Subir archivo excel con la Formulación Presupuestaria'
+            });
+
+            this.addButton('archivo', {
+                text: 'Adjuntar Archivo',
+                iconCls: 'bfolder',
+                disabled: false,
+                handler: this.archivo,
+                tooltip: '<b>Adjuntar Archivo</b><br><b>Nos permite adjuntar respaldos de una Formulacion Presupuestaria.</b>',
+                grupo: [0,1]
             });
 
             this.store.baseParams = {tipo_interfaz: this.nombreVista};
@@ -300,6 +310,28 @@ header("content-type: text/javascript; charset=UTF-8");
                 '',
                 this.idContenedor,
                 'FormDetalleSubirFormulacion')
+        },
+
+        archivo: function () {
+
+            var rec = this.getSelectedData();
+            //enviamos el id seleccionado para cual el archivo se deba subir
+            rec.datos_extras_id = rec.id_formulacion_presu;
+            //enviamos el nombre de la tabla
+            rec.datos_extras_tabla = 'pre.tformulacion_presu';
+            //enviamos el codigo ya que una tabla puede tener varios archivos diferentes como ci,pasaporte,contrato,slider,fotos,etc
+            rec.datos_extras_codigo = '';
+
+            //esto es cuando queremos darle una ruta personalizada
+            //rec.datos_extras_ruta_personalizada = './../../../uploaded_files/favioVideos/videos/';
+
+            Phx.CP.loadWindows('../../../sis_parametros/vista/archivo/Archivo.php',
+                'Archivo',
+                {
+                    width: '80%',
+                    height: '100%'
+                }, rec, this.idContenedor, 'Archivo');
+
         },
 
         iniciarEventos: function () {
