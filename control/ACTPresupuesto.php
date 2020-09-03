@@ -457,8 +457,8 @@ class ACTPresupuesto extends ACTbase{
                             $this->objParam->addParametro('id_gestion', $id_gestion);
 
                             $this->objParam->addParametro('centro_costo', $centro_costo);
-                            // $this->objParam->addParametro('concepto_gasto', html_entity_decode(preg_replace('/_x([0-9a-fA-F]{4})_/','&#x$1;', $concepto_gasto)));
-														$this->objParam->addParametro('concepto_gasto', $concepto_gasto);
+                            $this->objParam->addParametro('concepto_gasto', html_entity_decode(preg_replace('/_x([0-9a-fA-F]{4})_/','&#x$1;', $concepto_gasto)));
+                            //$this->objParam->addParametro('concepto_gasto', $concepto_gasto);
                             $this->objParam->addParametro('partida', ' ');
                             $this->objParam->addParametro('justificacion', $fila['justificacion']);
                             $this->objParam->addParametro('nro_contrato', $nro_contrato );

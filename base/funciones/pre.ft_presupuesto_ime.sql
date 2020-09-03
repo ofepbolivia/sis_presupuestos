@@ -1044,12 +1044,16 @@ BEGIN
              	RAISE EXCEPTION 'No se encuentra parametrizado el Centro de Costo %',v_parametros.centro_costo;
              END IF;
 
-             --CONCEPTO DE GASTO
-             select cig.id_concepto_ingas, cig.desc_ingas
-             into v_registros_cig
-             from param.tconcepto_ingas cig
-             where regexp_replace(upper(trim(cig.desc_ingas)), E'(^[\\n\\r]+)|([\\n\\r]+$) |(.)','','g') =  regexp_replace(upper(trim(v_parametros.concepto_gasto)), E'(^[\\n\\r]+)|([\\n\\r]+$)|(.)','','g');
 
+             --CONCEPTO DE GASTO
+              select cig.id_concepto_ingas,cig.desc_ingas
+               into v_registros_cig
+              from param.tconcepto_ingas cig
+              where cig.estado_reg = 'activo'
+              and orga.final_palabra(regexp_replace(trim(regexp_replace(upper(cig.desc_ingas)::text, '\s+',
+                ' ', 'g')), '\r|\n', '', 'g')) = orga.final_palabra(regexp_replace(trim(regexp_replace(upper(v_parametros.concepto_gasto)::text, '\s+', ' ', 'g')), '\r|\n', '', 'g'));
+     -- regexp_replace(field, E'(^[\\n\\r]+)|([\\n\\r]+$)', '', 'g' )
+     
              IF (v_registros_cig.id_concepto_ingas is null)THEN
              	RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto %',v_parametros.concepto_gasto;
              END IF;
