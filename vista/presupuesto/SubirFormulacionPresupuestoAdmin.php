@@ -124,35 +124,34 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: false,
                 form: false
             },
-
-            {
-                config: {
-                    name: 'observaciones',
-                    fieldLabel: 'Observaciones',
-                    allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 200,
-                    maxLength: 200
-                },
-                type: 'TextArea',
-                filters: {pfiltro: 'fp.observaciones', type: 'string'},
-                id_grupo: 1,
-                bottom_filter: true,
-                grid: true
-            },
             {
                 config: {
                     name: 'desc_persona',
                     fieldLabel: 'Responsable',
                     allowBlank: true,
                     anchor: '80%',
-                    gwidth: 100,
+                    gwidth: 350,
                     maxLength: 100
                 },
                 type: 'NumberField',
                 filters: {pfiltro: 'usures.desc_persona', type: 'string'},
                 bottom_filter: true,
                 id_grupo: 1,
+                grid: true
+            },
+            {
+                config: {
+                    name: 'observaciones',
+                    fieldLabel: 'Observaciones',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 250,
+                    maxLength: 200
+                },
+                type: 'TextArea',
+                filters: {pfiltro: 'fp.observaciones', type: 'string'},
+                id_grupo: 1,
+                bottom_filter: true,
                 grid: true
             },
             {
@@ -290,7 +289,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         onDetalleFormulacion: function () {
             //var rec = this.sm.getSelected();
-            Phx.CP.loadWindows('../../../sis_presupuestos/vista/presupuesto/FormDetalleSubirFormulacion.php',
+            Phx.CP.loadWindows('../../../sis_presupuestos/vista/presupuesto/FormDetalleSubirFormulacionAdmin.php',
                 'Subir Formulación',
                 {
                     modal: true,
@@ -299,7 +298,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 '',
                 this.idContenedor,
-                'FormDetalleSubirFormulacion')
+                'FormDetalleSubirFormulacionAdmin')
         },
 
         iniciarEventos: function () {

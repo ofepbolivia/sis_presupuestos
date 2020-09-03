@@ -994,7 +994,7 @@ BEGIN
         #FECHA:		05-08-2020 21:35:35
         ***********************************/
 
-        elsif(p_transaccion='PRE_LISFORMU_SEL')then
+       elsif(p_transaccion='PRE_LISFORMU_SEL')then
 
             begin
 
@@ -1030,7 +1030,7 @@ BEGIN
                             left join segu.tusuario usu2 on usu2.id_usuario = fp.id_usuario_mod
                             left join segu.vusuario usures on usures.id_usuario = fp.id_usuario_responsable
                             left join orga.vfuncionario fun on fun.id_persona = usures.id_persona
-                            where  '||v_filadd ;
+                            where fp.estado_reg = ''activo'' and  '||v_filadd ;
 
 
                 --Definicion de la respuesta
@@ -1056,6 +1056,17 @@ BEGIN
 
             begin
 
+            	v_filadd='';
+
+                IF (v_parametros.tipo_interfaz = 'FormulacionPresupuesto') THEN
+                	v_filadd = v_filadd ||'(fp.id_usuario_responsable = '||p_id_usuario||' or fp.id_usuario_reg = '||p_id_usuario||' or
+                	(fun.id_funcionario  IN (select *
+                						  FROM orga.f_get_funcionarios_x_usuario_asistente(now()::date,'||p_id_usuario||') AS (id_funcionario INTEGER))))  and ';
+
+
+                END IF;
+
+
                 --Sentencia de la consulta de conteo de registros
                 v_consulta:='select count(fp.id_formulacion_presu)
                             from pre.tformulacion_presu fp
@@ -1063,7 +1074,7 @@ BEGIN
                             left join segu.tusuario usu2 on usu2.id_usuario = fp.id_usuario_mod
                             left join segu.vusuario usures on usures.id_usuario = fp.id_usuario_responsable
                             left join orga.vfuncionario fun on fun.id_persona = usures.id_persona
-                            where  ';
+                            where fp.estado_reg = ''activo'' and '||v_filadd ;
 
                 --Definicion de la respuesta
                 v_consulta:=v_consulta||v_parametros.filtro;

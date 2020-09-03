@@ -124,29 +124,13 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid: false,
                 form: false
             },
-
-            {
-                config: {
-                    name: 'observaciones',
-                    fieldLabel: 'Observaciones',
-                    allowBlank: true,
-                    anchor: '80%',
-                    gwidth: 200,
-                    maxLength: 200
-                },
-                type: 'TextArea',
-                filters: {pfiltro: 'fp.observaciones', type: 'string'},
-                id_grupo: 1,
-                bottom_filter: true,
-                grid: true
-            },
             {
                 config: {
                     name: 'desc_persona',
                     fieldLabel: 'Responsable',
                     allowBlank: true,
                     anchor: '80%',
-                    gwidth: 100,
+                    gwidth: 350,
                     maxLength: 100
                 },
                 type: 'NumberField',
@@ -155,6 +139,22 @@ header("content-type: text/javascript; charset=UTF-8");
                 id_grupo: 1,
                 grid: true
             },
+            {
+                config: {
+                    name: 'observaciones',
+                    fieldLabel: 'Observaciones',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 250,
+                    maxLength: 200
+                },
+                type: 'TextArea',
+                filters: {pfiltro: 'fp.observaciones', type: 'string'},
+                id_grupo: 1,
+                bottom_filter: true,
+                grid: true
+            },
+
             {
                 config: {
                     name: 'estado_reg',

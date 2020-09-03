@@ -90,6 +90,8 @@ DECLARE
     v_id_memoria_calculo_presu			integer;
     v_registros_det						record;
     v_importe_presu_par					numeric;
+    v_importe_total						numeric;
+    v_justificacion						varchar;
 
 
 BEGIN
@@ -1068,8 +1070,8 @@ BEGIN
              WHERE fun.id_funcionario= v_parametros.id_responsable;
 
              --
-             SELECT usu.desc_persona, (p.fecha_reg::date||' '|| to_char(p.fecha_reg, 'HH12:MI:SS'))::varchar as fecha
-             INTO v_desc_persona_reg, v_fecha_reg
+             SELECT usu.desc_persona, (p.fecha_reg::date||' '|| to_char(p.fecha_reg, 'HH12:MI:SS'))::varchar as fecha, pd.importe_total, pd.justificacion
+             INTO v_desc_persona_reg, v_fecha_reg, v_importe_total, v_justificacion
              FROM pre.tformulacion_presu p
              left join pre.tformulacion_presu_detalle pd on pd.id_formulacion_presu = p.id_formulacion_presu
              left join segu.vusuario usu on usu.id_usuario = p.id_usuario_reg
@@ -1120,7 +1122,7 @@ BEGIN
                           SELECT p.id_formulacion_presu
                           into v_id_memoria_calculo_presu
                           FROM pre.tformulacion_presu p
-                          WHERE upper(p.observaciones) = upper(v_parametros.observaciones)
+                          WHERE trim(upper(p.observaciones)) = trim(upper(v_parametros.observaciones))
                           and p.id_usuario_responsable=v_id_usuario_resp
                           and p.estado_reg != 'inactivo';
 
@@ -1137,7 +1139,7 @@ BEGIN
 
                            END LOOP;
 
-                          RAISE EXCEPTION 'El documento ya fue registrado para el Centro de Costo % con el Concepto de Gasto %, por el usuario % el día %.',v_parametros.centro_costo,v_registros_cig.desc_ingas ,v_desc_persona_reg,v_fecha_reg ;
+                          RAISE EXCEPTION 'El documento ya fue registrado para el Centro de Costo % con el Concepto de Gasto %, con la Justificación % y un Importe de %, por el usuario % el día %.',v_parametros.centro_costo,v_registros_cig.desc_ingas,v_justificacion,v_importe_total,v_desc_persona_reg,v_fecha_reg ;
 
 
                 END IF;
