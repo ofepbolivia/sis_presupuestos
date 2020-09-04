@@ -605,12 +605,12 @@ BEGIN
                                 INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = ter.id_tipo_estado
                                 WHERE f.id_estado_anterior IS NOT NULL
                             )
-                            SELECT distinct on (f.codigo) codigo, 
-                            f.fecha_reg , 
-                            f.id_estado_fw, 
-                            f.id_estado_anterior, 
-                            f.id_funcionario 
-                            FROM firmas f 
+                            SELECT distinct on (f.codigo) codigo,
+                            f.fecha_reg ,
+                            f.id_estado_fw,
+                            f.id_estado_anterior,
+                            f.id_funcionario
+                            FROM firmas f
                             where   (case when f.codigo = 'vbrpc' then
                                 case when ((select te.codigo
                                 from wf.testado_wf es
@@ -620,9 +620,9 @@ BEGIN
                                 from wf.testado_wf fi
                                 where fi.id_estado_anterior  = f.id_estado_anterior)
                                 end
-                            else 
+                            else
                                 f.fecha_reg
-                            end) is not null                             
+                            end) is not null
                             ORDER BY f.codigo, f.fecha_reg DESC
                             ) LOOP
                   IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc')THEN
@@ -1024,12 +1024,13 @@ BEGIN
                                   usu1.cuenta as usr_reg,
                                   usu2.cuenta as usr_mod,
                                   fp.id_gestion
-
+                                  ,vu.desc_persona as usu_creacion
                             from pre.tformulacion_presu fp
                             inner join segu.tusuario usu1 on usu1.id_usuario = fp.id_usuario_reg
                             left join segu.tusuario usu2 on usu2.id_usuario = fp.id_usuario_mod
                             left join segu.vusuario usures on usures.id_usuario = fp.id_usuario_responsable
                             left join orga.vfuncionario fun on fun.id_persona = usures.id_persona
+                            inner join segu.vusuario vu on vu.id_usuario = fp.id_usuario_reg
                             where fp.estado_reg = ''activo'' and  '||v_filadd ;
 
 
@@ -1074,6 +1075,7 @@ BEGIN
                             left join segu.tusuario usu2 on usu2.id_usuario = fp.id_usuario_mod
                             left join segu.vusuario usures on usures.id_usuario = fp.id_usuario_responsable
                             left join orga.vfuncionario fun on fun.id_persona = usures.id_persona
+                            inner join segu.vusuario vu on vu.id_usuario = fp.id_usuario_reg
                             where fp.estado_reg = ''activo'' and '||v_filadd ;
 
                 --Definicion de la respuesta

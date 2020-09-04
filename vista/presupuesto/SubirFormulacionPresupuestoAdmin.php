@@ -70,6 +70,17 @@ header("content-type: text/javascript; charset=UTF-8");
                 grupo: [0,1]
             });*/
 
+            /*dev: breydi vasquez
+            description: reporte forulacion presupuestaria
+            date: 04/09/2020
+            */
+            this.addButton('archivo', {
+                text: 'Reporte PDF',
+                iconCls: 'bpdf',
+                disabled: false,
+                handler: this.onRepPDF,
+                tooltip: '<b>Reporte </b><br><b>Formulacion Presupuestaria</b>'
+            });
 
             this.store.baseParams = {tipo_interfaz: this.nombreVista};
 
@@ -272,7 +283,8 @@ header("content-type: text/javascript; charset=UTF-8");
             {name: 'estado_reg', type: 'string'},
             {name: 'usr_reg', type: 'string'},
             {name: 'usr_mod', type: 'string'},
-            {name: 'id_gestion', type: 'numeric'}
+            {name: 'id_gestion', type: 'numeric'},
+            {name: 'usu_creacion', type: 'string'},
 
         ],
 
@@ -331,6 +343,26 @@ header("content-type: text/javascript; charset=UTF-8");
                     height: '100%'
                 }, rec, this.idContenedor, 'Archivo');
 
+        },
+
+        onRepPDF: function () {
+          var data = this.getSelectedData();
+          var NumSelect = this.sm.getCount();
+            if(NumSelect != 0)
+            {
+              Phx.CP.loadingShow();
+              Ext.Ajax.request({
+                      url:'../../sis_presupuestos/control/Presupuesto/reportePDFPresupuestaria',
+                      params:{id_formulacion_presu:data.id_formulacion_presu, responsable: data.desc_persona, obs: data.observaciones, fecha_crea: data.fecha_reg,
+                              usu_creacion: data.usu_creacion},
+                      success: this.successExport,
+                      failure: this.conexionFailure,
+                      timeout:this.timeout,
+                      scope:this
+              });
+            }else{
+              Ext.MessageBox.alert('Alerta', 'Antes debe seleccionar un item.');
+            }
         },
 
         iniciarEventos: function () {

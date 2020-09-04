@@ -18,6 +18,7 @@ require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RNotaIntern.php
 require_once(dirname(__FILE__).'/../../sis_presupuestos/reportes/RCertificacionPresupuestariaMod.php');
 
 include_once(dirname(__FILE__).'/../../lib/lib_general/ExcelInput.php');
+require_once(dirname(__FILE__).'/../reportes/RFormPresupPDF.php');
 
 class ACTPresupuesto extends ACTbase{
 
@@ -589,6 +590,46 @@ class ACTPresupuesto extends ACTbase{
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
 
+		/*****
+		date: 03/09/2020
+		dev: breydi vasquez
+		description: Reporte Forulacion presupuestaria
+		****/
+		function reportePDFPresupuestaria () {
+			$this->objParam->defecto('ordenacion','id_formulacion_presu');
+			$this->objParam->defecto('dir_ordenacion','asc');
+			$this->objParam->defecto('cantidad', 1000000);
+			$this->objParam->defecto('puntero', 0);
+
+			$this->objParam->addFiltro("fpd.id_formulacion_presu = ".$this->objParam->getParametro('id_formulacion_presu'));
+
+			$this->objFunc=$this->create('MODPresupuesto');
+			$this->res=$this->objFunc->listarFormulacionPresuDet($this->objParam);
+
+			//obtener titulo del reporte
+			$titulo = 'FormulacionPresupuestaria';
+			//Genera el nombre del archivo (aleatorio + titulo)
+			$nombreArchivo=uniqid(md5(session_id()).$titulo);
+
+
+			$nombreArchivo.='.pdf';
+			$this->objParam->addParametro('orientacion','L');
+			$this->objParam->addParametro('tamano','LETTER	');
+			$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+			//Instancia la clase de pdf
+			$this->objReporteFormato=new RFormPresupPDF($this->objParam);
+			$this->objReporteFormato->setDatos($this->res->datos);
+			$this->objReporteFormato->generarReporte();
+			$this->objReporteFormato->output($this->objReporteFormato->url_archivo,'F');
+
+
+			$this->mensajeExito=new Mensaje();
+			$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado',
+					'Se generó con éxito el reporte: '.$nombreArchivo,'control');
+			$this->mensajeExito->setArchivoGenerado($nombreArchivo);
+			$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+		}
 
 
 }
