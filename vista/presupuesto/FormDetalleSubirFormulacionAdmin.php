@@ -59,7 +59,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 /*{
                     config:{
                         labelSeparator:'',
-                        inputType:'hidden',
+                        //inputType:'hidden',
                         name: 'id_solicitud'
 
                     },
@@ -154,6 +154,18 @@ header("content-type: text/javascript; charset=UTF-8");
                     form: true
                 },
                 {
+                    config: {
+                        name: 'observaciones',
+                        fieldLabel: 'Descripción',
+                        allowBlank: false,
+                        anchor:'100%',
+                        maxLength: 2000
+                    },
+                    type: 'TextArea',
+                    filters: {pfiltro: 'fp.observaciones', type: 'string'},
+                    form: true
+                },
+                {
                     config:{
                         fieldLabel: "Documento",
                         allowBlank:false,
@@ -166,18 +178,6 @@ header("content-type: text/javascript; charset=UTF-8");
                     },
                     type:'Field',
                     form:true
-                },
-                {
-                    config: {
-                        name: 'observaciones',
-                        fieldLabel: 'Observaciones',
-                        allowBlank: true,
-                        anchor:'100%',
-                        maxLength: 2000
-                    },
-                    type: 'TextArea',
-                    filters: {pfiltro: 'fp.observaciones', type: 'string'},
-                    form: true
                 }
             ],
             title:'Subir Detalle Formulación',

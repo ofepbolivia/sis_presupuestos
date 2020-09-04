@@ -92,6 +92,7 @@ DECLARE
     v_importe_presu_par					numeric;
     v_importe_total						numeric;
     v_justificacion						varchar;
+    v_id_formulacion_presu_encontrada	integer;
 
 
 BEGIN
@@ -1107,7 +1108,16 @@ BEGIN
                		RAISE EXCEPTION 'No se encuentra parametrizado la Partida para el Concepto de Gasto %',v_registros_cig.desc_ingas;
                END IF;
 
+               -- no se registre null observaciones ni el mismo dentro de una gestion
+               IF EXISTS (SELECT 1
+                           FROM pre.tformulacion_presu p
+                           WHERE p.id_gestion = v_id_gestion
+                           and p.estado_reg = 'activo'
+                           and p.id_usuario_responsable=v_id_usuario_resp
+                           and (trim(p.observaciones))::varchar = (trim(v_parametros.observaciones))::varchar) THEN
 
+                           RAISE EXCEPTION 'El campo Descripción no puede repetirse para el mismo responsable, modifique la Descripción.';
+                END IF;
 
                --CONTROL NO REPITA EN EL MISMO PRESUPUESTO UN CONCEPTO DE GASTO
                IF EXISTS (SELECT 1
@@ -1122,7 +1132,8 @@ BEGIN
                           SELECT p.id_formulacion_presu
                           into v_id_memoria_calculo_presu
                           FROM pre.tformulacion_presu p
-                          WHERE trim(upper(p.observaciones)) = trim(upper(v_parametros.observaciones))
+                          WHERE p.id_gestion = v_id_gestion
+                          and trim(upper(p.observaciones)) = trim(upper(v_parametros.observaciones))
                           and p.id_usuario_responsable=v_id_usuario_resp
                           and p.estado_reg != 'inactivo';
 
@@ -1139,7 +1150,18 @@ BEGIN
 
                            END LOOP;
 
-                          RAISE EXCEPTION 'El documento ya fue registrado para el Centro de Costo % con el Concepto de Gasto %, con la Justificación % y un Importe de %, por el usuario % el día %.',v_parametros.centro_costo,v_registros_cig.desc_ingas,v_justificacion,v_importe_total,v_desc_persona_reg,v_fecha_reg ;
+                           --id_preus cabecera
+                          SELECT p.id_formulacion_presu
+               			  INTO v_id_formulacion_presu_encontrada
+                          FROM pre.tformulacion_presu p
+                          join pre.tformulacion_presu_detalle pd  on pd.id_formulacion_presu = p.id_formulacion_presu
+                          WHERE pd.id_concepto_gasto = v_registros_cig.id_concepto_ingas
+                          and pd.id_centro_costo = v_id_centro_costo
+                          and p.id_gestion = v_id_gestion
+                          and pd.estado_reg= 'activo' and p.estado_reg = 'activo'
+                          and (trim(pd.justificacion))::varchar = (trim(v_parametros.justificacion))::varchar;
+
+                         RAISE EXCEPTION 'En el documento % ya fue registrado el Centro de Costo % con el Concepto de Gasto %, con la Justificación % y un Importe de %, por el usuario % el día %.',v_id_formulacion_presu_encontrada, v_parametros.centro_costo,v_registros_cig.desc_ingas,v_justificacion,v_importe_total,v_desc_persona_reg,v_fecha_reg ;
 
 
                 END IF;

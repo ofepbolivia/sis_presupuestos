@@ -62,14 +62,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 tooltip: 'Subir archivo excel con la Formulación Presupuestaria'
             });
 
-            this.addButton('archivo', {
-                text: 'Adjuntar Archivo',
+            /*this.addButton('archivo', {
+                text: 'Ver Archivo',
                 iconCls: 'bfolder',
                 disabled: false,
                 handler: this.archivo,
                 tooltip: '<b>Adjuntar Archivo</b><br><b>Nos permite adjuntar respaldos de una Formulacion Presupuestaria.</b>',
                 grupo: [0,1]
-            });
+            });*/
 
             this.store.baseParams = {tipo_interfaz: this.nombreVista};
 
@@ -124,14 +124,14 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 //configuracion del componente
                 config: {
-                    labelSeparator: '',
-                    inputType: 'hidden',
+                    //labelSeparator: '',
+                    //inputType: 'hidd en',
                     name: 'id_formulacion_presu',
                     fieldLabel: 'ID',
                     gwidth: 50
                 },
-                type: 'Field',
-                grid: false,
+                type: 'FieldText',
+                grid: true,
                 form: false
             },
             {
@@ -152,7 +152,7 @@ header("content-type: text/javascript; charset=UTF-8");
             {
                 config: {
                     name: 'observaciones',
-                    fieldLabel: 'Observaciones',
+                    fieldLabel: 'Descripción',
                     allowBlank: true,
                     anchor: '80%',
                     gwidth: 250,
