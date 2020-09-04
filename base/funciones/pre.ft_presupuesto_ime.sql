@@ -1021,7 +1021,7 @@ BEGIN
 
       elsif(p_transaccion='PRE_FORMUPRE_INS')then
 
-           begin
+          begin
 
           --raise EXCEPTION 'llegabd % ',v_parametros.id_gestion;
 
@@ -1056,7 +1056,7 @@ BEGIN
               and orga.final_palabra(regexp_replace(trim(regexp_replace(upper(cig.desc_ingas)::text, '\s+',
                 ' ', 'g')), '\r|\n', '', 'g')) = orga.final_palabra(regexp_replace(trim(regexp_replace(upper(v_parametros.concepto_gasto)::text, '\s+', ' ', 'g')), '\r|\n', '', 'g'));
      -- regexp_replace(field, E'(^[\\n\\r]+)|([\\n\\r]+$)', '', 'g' )
-     
+
              IF (v_registros_cig.id_concepto_ingas is null)THEN
              	RAISE EXCEPTION 'No se encuentra parametrizado el Concepto de Gasto %',v_parametros.concepto_gasto;
              END IF;
@@ -1108,16 +1108,7 @@ BEGIN
                		RAISE EXCEPTION 'No se encuentra parametrizado la Partida para el Concepto de Gasto %',v_registros_cig.desc_ingas;
                END IF;
 
-               -- no se registre null observaciones ni el mismo dentro de una gestion
-               IF EXISTS (SELECT 1
-                           FROM pre.tformulacion_presu p
-                           WHERE p.id_gestion = v_id_gestion
-                           and p.estado_reg = 'activo'
-                           and p.id_usuario_responsable=v_id_usuario_resp
-                           and (trim(p.observaciones))::varchar = (trim(v_parametros.observaciones))::varchar) THEN
 
-                           RAISE EXCEPTION 'El campo Descripción no puede repetirse para el mismo responsable, modifique la Descripción.';
-                END IF;
 
                --CONTROL NO REPITA EN EL MISMO PRESUPUESTO UN CONCEPTO DE GASTO
                IF EXISTS (SELECT 1
@@ -1161,7 +1152,7 @@ BEGIN
                           and pd.estado_reg= 'activo' and p.estado_reg = 'activo'
                           and (trim(pd.justificacion))::varchar = (trim(v_parametros.justificacion))::varchar;
 
-                         RAISE EXCEPTION 'En el documento % ya fue registrado el Centro de Costo % con el Concepto de Gasto %, con la Justificación % y un Importe de %, por el usuario % el día %.',v_id_formulacion_presu_encontrada, v_parametros.centro_costo,v_registros_cig.desc_ingas,v_justificacion,v_importe_total,v_desc_persona_reg,v_fecha_reg ;
+                         RAISE EXCEPTION 'En el documento % ya fue registrado el Centro de Costo % con el Concepto de Gasto %, con la Justificación % y un Importe de %, por el usuario % el día %.',COALESCE(v_id_formulacion_presu_encontrada, null), v_parametros.centro_costo,v_registros_cig.desc_ingas,v_justificacion,v_importe_total,v_desc_persona_reg,v_fecha_reg ;
 
 
                 END IF;
@@ -1170,9 +1161,10 @@ BEGIN
                 --INSERTAR TABLA FORMULACION
                 IF NOT EXISTS (SELECT 1
                               FROM pre.tformulacion_presu p
-                              WHERE upper(p.observaciones) = upper(v_parametros.observaciones)
-                              and p.id_usuario_responsable=v_id_usuario_resp
-                              and p.estado_reg != 'inactivo'  ) THEN
+                             WHERE p.id_gestion = v_id_gestion
+                                             and p.estado_reg = 'activo'
+                                             and p.id_usuario_responsable=v_id_usuario_resp
+                                             and (trim(upper(p.observaciones)))::varchar = (trim(upper(v_parametros.observaciones)))::varchar)THEN
 
                                --CONTROL NO REPITA EN EL MISMO PRESUPUESTO UN CONCEPTO DE GASTO
                                IF EXISTS (SELECT 1
