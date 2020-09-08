@@ -136,7 +136,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'id_funcionario',
                         hiddenName: 'id_funcionario',
                         origen: 'FUNCIONARIOCAR',
-                        fieldLabel: 'Funcionario',
+                        fieldLabel: 'Funcionario Responsable',
                         allowBlank: false,
                         anchor:'100%',
                         valueField: 'id_funcionario',
@@ -159,7 +159,8 @@ header("content-type: text/javascript; charset=UTF-8");
                         fieldLabel: 'Descripción',
                         allowBlank: false,
                         anchor:'100%',
-                        maxLength: 2000
+                        maxLength: 2000//,
+                        //gtip: 'el campo descripcion no puede modificarse'
                     },
                     type: 'TextArea',
                     filters: {pfiltro: 'fp.observaciones', type: 'string'},

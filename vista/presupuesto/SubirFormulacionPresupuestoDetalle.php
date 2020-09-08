@@ -482,7 +482,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         currencyChar:' ',
                         allowBlank: true,
                         anchor: '80%',
-                        gwidth: 100,
+                        gwidth: 150,
                         maxLength:123456778,
                         galign: 'right ',
                         renderer: function (value, p, record) {

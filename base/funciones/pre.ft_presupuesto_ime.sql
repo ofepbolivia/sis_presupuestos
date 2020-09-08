@@ -1070,6 +1070,10 @@ BEGIN
              join orga.vfuncionario_persona fun on fun.id_persona= usu.id_persona
              WHERE fun.id_funcionario= v_parametros.id_responsable;
 
+             IF (v_id_usuario_resp is null) THEN
+             	raise exception 'El Funcionario Responsable no se encuentra registrado como un usuario.';
+             END IF;
+
              --
              SELECT usu.desc_persona, (p.fecha_reg::date||' '|| to_char(p.fecha_reg, 'HH12:MI:SS'))::varchar as fecha, pd.importe_total, pd.justificacion
              INTO v_desc_persona_reg, v_fecha_reg, v_importe_total, v_justificacion

@@ -136,7 +136,7 @@ header("content-type: text/javascript; charset=UTF-8");
                         name: 'id_funcionario',
                         hiddenName: 'id_funcionario',
                         origen: 'FUNCIONARIOCAR',
-                        fieldLabel: 'Funcionario',
+                        fieldLabel: 'Funcionario Responsable',
                         allowBlank: false,
                         anchor:'100%',
                         valueField: 'id_funcionario',
