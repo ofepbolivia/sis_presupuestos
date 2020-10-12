@@ -1439,11 +1439,13 @@ BEGIN
               END IF;*/
 
               update pre.tformulacion_presu  set
-              estado_reg = 'inactivo'
+              estado_reg = 'inactivo',
+              id_usuario_mod = p_id_usuario
               where id_formulacion_presu = v_parametros.id_formulacion_presu;
 
               update pre.tformulacion_presu_detalle set
-              estado_reg = 'inactivo'
+              estado_reg = 'inactivo',
+              id_usuario_mod = p_id_usuario
               where id_formulacion_presu = v_parametros.id_formulacion_presu;
 
 

@@ -82,7 +82,7 @@ BEGIN
                         (case when''contrato'' = ANY (conig.sw_autorizacion) then ''contrato'' else ''X'' end)::varchar as contrato,
                         (case when''especial'' = ANY (conig.sw_autorizacion) then ''especial'' else ''X'' end)::varchar as especial,
 
-                        (select array_to_string( array_agg( mmod.tipo_contratacion), '', '' )
+                        (select array_to_string( array_agg(mmod.referencia||''-''|| mmod.tipo_contratacion), '', '' )
                          from adq.tmatriz_modalidad mmod
                          inner join adq.tmatriz_concepto mcon on mcon.id_matriz_modalidad = mmod.id_matriz_modalidad
                          where mmod.estado_reg = ''activo''
