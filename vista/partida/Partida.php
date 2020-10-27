@@ -19,9 +19,9 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 		Phx.vista.Partida.superclass.constructor.call(this,config);
 		this.init();
 		this.loaderTree.baseParams={id_gestion:0,tipo:'gasto'};
-		
+
 		this.cmbGestion.on('select',this.capturaFiltros,this);
-		
+
 		this.cmbTipo.on('select',this.capturaFiltros,this);
 		this.addButton('btnImprimir',
 			{
@@ -42,12 +42,12 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 				tooltip: '<b>Clonar  las partidas para las gestión siguiente </b><br/>Clonar las partidas, para la gestión siguiente guardando las relacion entre las mismas'
 			}
 		);
-		
+
 	},
-	
+
 	duplicarPartidas: function(){
 		if(this.cmbGestion.getValue()){
-			Phx.CP.loadingShow(); 
+			Phx.CP.loadingShow();
 	   		Ext.Ajax.request({
 				url: '../../sis_presupuestos/control/Partida/clonarPartidasGestion',
 			  	params:{
@@ -62,9 +62,9 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 		else{
 			alert('Primero debe selecionar la gestion origen');
 		}
-   		
+
    },
-   
+
    successRep:function(resp){
         Phx.CP.loadingHide();
         var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
@@ -75,20 +75,20 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
             alert('Ocurrió un error durante el proceso')
         }
 	},
-	
+
 	capturaFiltros:function(combo, record, index){
-		
+
 		this.loaderTree.baseParams={id_gestion:this.cmbGestion.getValue(),tipo:this.cmbTipo.getValue()};
 		this.root.reload();
 	},
-    
+
     loadValoresIniciales:function()
 	{
 		Phx.vista.Partida.superclass.loadValoresIniciales.call(this);
-		this.getComponente('id_gestion').setValue(this.cmbGestion.getValue());	
-		this.getComponente('tipo').setValue(this.cmbTipo.getValue());	
+		this.getComponente('id_gestion').setValue(this.cmbGestion.getValue());
+		this.getComponente('tipo').setValue(this.cmbTipo.getValue());
 	},
-	
+
 	imprimirCbte: function(){
 		Phx.CP.loadingShow();
 		Ext.Ajax.request({
@@ -103,8 +103,8 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 						scope : this
 					});
 	},
-	
-			
+
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -114,7 +114,7 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 					name: 'id_partida'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			//configuracion del componente
@@ -124,7 +124,7 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 					name: 'id_gestion'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
 		{
 			//configuracion del componente
@@ -134,9 +134,9 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 					name: 'tipo'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
-		
+
 		{
 			config:{
 				name: 'id_partida_fk',
@@ -218,10 +218,10 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,
-	       		filters:{	
+	       		filters:{
 	       		         type: 'list',
 	       		         pfiltro:'par.sw_movimiento',
-	       				 options: ['fresupuestaria','flujo'],	
+	       				 options: ['fresupuestaria','flujo'],
 	       		 	},
 	       		grid:true,
 	       		form:true
@@ -241,10 +241,10 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 	       		},
 	       		type:'ComboBox',
 	       		id_grupo:0,
-	       		filters:{	
+	       		filters:{
 	       		         type: 'list',
 	       		         pfiltro:'par.sw_transaccional',
-	       				 options: ['movimiento','titular'],	
+	       				 options: ['movimiento','titular'],
 	       		 	},
 	       		grid:true,
 	       		form:true
@@ -347,9 +347,9 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 		{name:'fecha_mod', type: 'date', dateFormat:'Y-m-d H:i:s'},
 		{name:'usr_reg', type: 'string'},
 		{name:'usr_mod', type: 'string'},'id_gestion','sw_transaccional','sw_movimiento'
-		
+
 	],
-	
+
 	cmbGestion:new Ext.form.ComboBox({
 				fieldLabel: 'Gestion',
 				allowBlank: true,
@@ -374,12 +374,12 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 				displayField: 'gestion',
 			    hiddenName: 'id_gestion',
     			mode:'remote',
-				pageSize:50,
+				pageSize:5,
 				queryDelay:500,
 				listWidth:'280',
 				width:80
 			}),
-	
+
 	cmbTipo:new Ext.form.ComboBox({
 	       			name:'movimiento',
 	       			fieldLabel:'Movimiento',
@@ -401,19 +401,19 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 	bsave:false,
 	rootVisible:true,
 	expanded:false,
-	
+
 	onButtonNew:function(){
 		if(this.cmbGestion.getValue()){
-	        var nodo = this.sm.getSelectedNode();           
+	        var nodo = this.sm.getSelectedNode();
 	        Phx.vista.Partida.superclass.onButtonNew.call(this);
 	     }
 	     else
 	     {
 	     	alert("Seleccione una gestion primero.");
-	     	
-	     }   
+
+	     }
     },
-    
+
     preparaMenu:function(n){
         if(n.attributes.tipo_nodo == 'hijo' || n.attributes.tipo_nodo == 'raiz' || n.attributes.id == 'id'){
             this.tbar.items.get('b-new-'+this.idContenedor).enable()
@@ -424,18 +424,18 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
         // llamada funcion clase padre
             Phx.vista.Partida.superclass.preparaMenu.call(this,n);
     },
-    
+
     /*EnableSelect:function(n){
     	console.log('pasa...')
         var nivel = n.getDepth();
         var direc = this.getNombrePadre(n)
-        
+
         console.log(direc)
-        if(direc){            
+        if(direc){
             Phx.vista.Partida.superclass.EnableSelect.call(this,n)
-        }        
+        }
     },
-    
+
     getNombrePadre:function(n){
         var direc
         var padre = n.parentNode;
@@ -444,16 +444,28 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
                direc = n.attributes.nombre +' - '+ this.getNombrePadre(padre)
                return direc;
             }else{
-                
+
                 return n.attributes.nombre;
             }
         }
         else{
                 return undefined;
-        }       
+        }
      }*/
+
+		 /*ini
+		 Dev: breydi vasquez
+		 Description: grilla hijo plan de cuentas por partida
+		 date: 22/10/2020
+		 */
+		 tabeast:[
+			 {
+					 url:'../../../sis_presupuestos/vista/partida/PlanCuentaPartida.php',
+					 title:'Plan de Cuentas',
+					 width:'60%',
+					 cls:'PlanCuentaPartida'
+			 }]
+		 /*fin*/
 }
 )
 </script>
-		
-		

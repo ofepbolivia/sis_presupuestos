@@ -284,7 +284,29 @@ class ACTPartida extends ACTbase{
 
 
     }
+		/*ini
+		Dev: breydi vasquez
+		Description: grilla hijo plan de cuentas por partida
+		date: 22/10/2020
+		*/
+		function listPlanCuentaPartida () {
+			$this->objParam->defecto('ordenacion','nro_cuenta');
+			$this->objParam->defecto('dir_ordenacion','asc');
 
+			$this->objParam->getParametro('id_partida') != '' && $this->objParam->addFiltro("cupa.id_partida = ".$this->objParam->getParametro('id_partida'));
+			$this->objParam->getParametro('id_gestion') != '' && $this->objParam->addFiltro("cta.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+
+			if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+				$this->objReporte = new Reporte($this->objParam,$this);
+				$this->res = $this->objReporte->generarReporteListado('MODPartida','listPlanCuentaPartida');
+			} else{
+				$this->objFunc=$this->create('MODPartida');
+
+				$this->res=$this->objFunc->listPlanCuentaPartida($this->objParam);
+			}
+			$this->res->imprimirRespuesta($this->res->generarJson());
+		}
+		// fin
 
 }
 
