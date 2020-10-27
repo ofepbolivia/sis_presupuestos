@@ -49,7 +49,10 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                 if (strpos($fir, 'vbrpc') !== false) {
                     $firma_fecha = explode(',', $fir);
                     //var_dump($firma_fecha);
+                }elseif (strpos($fir, 'vbrpa') !== false){
+                    $firma_fecha = explode(',', $fir);
                 }
+
             }
             // foreach ($firmas as $fir) {
             //     if (strpos($fir, 'vbpresupuestos') !== false) {
@@ -75,7 +78,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         //var_dump($firma_fecha);
 
-        if($firma_fecha[0]=='vbrpc') {
+        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
           $fecha = date_create($firma_fecha[1]);
         }
         $fecha_sol = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
@@ -90,11 +93,11 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
       if(($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018'))||($this->datos[0]['funcionario_solicitante']=='PASTOR JAIME LAZARTE VILLAGRA'&&$this->datos[0]['codigo_moneda']!='Bs')/*||$fecha_sol<= date_create('31-10-2018')*/){
             if ($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018')){
-              if($firma_fecha[0]=='vbrpc') {
+              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
                 $fecha  = $fecha_sol;
               }
             }else{
-              if($firma_fecha[0]=='vbrpc') {
+              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
                 $fecha = date_format($fecha, 'd/m/Y');
               }
             }
@@ -103,7 +106,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             /*if($fecha_sol<= date_create('31-10-2018')){
                 $fecha  = $fecha_sol;
             }else {*/
-            if($firma_fecha[0]=='vbrpc') {
+            if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
             $fecha = date_format($fecha, 'd/m/Y');
            }
             //}
@@ -270,7 +273,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         if($this->GetY() == 220)
             $this->SetY(250);
 
-        if($firma_fecha[0]=='vbrpc') {
+        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
             $tbl = '<table>
                     <tr>
                     <td style="width: 15%"></td>

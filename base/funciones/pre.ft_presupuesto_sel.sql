@@ -589,7 +589,7 @@ BEGIN
             FROM adq.tsolicitud ts
             WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
 
-            IF(v_record_sol.estado='vbpresupuestos' OR v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado')THEN
+            IF(v_record_sol.estado='vbpresupuestos' OR v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado='vbrpa' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado')THEN
               v_index = 1;
               FOR v_record IN (WITH RECURSIVE firmas(id_estado_fw, id_estado_anterior,fecha_reg, codigo, id_funcionario) AS (
                                 SELECT tew.id_estado_wf, tew.id_estado_anterior , tew.fecha_reg, te.codigo, tew.id_funcionario
@@ -604,32 +604,33 @@ BEGIN
                                 INNER JOIN firmas f ON f.id_estado_anterior = ter.id_estado_wf
                                 INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = ter.id_tipo_estado
                                 WHERE f.id_estado_anterior IS NOT NULL
-                            )
-                            SELECT distinct on (f.codigo) codigo,
-                            f.fecha_reg ,
-                            f.id_estado_fw,
-                            f.id_estado_anterior,
-                            f.id_funcionario
-                            FROM firmas f
-                            where   (case when f.codigo = 'vbrpc' then
-                                case when ((select te.codigo
-                                from wf.testado_wf es
-                                INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = es.id_tipo_estado
-                                where es.id_estado_wf  = f.id_estado_anterior) = 'vbpresupuestos') then
-                                (select fi.fecha_reg
-                                from wf.testado_wf fi
-                                where fi.id_estado_anterior  = f.id_estado_anterior)
-                                end
-                            else
-                                f.fecha_reg
-                            end) is not null
-                            ORDER BY f.codigo, f.fecha_reg DESC
-                            ) LOOP
-                  IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc')THEN
+                            )SELECT
+                                  distinct on (f.codigo) codigo,
+                                  f.codigo,
+                                  f.fecha_reg,
+                                  f.id_funcionario
+                                  FROM firmas f
+                                        where   (case when f.codigo in ('vbrpc', 'vbrpa') then
+                                            case when ((select te.codigo
+                                            from wf.testado_wf es
+                                            INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = es.id_tipo_estado
+                                            where es.id_estado_wf  = f.id_estado_anterior) = 'vbpresupuestos') then
+                                            (select fi.fecha_reg
+                                            from wf.testado_wf fi
+                                            where fi.id_estado_anterior  = f.id_estado_anterior)
+                                            end
+                                        else
+                                            f.fecha_reg
+                                        end) is not null
+                                ORDER BY f.codigo, f.fecha_reg DESC
+                                ) LOOP
+                  IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc' OR v_record.codigo = 'vbrpa')THEN
+
                     SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                     INTO v_record_funcionario
                     FROM orga.vfuncionario_cargo_lugar vf
                     WHERE vf.id_funcionario = v_record.id_funcionario;
+
                     v_firmas[v_index] = v_record.codigo::VARCHAR||','||v_record.fecha_reg::VARCHAR||','||v_record_funcionario.desc_funcionario1::VARCHAR||','||v_record_funcionario.nombre_cargo::VARCHAR||','||v_record_funcionario.oficina_nombre;
                     v_index = v_index + 1;
                   END IF;
