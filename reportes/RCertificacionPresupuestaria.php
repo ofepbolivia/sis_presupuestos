@@ -70,6 +70,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         foreach ($firmas as $fir){
             if(strpos($fir, 'suppresu')!==false){
                 $firma_aprobado = explode(',',$fir);
+                //var_dump($firma_aprobado);
             }
         }
 
