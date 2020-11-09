@@ -305,24 +305,25 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             $this->Ln(5);
             $this->writeHTML($tbl, true, false, false, false, '');
         }else{
+            //(may) 06/11/2020 modificacion para los procesos de modalidad de excepcion
             $tbl = '<table>
                     <tr>
                     <td style="width: 15%"></td>
                     <td style="width: 70%">
-                    <table cellspacing="0" cellpadding="1" border="1" style="font-family: Calibri; font-size: 9px;">
+                    <table cellspacing="0" cellpadding="1" border="1">
                         <tr>
-                            <td style="font-family: Calibri; font-size: 9px;"><b> Elaborado por:</b> <br> </td>
-                            <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> </td>
+                            <td style="font-family: Calibri; font-size: 9px;"><b> Elaborado por:</b> <br> ' . $firma_elaborado[2] . '</td>
+                            <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> ' . $firma_aprobado[2] . '</td>
                         </tr>
                         <tr>
                             <td align="center" >
                                 <br><br>
-                                <img  style="width: 95px; height: 95px;" src="" alt="Logo"><br>
+                                <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_elaborado[2], $firma_elaborado[3],$firma_elaborado[4]) . '" alt="Logo">
 
                             </td>
                             <td align="center" >
                                 <br><br>
-                                <img  style="width: 95px; height: 95px;" src="" alt="Logo"><br>
+                                <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_aprobado[2], $firma_aprobado[3],$firma_aprobado[4]) . '" alt="Logo">
 
                             </td>
                          </tr>
