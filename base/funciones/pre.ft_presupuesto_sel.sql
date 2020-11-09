@@ -584,12 +584,12 @@ BEGIN
               "CINTPD-001025-2018":"19/7/2018"
             }';
             --raise exception 'v_procesos_excepcion: %, %', v_procesos_excepcion->'CINTPD-000964-2018', json_object_keys (v_procesos_excepcion->'CINTPD-000964-2018');
-            SELECT ts.estado, ts.id_estado_wf, ts.justificacion, ts.id_gestion
+            SELECT ts.estado, ts.id_estado_wf, ts.justificacion, ts.id_gestion, ts.tipo_modalidad
             INTO v_record_sol
             FROM adq.tsolicitud ts
             WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
 
-            IF(v_record_sol.estado='vbpresupuestos' OR v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado='vbrpa' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado')THEN
+            IF(v_record_sol.estado='vbpresupuestos' OR v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado='vbrpa' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado' OR v_record_sol.tipo_modalidad = 'mod_excepcion')THEN
               v_index = 1;
               FOR v_record IN (WITH RECURSIVE firmas(id_estado_fw, id_estado_anterior,fecha_reg, codigo, id_funcionario) AS (
                                 SELECT tew.id_estado_wf, tew.id_estado_anterior , tew.fecha_reg, te.codigo, tew.id_funcionario
@@ -624,7 +624,7 @@ BEGIN
                                         end) is not null
                                 ORDER BY f.codigo, f.fecha_reg DESC
                                 ) LOOP
-                  IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc' OR v_record.codigo = 'vbrpa')THEN
+                  IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc' OR v_record.codigo = 'vbrpa' OR v_record_sol.tipo_modalidad = 'mod_excepcion')THEN
 
                     SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                     INTO v_record_funcionario
