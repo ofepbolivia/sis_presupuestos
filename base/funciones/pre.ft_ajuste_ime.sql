@@ -541,7 +541,7 @@ BEGIN
                      where ad.id_ajuste = v_parametros.id_ajuste;
 
                      IF   array_length(va_id_partida,1 ) > 1 THEN
-                         raise exception 'en traspasos la partida en cada detalle tiene que ser la misma';
+                         --raise exception 'en traspasos la partida en cada detalle tiene que ser la misma';
                      END IF;
 
 

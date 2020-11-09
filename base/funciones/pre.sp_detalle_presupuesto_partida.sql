@@ -27,9 +27,9 @@ RETURNS TABLE (
 $body$
 DECLARE
   v_resp INT;
-  
+
 BEGIN
-    RETURN QUERY 
+    RETURN QUERY
     select DISTINCT ON (num_tramite,codigo_cc, id_partida_ejecucion)
     registros.comprometido,registros.ejecutado, registros.pagado,registros.codigo,registros.id_centro_costo,
     registros.num_tramite,registros.descripcion, registros.gestion,
@@ -45,16 +45,16 @@ BEGIN
     coalesce(s.justificacion, '')  ||' - Desc: '|| coalesce(sd.descripcion, '') as descripcion,
     ges.gestion,
     par.nombre_partida,
-    par.codigo as partida_cod, 
+    par.codigo as partida_cod,
     vpres.codigo_cc,
     soli.desc_funcionario1,
     to_char(s.fecha_soli ,'DD/MM/YYYY') as fechaAux,
     s.fecha_soli,
-    usu.desc_persona , 
+    usu.desc_persona ,
     sd.id_partida_ejecucion,
     pro.desc_proveedor,
     s.id_moneda
-    from 
+    from
     adq.tsolicitud s
     inner join adq.tsolicitud_det sd on sd.id_solicitud = s.id_solicitud and s.estado_reg = 'activo' and  sd.estado_reg = 'activo'
     inner join param.tmoneda m on m.id_moneda = moneda_id
@@ -65,12 +65,12 @@ BEGIN
     inner join orga.vfuncionario soli on soli.id_funcionario = s.id_funcionario
     inner join segu.vusuario  usu on usu.id_usuario = usuario_id
     inner join param.vproveedor pro on pro.id_proveedor = s.id_proveedor
-    where  s.estado not in ('borrador','vbgerencia','vbpresupuestos','anulado')
+    where s.id_gestion=17 and s.fecha_soli >'31/10/2019' and s.estado not in ('borrador','vbgerencia','vbpresupuestos','anulado')
           AND ((presupuesto_id > 0 AND sd.id_centro_costo in (presupuesto_id))OR(presupuesto_id = 0))
           AND((partida_id > 0 AND sd.id_partida in (partida_id))OR(partida_id = 0))
-     
-     union
-     
+
+    /* union
+
     select
     (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(odi.id_partida_ejecucion_com, moneda_id)) as comprometido,
 	(select COALESCE(ps_ejecutado,0) from pre.f_verificar_com_eje_pag(odi.id_partida_ejecucion_com, moneda_id)) as ejecutado,
@@ -82,7 +82,7 @@ BEGIN
     ges.gestion,
     part.nombre_partida,
     part.codigo,
-    vpresu.codigo_cc, 
+    vpresu.codigo_cc,
     solici.desc_funcionario1,
     to_char(op.fecha,'DD/MM/YYYY'),
     op.fecha,
@@ -90,7 +90,7 @@ BEGIN
     odi.id_partida_ejecucion_com,
     pro.desc_proveedor,
     op.id_moneda
-    from 
+    from
     tes.tobligacion_pago op
     inner join tes.tobligacion_det odi on odi.id_obligacion_pago = op.id_obligacion_pago and odi.estado_reg = 'activo' and  op.estado_reg = 'activo'
     inner join param.tmoneda m on m.id_moneda = moneda_id
@@ -105,8 +105,8 @@ BEGIN
     AND ((presupuesto_id > 0 AND odi.id_centro_costo in (presupuesto_id))OR(presupuesto_id = 0))
     AND((partida_id > 0 AND odi.id_partida in (partida_id))OR(partida_id = 0))
 
-    
-union 
+
+union
 
     select
     (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(tra.id_partida_ejecucion, moneda_id)) as comprometido,
@@ -119,7 +119,7 @@ union
     ges.gestion,
     part.nombre_partida,
     part.codigo,
-    vpresu.codigo_cc, 
+    vpresu.codigo_cc,
     fp.desc_funcionario1,
     to_char(ic.fecha,'DD/MM/YYYY'),
     ic.fecha,
@@ -127,9 +127,9 @@ union
     tra.id_partida_ejecucion,
     ic.beneficiario,
     ic.id_moneda
-    from 
-    conta.tint_comprobante ic 
-    inner join conta.tint_transaccion tra on tra.id_int_comprobante = ic.id_int_comprobante 
+    from
+    conta.tint_comprobante ic
+    inner join conta.tint_transaccion tra on tra.id_int_comprobante = ic.id_int_comprobante
     and ic.estado_reg = 'validado' and tra.estado_reg = 'activo'
     inner join param.tmoneda m on m.id_moneda = moneda_id
     inner join param.tcentro_costo tco on tco.id_centro_costo = tra.id_centro_costo
@@ -143,7 +143,7 @@ union
     AND((partida_id > 0 AND tra.id_partida in (partida_id))OR(partida_id = 0))
     and tra.id_partida_ejecucion is not null
 
-    union 
+    union
 
     select
     (select COALESCE(ps_comprometido,0) from pre.f_verificar_com_eje_pag(doc.id_partida_ejecucion, moneda_id)) as comprometido,
@@ -155,17 +155,17 @@ union
     coalesce(doc.descripcion, '') ||' - Desc: '|| coalesce(docv.razon_social, '') as descripcion,
     ges.gestion,
     par.nombre_partida,
-    par.codigo as partida_cod, 
+    par.codigo as partida_cod,
     vpres.codigo_cc,
     soli.desc_funcionario1,
     to_char(docv.fecha ,'DD/MM/YYYY') as fechaAux,
     docv.fecha,
-    usu.desc_persona , 
+    usu.desc_persona ,
     doc.id_partida_ejecucion,
     pro.desc_proveedor,
     docv.id_moneda
-    from 
-    conta.tdoc_concepto doc 
+    from
+    conta.tdoc_concepto doc
     inner join conta.tdoc_compra_venta docv on docv.id_doc_compra_venta = doc.id_doc_compra_venta
     and doc.estado_reg = 'activo' and docv.estado_reg = 'activo'
     inner join param.tmoneda m on m.id_moneda = moneda_id
@@ -173,14 +173,14 @@ union
     inner join param.tgestion ges on ges.id_gestion = tcco.id_gestion
     inner join pre.tpartida par on par.id_partida = doc.id_partida
     inner join pre.vpresupuesto_cc vpres on vpres.id_centro_costo = doc.id_centro_costo
-    inner join segu.vusuario usua on usua.id_usuario = doc.id_usuario_reg 
+    inner join segu.vusuario usua on usua.id_usuario = doc.id_usuario_reg
     inner join orga.vfuncionario_persona soli on soli.id_persona = usua.id_persona
     inner join segu.vusuario usu on usu.id_usuario = usuario_id
     left join param.vproveedor pro on pro.id_proveedor = docv.id_proveedor
     where ((presupuesto_id > 0 AND doc.id_centro_costo in (presupuesto_id))OR(presupuesto_id = 0))
     AND((partida_id > 0 AND doc.id_partida in (partida_id))OR(partida_id = 0))
-    and doc.id_partida_ejecucion is not null  
-    
+    and doc.id_partida_ejecucion is not null  */
+
     ) as registros
     where registros.id_moneda = moneda_id
    order by num_tramite,codigo_cc,id_partida_ejecucion,fecha_soli;
@@ -191,3 +191,6 @@ VOLATILE
 RETURNS NULL ON NULL INPUT
 SECURITY INVOKER
 COST 100 ROWS 1000;
+
+ALTER FUNCTION pre.sp_detalle_presupuesto_partida (presupuesto_id integer, partida_id integer, moneda_id integer, usuario_id integer)
+  OWNER TO postgres;

@@ -52,6 +52,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                 }elseif (strpos($fir, 'vbrpa') !== false){
                     $firma_fecha = explode(',', $fir);
                 }
+                elseif (strpos($fir, 'vbpresupuestos') !== false){
+                    $firma_fecha = explode(',', $fir);
+                }
 
             }
             // foreach ($firmas as $fir) {
@@ -78,8 +81,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         //var_dump($firma_fecha);
 
-        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
+        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
           $fecha = date_create($firma_fecha[1]);
+
         }
         $fecha_sol = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
 
@@ -93,11 +97,11 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
       if(($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018'))||($this->datos[0]['funcionario_solicitante']=='PASTOR JAIME LAZARTE VILLAGRA'&&$this->datos[0]['codigo_moneda']!='Bs')/*||$fecha_sol<= date_create('31-10-2018')*/){
             if ($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018')){
-              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
+              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
                 $fecha  = $fecha_sol;
               }
             }else{
-              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
+              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
                 $fecha = date_format($fecha, 'd/m/Y');
               }
             }
@@ -106,7 +110,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             /*if($fecha_sol<= date_create('31-10-2018')){
                 $fecha  = $fecha_sol;
             }else {*/
-            if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
+            if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
             $fecha = date_format($fecha, 'd/m/Y');
            }
             //}
@@ -273,7 +277,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         if($this->GetY() == 220)
             $this->SetY(250);
 
-        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa') {
+        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
             $tbl = '<table>
                     <tr>
                     <td style="width: 15%"></td>
@@ -305,25 +309,24 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             $this->Ln(5);
             $this->writeHTML($tbl, true, false, false, false, '');
         }else{
-            //(may) 06/11/2020 modificacion para los procesos de modalidad de excepcion
             $tbl = '<table>
                     <tr>
                     <td style="width: 15%"></td>
                     <td style="width: 70%">
-                    <table cellspacing="0" cellpadding="1" border="1">
+                    <table cellspacing="0" cellpadding="1" border="1" style="font-family: Calibri; font-size: 9px;">
                         <tr>
-                            <td style="font-family: Calibri; font-size: 9px;"><b> Elaborado por:</b> <br> ' . $firma_elaborado[2] . '</td>
-                            <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> ' . $firma_aprobado[2] . '</td>
+                            <td style="font-family: Calibri; font-size: 9px;"><b> Elaborado por:</b> <br> </td>
+                            <td style="font-family: Calibri; font-size: 9px;"><b> Aprobado por:</b><br> </td>
                         </tr>
                         <tr>
                             <td align="center" >
                                 <br><br>
-                                <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_elaborado[2], $firma_elaborado[3],$firma_elaborado[4]) . '" alt="Logo">
+                                <img  style="width: 95px; height: 95px;" src="" alt="Logo"><br>
 
                             </td>
                             <td align="center" >
                                 <br><br>
-                                <img  style="width: 110px; height: 110px;" src="' . $this->generarImagen($firma_aprobado[2], $firma_aprobado[3],$firma_aprobado[4]) . '" alt="Logo">
+                                <img  style="width: 95px; height: 95px;" src="" alt="Logo"><br>
 
                             </td>
                          </tr>
