@@ -552,7 +552,7 @@ BEGIN
 
         end;
 
-    /*********************************
+     /*********************************
  	#TRANSACCION:  'PR_REPCERPRE_SEL'
  	#DESCRIPCION:	Reporte Certificación Presupuestaria
  	#AUTOR:		FEA
@@ -656,33 +656,43 @@ BEGIN
 
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='
-            SELECT vcp.id_categoria_programatica AS id_cp,  ttc.codigo AS centro_costo,
-            vcp.codigo_programa , vcp.codigo_proyecto, vcp.codigo_actividad, vcp.codigo_fuente_fin, vcp.codigo_origen_fin,
-            tpar.codigo AS codigo_partida, tpar.nombre_partida , tcg.codigo AS codigo_cg,  tcg.nombre AS nombre_cg,
-            sum(tsd.precio_total) AS precio_total,tmo.codigo AS codigo_moneda, ts.num_tramite,
-            '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
-            COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
-            --'''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
-            coalesce(vcp.desc_unidad_ejecutora::varchar,''Boliviana de Aviación - BoA''::varchar) as unidad_ejecutora,
-            coalesce(vcp.codigo_unidad_ejecutora::varchar,''0''::varchar) as codigo_ue,
-            COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
-            COALESCE('''||v_record_sol.justificacion||'''::varchar,'''') AS justificacion,
-            COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
-            (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
-            fun.desc_funcionario1::varchar as funcionario_solicitante,
-            CASE
-            WHEN (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite) is not null then (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite)::date
-            WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date
-            WHEN ((select count(sold.id_solicitud_det) from adq.tsolicitud_det sold where sold.id_solicitud = ts.id_solicitud and sold.id_concepto_ingas = 2208) >= 1 and (ts.fecha_po between ''13/08/2018''::date and ''13/10/2018''::date)) THEN (ts.fecha_po - 5)::date
-            ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
-            COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
-            ts.codigo_poa,
-            (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
-            from pre.tobjetivo ob
-            where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_sol.id_gestion||'
+            SELECT  vcp.id_categoria_programatica AS id_cp,
+            	    ttc.codigo AS centro_costo,
+            		vcp.codigo_programa ,
+                    vcp.codigo_proyecto,
+                    vcp.codigo_actividad,
+                    vcp.codigo_fuente_fin,
+                    vcp.codigo_origen_fin,
+            		tpar.codigo AS codigo_partida,
+                    tpar.nombre_partida ,
+                    tcg.codigo AS codigo_cg,
+                    tcg.nombre AS nombre_cg,
+            		sum(tsd.precio_total) AS precio_total,
+                    tmo.codigo AS codigo_moneda,
+                    ts.num_tramite,
+            		'''||v_nombre_entidad||'''::varchar AS nombre_entidad,
+            		COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
+            		--'''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+                    coalesce(vcp.desc_unidad_ejecutora::varchar,''Boliviana de Aviación - BoA''::varchar) as unidad_ejecutora,
+            		coalesce(vcp.codigo_unidad_ejecutora::varchar,''0''::varchar) as codigo_ue,
+                    COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
+                    COALESCE('''||v_record_sol.justificacion||'''::varchar,'''') AS justificacion,
+                    COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
+                    (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
+            		fun.desc_funcionario1::varchar as funcionario_solicitante,
+                    CASE
+                    WHEN (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite) is not null then (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite)::date
+                    WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date
+                    WHEN ((select count(sold.id_solicitud_det) from adq.tsolicitud_det sold where sold.id_solicitud = ts.id_solicitud and sold.id_concepto_ingas = 2208) >= 1 and (ts.fecha_po between ''13/08/2018''::date and ''13/10/2018''::date)) THEN (ts.fecha_po - 5)::date
+                    ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
+                    COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
+            		ts.codigo_poa,
+                    (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
+                    from pre.tobjetivo ob
+                    where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_sol.id_gestion||' )::varchar as codigo_descripcion,
+                    ts.tipo,
+                    cco.nombre as nombre_categoria
 
-            )::varchar as codigo_descripcion,
-            ts.tipo
             FROM adq.tsolicitud ts
             INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tsd.id_partida
@@ -708,12 +718,14 @@ BEGIN
             left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
             left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
 
+            left join adq.tcategoria_compra cco on cco.id_categoria_compra = ts.id_categoria_compra
+
             WHERE tsd.estado_reg = ''activo'' AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
             ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud,
-            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora';
+            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, cco.nombre ';
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
@@ -1186,6 +1198,193 @@ BEGIN
                     return v_consulta;
 
                 end;
+
+                /*********************************
+                #TRANSACCION:  'PR_REPINFPRE_SEL'
+                #DESCRIPCION:	Reporte Informacion Presupuestaria
+                #AUTOR:		maylee.perez
+                #FECHA:		20-11-2020 11:00
+                ***********************************/
+
+                elsif(p_transaccion='PR_REPINFPRE_SEL')then
+
+                    begin
+
+                        v_procesos_excepcion = '{
+                          "CINTPD-000964-2018":"30/5/2018",
+                          "CINTPD-000966-2018":"23/5/2018",
+                          "CINTPD-000968-2018":"6/7/2018",
+                          "CINTPD-000969-2018":"6/7/2018",
+                          "CINTPD-000988-2018":"18/7/2018",
+                          "CINTPD-000989-2018":"19/7/2018",
+                          "CINTPD-000997-2018":"18/7/2018",
+                          "CINTPD-000998-2018":"18/7/2018",
+                          "CINTPD-000999-2018":"10/7/2018",
+                          "CINTPD-001000-2018":"18/7/2018",
+                          "CINTPD-001001-2018":"26/1/2018",
+                          "CINTPD-001018-2018":"31/7/2018",
+                          "CINTPD-001019-2018":"25/6/2018",
+                          "CINTPD-001020-2018":"18/7/2018",
+                          "CINTPD-001022-2018":"19/7/2018",
+                          "CINTPD-001023-2018":"19/7/2018",
+                          "CINTPD-001024-2018":"19/7/2018",
+                          "CINTPD-001025-2018":"19/7/2018"
+                        }';
+                        --raise exception 'v_procesos_excepcion: %, %', v_procesos_excepcion->'CINTPD-000964-2018', json_object_keys (v_procesos_excepcion->'CINTPD-000964-2018');
+                        SELECT ts.estado, ts.id_estado_wf, ts.justificacion, ts.id_gestion, ts.tipo_modalidad
+                        INTO v_record_sol
+                        FROM adq.tsolicitud ts
+                        WHERE ts.id_proceso_wf = v_parametros.id_proceso_wf;
+
+                        IF(v_record_sol.estado='vbpresupuestos' OR v_record_sol.estado='suppresu' OR v_record_sol.estado='vbrpc' OR v_record_sol.estado='vbrpa' OR v_record_sol.estado = 'aprobado' OR v_record_sol.estado = 'proceso' OR v_record_sol.estado = 'finalizado' OR v_record_sol.tipo_modalidad = 'mod_excepcion')THEN
+                          v_index = 1;
+                          FOR v_record IN (WITH RECURSIVE firmas(id_estado_fw, id_estado_anterior,fecha_reg, codigo, id_funcionario) AS (
+                                            SELECT tew.id_estado_wf, tew.id_estado_anterior , tew.fecha_reg, te.codigo, tew.id_funcionario
+                                            FROM wf.testado_wf tew
+                                            INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = tew.id_tipo_estado
+                                            WHERE tew.id_estado_wf = v_record_sol.id_estado_wf
+
+                                            UNION ALL
+
+                                            SELECT ter.id_estado_wf, ter.id_estado_anterior, ter.fecha_reg, te.codigo, ter.id_funcionario
+                                            FROM wf.testado_wf ter
+                                            INNER JOIN firmas f ON f.id_estado_anterior = ter.id_estado_wf
+                                            INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = ter.id_tipo_estado
+                                            WHERE f.id_estado_anterior IS NOT NULL
+                                        )SELECT
+                                              distinct on (f.codigo) codigo,
+                                              f.codigo,
+                                              f.fecha_reg,
+                                              f.id_funcionario
+                                              FROM firmas f
+                                                    where   (case when f.codigo in ('vbrpc', 'vbrpa') then
+                                                        case when ((select te.codigo
+                                                        from wf.testado_wf es
+                                                        INNER JOIN wf.ttipo_estado te ON te.id_tipo_estado = es.id_tipo_estado
+                                                        where es.id_estado_wf  = f.id_estado_anterior) = 'vbpresupuestos') then
+                                                        (select fi.fecha_reg
+                                                        from wf.testado_wf fi
+                                                        where fi.id_estado_anterior  = f.id_estado_anterior)
+                                                        end
+                                                    else
+                                                        f.fecha_reg
+                                                    end) is not null
+                                            ORDER BY f.codigo, f.fecha_reg DESC
+                                            ) LOOP
+                              IF(v_record.codigo = 'vbpoa' OR v_record.codigo = 'suppresu' OR v_record.codigo = 'vbpresupuestos' OR v_record.codigo = 'vbrpc' OR v_record.codigo = 'vbrpa' OR v_record_sol.tipo_modalidad = 'mod_excepcion')THEN
+
+                                SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
+                                INTO v_record_funcionario
+                                FROM orga.vfuncionario_cargo_lugar vf
+                                WHERE vf.id_funcionario = v_record.id_funcionario;
+
+                                v_firmas[v_index] = v_record.codigo::VARCHAR||','||v_record.fecha_reg::VARCHAR||','||v_record_funcionario.desc_funcionario1::VARCHAR||','||v_record_funcionario.nombre_cargo::VARCHAR||','||v_record_funcionario.oficina_nombre;
+                                v_index = v_index + 1;
+                              END IF;
+                          END LOOP;
+                            v_firma_fun = array_to_string(v_firmas,';');
+                        ELSE
+                            v_firma_fun = '';
+                        END IF;
+
+                            ------
+                        SELECT (''||te.codigo||' '||te.nombre)::varchar
+                        INTO v_nombre_entidad
+                        FROM param.tempresa te;
+                        ------
+                        SELECT (''||tda.codigo||' '||tda.nombre)::varchar
+                        INTO v_direccion_admin
+                        FROM pre.tdireccion_administrativa tda;
+                        ------
+                        SELECT (''||tue.codigo||' '||tue.nombre)::varchar
+                        INTO v_unidad_ejecutora
+                        FROM pre.tunidad_ejecutora tue;
+                        ---
+
+                        --Sentencia de la consulta de conteo de registros
+                        v_consulta:='
+                        SELECT  vcp.id_categoria_programatica AS id_cp,
+                                ttc.codigo AS centro_costo,
+                                vcp.codigo_programa ,
+                                vcp.codigo_proyecto,
+                                vcp.codigo_actividad,
+                                vcp.codigo_fuente_fin,
+                                vcp.codigo_origen_fin,
+                                tpar.codigo AS codigo_partida,
+                                tpar.nombre_partida ,
+                                tcg.codigo AS codigo_cg,
+                                tcg.nombre AS nombre_cg,
+                                sum(tsd.precio_total) AS precio_total,
+                                tmo.codigo AS codigo_moneda,
+                                ts.num_tramite,
+                                '''||v_nombre_entidad||'''::varchar AS nombre_entidad,
+                                COALESCE('''||v_direccion_admin||'''::varchar, '''') AS direccion_admin,
+                                --'''||v_unidad_ejecutora||'''::varchar AS unidad_ejecutora,
+                                coalesce(vcp.desc_unidad_ejecutora::varchar,''Boliviana de Aviación - BoA''::varchar) as unidad_ejecutora,
+                                coalesce(vcp.codigo_unidad_ejecutora::varchar,''0''::varchar) as codigo_ue,
+                                COALESCE('''||v_firma_fun||'''::varchar, '''') AS firmas,
+                                COALESCE('''||v_record_sol.justificacion||'''::varchar,'''') AS justificacion,
+                                COALESCE(tet.codigo::varchar,''00''::varchar) AS codigo_transf,
+                                (uo.codigo||''-''||uo.nombre_unidad)::varchar as unidad_solicitante,
+                                fun.desc_funcionario1::varchar as funcionario_solicitante,
+                                CASE
+                                WHEN (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite) is not null then (select tex.fecha from adq.texcepciones tex where tex.num_tramite = ts.num_tramite)::date
+                                WHEN ts.tipo = ''Boa'' and ts.fecha_soli >= ''27/04/2018'' THEN (select tmat.fecha_solicitud from mat.tsolicitud tmat where tmat.nro_tramite = ts.num_tramite)::date
+                                WHEN ((select count(sold.id_solicitud_det) from adq.tsolicitud_det sold where sold.id_solicitud = ts.id_solicitud and sold.id_concepto_ingas = 2208) >= 1 and (ts.fecha_po between ''13/08/2018''::date and ''13/10/2018''::date)) THEN (ts.fecha_po - 5)::date
+                                ELSE COALESCE(ts.fecha_soli,null::date) END AS fecha_soli,
+                                COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
+                                ts.codigo_poa,
+                                (select  pxp.list(distinct ob.codigo|| '' ''||ob.descripcion||'' '')
+                                from pre.tobjetivo ob
+                                where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_sol.id_gestion||' )::varchar as codigo_descripcion,
+                                ts.tipo,
+                                cco.nombre as nombre_categoria,
+                                resin.nro_directorio,
+                                resin.nro_nota,
+                                resin.nro_nota2
+
+                        FROM adq.tsolicitud ts
+                        INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
+                        INNER JOIN pre.tpartida tpar ON tpar.id_partida = tsd.id_partida
+
+                        inner join param.tgestion tg on tg.id_gestion = ts.id_gestion
+
+                        --INNER JOIN pre.tpresup_partida tpp ON tpp.id_partida = tpar.id_partida AND tpp.id_centro_costo = tsd.id_centro_costo
+
+                        INNER JOIN param.tcentro_costo tcc ON tcc.id_centro_costo = tsd.id_centro_costo
+                        INNER JOIN param.ttipo_cc ttc ON ttc.id_tipo_cc = tcc.id_tipo_cc
+
+                        INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tsd.id_centro_costo --tpp.id_presupuesto
+                        INNER JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = tp.id_categoria_prog
+
+                        INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida --tpp.id_partida
+                        INNER JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
+
+                        INNER JOIN param.tmoneda tmo ON tmo.id_moneda = ts.id_moneda
+
+                        inner join orga.vfuncionario fun on fun.id_funcionario = ts.id_funcionario
+                        inner join orga.tuo uo on uo.id_uo = ts.id_uo
+
+                        left JOIN pre.tpresupuesto_partida_entidad tppe ON tppe.id_partida = tpar.id_partida AND tppe.id_presupuesto = tp.id_presupuesto
+                        left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
+
+                        left join adq.tcategoria_compra cco on cco.id_categoria_compra = ts.id_categoria_compra
+                        left join adq.tresoluciones_info_pre resin on resin.gestion = (tg.gestion -1)
+
+                        WHERE tsd.estado_reg = ''activo'' AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
+
+                        v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
+                        vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
+                        ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud,
+                        vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, cco.nombre, resin.nro_directorio,
+                                resin.nro_nota,
+                                resin.nro_nota2';
+                        v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
+                        --Devuelve la respuesta
+                        RAISE NOTICE 'v_consulta %',v_consulta;
+                        return v_consulta;
+
+                    end;
 
 
     else
