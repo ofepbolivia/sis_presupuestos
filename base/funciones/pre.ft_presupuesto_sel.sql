@@ -1369,7 +1369,7 @@ BEGIN
                         left JOIN pre.tentidad_transferencia tet ON tet.id_entidad_transferencia = tppe.id_entidad_transferencia
 
                         left join adq.tcategoria_compra cco on cco.id_categoria_compra = ts.id_categoria_compra
-                        left join adq.tresoluciones_info_pre resin on resin.gestion = (tg.gestion -1)
+                        left join adq.ttresoluciones_info_pre resin on resin.gestion = (tg.gestion -1)
 
                         WHERE tsd.estado_reg = ''activo'' AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
 
@@ -1378,7 +1378,7 @@ BEGIN
                         ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud,
                         vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, cco.nombre, resin.nro_directorio,
                                 resin.nro_nota,
-                                resin.nro_nota2';
+                                resin.nro_nota2 ';
                         v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
                         --Devuelve la respuesta
                         RAISE NOTICE 'v_consulta %',v_consulta;

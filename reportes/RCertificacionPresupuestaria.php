@@ -47,8 +47,6 @@ class RCertificacionPresupuestaria extends  ReportePDF{
     $date = date("Y");
     if ($this->datos[0]['gestion'] <= $date ){
 
-
-
         if(count($firmas)>1) {
 
             foreach ($firmas as $fir) {

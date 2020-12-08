@@ -639,7 +639,7 @@ class ACTPresupuesto extends ACTbase{
         $dataSource=$this->objFunc->reporteInformacionP();
         $this->dataSource=$dataSource->getDatos();
 
-        $nombreArchivo = uniqid(md5(session_id()).'[Reporte-CertificaciónPresupuestaria]').'.pdf';
+        $nombreArchivo = uniqid(md5(session_id()).'[Reporte-InformaciónPresupuestaria]').'.pdf';
         $this->objParam->addParametro('orientacion','P');
         $this->objParam->addParametro('tamano','LETTER');
         $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
