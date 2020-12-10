@@ -123,8 +123,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         //10-12-2020 (may) para verificar las fechas... de una gestion del proceso..con la fecha de la solicitud si hay diferencia...
         //este es un proceso de una gestion adelantada el cual se parametriza una fecha establecida
-
-        $anio = date_format(date_create($fecha_sol),'Y');
+        $anio = date_format(date_create($this->datos[0]['fecha_solicitud'] ),'Y');
 
         if($this->datos[0]['gestion'] == $anio ){
             $fecha_certificacion = $fecha;

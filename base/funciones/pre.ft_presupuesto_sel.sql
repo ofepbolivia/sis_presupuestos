@@ -693,7 +693,8 @@ BEGIN
                     ts.tipo,
                     cco.nombre as nombre_categoria,
                     to_char(resin.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion,
-                    to_char(resin2.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion_por_generar
+                    to_char(resin2.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion_por_generar,
+                    ts.fecha_soli as fecha_solicitud                     '
 
             FROM adq.tsolicitud ts
             INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
