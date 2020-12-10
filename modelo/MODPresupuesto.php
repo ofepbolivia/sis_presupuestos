@@ -417,6 +417,8 @@ class MODPresupuesto extends MODbase{
         $this->captura('tipo', 'varchar');
 
         $this->captura('nombre_categoria', 'varchar');
+        $this->captura('fecha_certificacion', 'varchar');
+        $this->captura('fecha_certificacion_por_generar', 'varchar');
 
 
         //Ejecuta la instruccion

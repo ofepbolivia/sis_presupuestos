@@ -691,7 +691,9 @@ BEGIN
                     from pre.tobjetivo ob
                     where ob.codigo = ANY (string_to_array(ts.codigo_poa,'','')) and ob.id_gestion = '||v_record_sol.id_gestion||' )::varchar as codigo_descripcion,
                     ts.tipo,
-                    cco.nombre as nombre_categoria
+                    cco.nombre as nombre_categoria,
+                    to_char(resin.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion,
+                    to_char(resin2.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion_por_generar
 
             FROM adq.tsolicitud ts
             INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
@@ -720,12 +722,15 @@ BEGIN
 
             left join adq.tcategoria_compra cco on cco.id_categoria_compra = ts.id_categoria_compra
 
+            left join adq.ttresoluciones_info_pre resin on resin.gestion = tg.gestion and resin.estado_reg =''activo''
+            left join adq.ttresoluciones_info_pre resin2 on resin2.gestion = (tg.gestion-1) and resin2.estado_reg =''activo''
+
             WHERE tsd.estado_reg = ''activo'' AND ts.id_proceso_wf = '||v_parametros.id_proceso_wf;
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
             ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud,
-            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, cco.nombre ';
+            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, cco.nombre, resin.fecha_certificacion, resin2.fecha_certificacion ';
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;

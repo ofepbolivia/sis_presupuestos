@@ -120,6 +120,18 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             //}
         }
 
+
+        //10-12-2020 (may) para verificar las fechas... de una gestion del proceso..con la fecha de la solicitud si hay diferencia...
+        //este es un proceso de una gestion adelantada el cual se parametriza una fecha establecida
+
+        $anio = date_format(date_create($fecha_sol),'Y');
+
+        if($this->datos[0]['gestion'] == $anio ){
+            $fecha_certificacion = $fecha;
+        }else{
+            $fecha_certificacion = $this->datos[0]['fecha_certificacion'];
+        }
+
         /*$tbl = '<table border="0" style="font-size: 7pt;">
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
                 <!-- <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA SOLICITUD: </b></td><td>'.$fecha_soli.'</td></tr> -->
@@ -131,7 +143,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         $tbl = '<table border="0" style="font-size: 7pt;"> 
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
-                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha.'</td></tr>
+                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha_certificacion.'</td></tr>
                 <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b></td><td>Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
                 <tr><td><b>CATEGORIA:</b></td><td>'.$this->datos[0]['nombre_categoria'].'</td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
                 ';
@@ -413,8 +425,10 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
 
     }else{
+        $fecha_certificacion_por_generar = $this->datos[0]['fecha_certificacion_por_generar'];
+
         $tbl = '<table border="0" style="font-size: 7pt;"> 
-                <tr width="28%" align="center"><b>AUN NO SE ENCUENTRA LA CERTIFICACION PRESUPUESTARIA PARA EL PROCESO '.$this->datos[0]['num_tramite'].'</b></tr>
+                <tr width="28%" align="center"><b>AUN NO SE ENCUENTRA LA CERTIFICACION PRESUPUESTARIA PARA EL PROCESO '.$this->datos[0]['num_tramite'].', SE GENERARÁ AUTOMÁTICAMENTE EN LA FECHA '.$fecha_certificacion_por_generar.'.</b></tr>
                 </table>
                 ';
         $this->Ln(5);
