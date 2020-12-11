@@ -552,7 +552,7 @@ BEGIN
 
         end;
 
-     /*********************************
+    /*********************************
  	#TRANSACCION:  'PR_REPCERPRE_SEL'
  	#DESCRIPCION:	Reporte Certificación Presupuestaria
  	#AUTOR:		FEA
@@ -694,7 +694,7 @@ BEGIN
                     cco.nombre as nombre_categoria,
                     to_char(resin.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion,
                     to_char(resin2.fecha_certificacion,''DD/MM/YYYY'')::varchar as fecha_certificacion_por_generar,
-                    ts.fecha_soli as fecha_solicitud                     '
+                    ts.fecha_soli as fecha_solicitud
 
             FROM adq.tsolicitud ts
             INNER JOIN adq.tsolicitud_det tsd ON tsd.id_solicitud = ts.id_solicitud
@@ -731,7 +731,7 @@ BEGIN
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, tpar.nombre_partida, tcg.codigo, tcg.nombre, tmo.codigo, ts.num_tramite, tet.codigo, unidad_solicitante, funcionario_solicitante,
             ts.fecha_soli, tg.gestion, ts.codigo_poa, ts.tipo, ts.id_solicitud,
-            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora, cco.nombre, resin.fecha_certificacion, resin2.fecha_certificacion ';
+            vcp.desc_unidad_ejecutora, vcp.codigo_unidad_ejecutora , cco.nombre, resin.fecha_certificacion, resin2.fecha_certificacion ';
 			v_consulta =  v_consulta || ' ORDER BY tpar.codigo, tcg.nombre, vcp.id_categoria_programatica, ttc.codigo asc ';
 			--Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;
@@ -1414,3 +1414,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION pre.ft_presupuesto_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO "postgres";
