@@ -416,6 +416,11 @@ class MODPresupuesto extends MODbase{
         $this->captura('codigo_descripcion', 'varchar');
         $this->captura('tipo', 'varchar');
 
+        $this->captura('nombre_categoria', 'varchar');
+        $this->captura('fecha_certificacion', 'varchar');
+        $this->captura('fecha_certificacion_por_generar', 'varchar');
+        $this->captura('fecha_solicitud', 'date');
+
 
         //Ejecuta la instruccion
         $this->armarConsulta();
@@ -702,6 +707,62 @@ class MODPresupuesto extends MODbase{
 
         //Ejecuta la instruccion
         $this->armarConsulta();//echo $this->consulta;exit;
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+
+    function reporteInformacionP(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_presupuesto_sel';
+        $this->transaccion='PR_REPINFPRE_SEL';
+        $this->tipo_procedimiento='SEL';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_proceso_wf','id_proceso_wf','int4');
+
+
+        $this->captura('id_cp', 'int4');
+        $this->captura('centro_costo', 'varchar');
+        $this->captura('codigo_programa', 'varchar');
+        $this->captura('codigo_proyecto', 'varchar');
+        $this->captura('codigo_actividad', 'varchar');
+        $this->captura('codigo_fuente_fin', 'varchar');
+        $this->captura('codigo_origen_fin', 'varchar');
+
+        $this->captura('codigo_partida', 'varchar');
+        $this->captura('nombre_partidad', 'varchar');
+        $this->captura('codigo_cg', 'varchar');
+        $this->captura('nombre_cg', 'varchar');
+        $this->captura('precio_total', 'numeric');
+        $this->captura('codigo_moneda', 'varchar');
+        $this->captura('num_tramite', 'varchar');
+        $this->captura('nombre_entidad', 'varchar');
+        $this->captura('direccion_admin', 'varchar');
+        $this->captura('unidad_ejecutora', 'varchar');
+        $this->captura('codigo_ue', 'varchar');
+        $this->captura('firmas', 'varchar');
+        $this->captura('justificacion', 'varchar');
+        $this->captura('codigo_transf', 'varchar');
+        $this->captura('unidad_solicitante', 'varchar');
+        $this->captura('funcionario_solicitante', 'varchar');
+        $this->captura('fecha_soli', 'date');
+        $this->captura('gestion', 'integer');
+        $this->captura('codigo_poa', 'varchar');
+        $this->captura('codigo_descripcion', 'varchar');
+        $this->captura('tipo', 'varchar');
+
+        $this->captura('nombre_categoria', 'varchar');
+
+        $this->captura('nro_directorio', 'varchar');
+        $this->captura('nro_nota', 'varchar');
+        $this->captura('nro_nota2', 'varchar');
+
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        //var_dump($this->consulta);exit;
         $this->ejecutarConsulta();
 
         //Devuelve la respuesta
