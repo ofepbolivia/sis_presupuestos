@@ -49,6 +49,9 @@ class RInformacionPresupuestaria extends  ReportePDF{
         $firma_aprobado = '';
         $fecha_presupuesto = '';
 
+     $date = date("Y");
+     if ($this->datos[0]['gestion'] > $date ){
+
         if(count($firmas)>1) {
 
             foreach ($firmas as $fir) {
@@ -455,6 +458,16 @@ class RInformacionPresupuestaria extends  ReportePDF{
                 $this->writeHTML($tbl, true, false, false, false, '');
             }
         }
+
+     }else{
+
+         $tbl = '<table border="0" style="font-size: 7pt;"> 
+                <tr width="28%" align="center"><b></b></tr>
+                </table>
+                ';
+         $this->Ln(5);
+         $this->writeHTML($tbl, true, false, false, false, '');
+     }
     }
 
     function basico($numero) {
