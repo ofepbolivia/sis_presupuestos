@@ -19,16 +19,18 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.Presupuesto.superclass.constructor.call(this,config);
 
             this.addButton('ant_estado',{
-                grupo:[4],
+                //(may) 05-01-2021 modificacion temporal
+                //grupo:[4]
+                grupo:[0, 1,2,4],
                 argument: {estado: 'anterior'},
                 text: 'Retroceder',
                 iconCls: 'batras',
-                disabled: true,
+                disabled: false,
                 handler: this.antEstado,
                 tooltip: '<b>Pasar al Anterior Estado</b>'
             });
 
-            this.addButton('fin_registro', { grupo:[0, 1], text:'Siguiente', iconCls: 'badelante', disabled:true,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
+            this.addButton('fin_registro', { grupo:[0, 1], text:'Siguiente', iconCls: 'badelante', disabled:false,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
             this.addButton('btnMemoria',{ grupo:[0,1,2], text :'Memoria', iconCls:'bdocuments', disabled: true, handler : this.onButtonMemoria,tooltip : '<b>Memoria de Calculo</b><br/><b>Planificación de gastos o recursos</b>'});
             this.addButton('btnChequeoDocumentosWf',
                 {
@@ -573,10 +575,12 @@ header("content-type: text/javascript; charset=UTF-8");
                 }
             }
 
-
-            if (data['estado']!= 'borrador' && data['estado']!= 'aprobado'){
+            //(may) 05-01-2021 modificacion temporal -- descomentar
+            /*if (data['estado']!= 'borrador' && data['estado']!= 'aprobado'){
                 this.getBoton('ant_estado').enable();
-            }
+            }*/
+
+
 
             this.getBoton('btnMemoria').enable();
             this.getBoton('btnObs').enable();
