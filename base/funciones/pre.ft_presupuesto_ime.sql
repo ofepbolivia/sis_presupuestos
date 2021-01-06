@@ -761,6 +761,34 @@ BEGIN
            from wf.ttipo_estado te
            where te.id_tipo_estado = v_parametros.id_tipo_estado;
 
+
+            /*--------------------------------------------------------------
+            (may) 05-01-2021
+            update para el importe verificado aprobado y al validarlo sea
+            todos un 100% su importe registrado si pasa desde estado en borrador a aprobado
+            ----------------------------------------------------------------*/
+
+            IF (v_codigo_estado = 'borrador' and v_codigo_estado_siguiente = 'aprobado') THEN
+
+                        for v_presu_partida in (  select *
+                                                  from pre.tpresup_partida pp
+                                                  where  pp.estado_reg = 'activo'
+                                                  and pp.id_presupuesto = v_parametros.id_presupuesto
+                                                  ) loop
+
+                                      UPDATE pre.tpresup_partida SET
+                                      importe_aprobado = v_presu_partida.importe
+                                      WHERE id_presupuesto = v_parametros.id_presupuesto
+                                      and id_presup_partida = v_presu_partida.id_presup_partida;
+
+                      end loop;
+
+
+            END IF;
+            --
+
+
+
            IF  pxp.f_existe_parametro(p_tabla,'id_depto_wf') THEN
               v_id_depto = v_parametros.id_depto_wf;
            END IF;

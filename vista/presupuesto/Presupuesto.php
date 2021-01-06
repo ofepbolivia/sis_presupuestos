@@ -21,7 +21,9 @@ header("content-type: text/javascript; charset=UTF-8");
             this.addButton('ant_estado',{
                 //(may) 05-01-2021 modificacion temporal
                 //grupo:[4]
-                grupo:[0, 1,2,4],
+                //(may) 06-01-2021 se quita la modificacion temporal
+                //grupo:[0, 1,2,4],
+                grupo:[4]
                 argument: {estado: 'anterior'},
                 text: 'Retroceder',
                 iconCls: 'batras',
@@ -576,9 +578,11 @@ header("content-type: text/javascript; charset=UTF-8");
             }
 
             //(may) 05-01-2021 modificacion temporal -- descomentar
-            /*if (data['estado']!= 'borrador' && data['estado']!= 'aprobado'){
+            //(may) 06-01-2021 se quita la modificacion temporal
+            if (data['estado']!= 'borrador' && data['estado']!= 'aprobado'){
                 this.getBoton('ant_estado').enable();
-            }*/
+            }
+
 
 
 
