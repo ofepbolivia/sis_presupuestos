@@ -23,7 +23,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 //grupo:[4]
                 //(may) 06-01-2021 se quita la modificacion temporal
                 //grupo:[0, 1,2,4],
-                grupo:[4]
+                grupo:[4],
                 argument: {estado: 'anterior'},
                 text: 'Retroceder',
                 iconCls: 'batras',
