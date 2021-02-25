@@ -98,6 +98,25 @@ class MODClaseGastoCuenta extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
+    /**{developer:franklin.espinoza, date:22/12/2020, description: Clonar Cuentas Contables}**/
+    function clonarCuenta(){
+        //Definicion de variables para ejecucion del procedimiento
+        $this->procedimiento='pre.ft_clase_gasto_cuenta_ime';
+        $this->transaccion='PRE_CLOCUE_IME';
+        $this->tipo_procedimiento='IME';
+
+        //Define los parametros para la funcion
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_clase_gasto','id_clase_gasto','int4');
+
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
+    /**{developer:franklin.espinoza, date:22/12/2020, description: Clonar Cuentas Contables}**/
 
 }
 ?>

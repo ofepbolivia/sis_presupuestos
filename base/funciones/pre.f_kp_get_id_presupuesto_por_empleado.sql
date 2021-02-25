@@ -26,7 +26,7 @@ BEGIN
     into g_id_presupuesto, g_codigo_prog, g_codigo_presupuesto
     from orga.tcargo_presupuesto carpres
     inner join param.tgestion g on g.id_gestion = carpres.id_gestion
-    inner join orga.tuo_funcionario h on h.id_cargo = carpres.id_cargo
+    inner join orga.tuo_funcionario h on h.id_cargo = carpres.id_cargo AND h.tipo = 'oficial'
     inner join pre.tpresupuesto pres on pres.id_centro_costo = carpres.id_centro_costo
     inner join pre.vcategoria_programatica cp on cp.id_categoria_programatica = pres.id_categoria_prog
     inner join param.tcentro_costo cc on cc.id_centro_costo = pres.id_centro_costo
