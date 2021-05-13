@@ -150,7 +150,7 @@ Phx.vista.FormRepEjecucionPorPartida = Ext.extend(Phx.frmInterfaz, {
    				allowBlank:false,
    				fieldLabel:'Partida',
    				gdisplayField:'desc_partida',//mapea al store del grid
-   				baseParams: {_adicionar:'si',sw_transaccional: 'movimiento', partida_tipo: 'presupuestaria'},
+   				baseParams: {_adicionar:'si',sw_transaccional: 'movimiento'}, //partida_tipo: 'presupuestaria'},
                 width: 250,
    				listWidth: 350
        	     },
