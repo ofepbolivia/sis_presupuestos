@@ -628,7 +628,7 @@ BEGIN
 
                     SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                     INTO v_record_funcionario
-                    FROM orga.vfuncionario_cargo_lugar vf
+                    FROM orga.vfuncionario_cargo_lugar_todos vf
                     WHERE vf.id_funcionario = v_record.id_funcionario;
 
                     v_firmas[v_index] = v_record.codigo::VARCHAR||','||v_record.fecha_reg::VARCHAR||','||v_record_funcionario.desc_funcionario1::VARCHAR||','||v_record_funcionario.nombre_cargo::VARCHAR||','||v_record_funcionario.oficina_nombre;
@@ -886,7 +886,7 @@ BEGIN
                   IF(v_record_ajuste.estado='borrador' OR v_record_ajuste.estado='revision' OR v_record_ajuste.estado = 'aprobado')THEN
                     SELECT vf.desc_funcionario1, vf.nombre_cargo, vf.oficina_nombre
                     INTO v_record_funcionario
-                    FROM orga.vfuncionario_cargo_lugar vf
+                    FROM orga.vfuncionario_cargo_lugar_todos vf
                     WHERE vf.id_funcionario = v_record.id_funcionario;
                     v_firmas[v_index] = v_record.codigo::VARCHAR||','||(v_record.fecha_reg::date)::VARCHAR||','||coalesce(v_record_funcionario.desc_funcionario1::VARCHAR, 'No Declara')||','||coalesce(v_record_funcionario.nombre_cargo::VARCHAR, 'No Declara')||','||coalesce(v_record_funcionario.oficina_nombre, 'No Declara');
                     v_index = v_index + 1;
