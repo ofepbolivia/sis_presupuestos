@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.ft_ajuste_det_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -34,6 +32,15 @@ DECLARE
 	v_id_ajuste_det	integer;
 	--(franklin.espinoza)variables total detalle
     v_importe_total			numeric;
+
+    --11-06-2021(may)
+    v_registros_cig			varchar;
+    v_ajuste				record;
+    v_tipo_obligacion		varchar;
+    v_relacion				varchar;
+    v_id_partida			integer;
+    v_id_centro_costo		integer;
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_ajuste_det_ime';
@@ -50,17 +57,63 @@ BEGIN
 
         begin
 
-            IF v_parametros.tipo_ajuste = 'incremento' THEN
-              IF v_parametros.importe <= 0 THEN
-                   RAISE EXCEPTION 'en incrementos el importe tiene que ser mayor a cero';
-              END IF;
+			--16-06-2021 (may) para tipo AJUSTE estaran con incremento y decremento
+			IF v_parametros.tipo_ajuste != 'ajuste' THEN
+                IF v_parametros.tipo_ajuste = 'incremento' THEN
+                  IF v_parametros.importe <= 0 THEN
+                       RAISE EXCEPTION 'en incrementos el importe tiene que ser mayor a cero';
+                  END IF;
 
-            ELSE
-              IF v_parametros.importe >= 0 THEN
-                   RAISE EXCEPTION 'en decrementos el importe tiene que ser menor a cero';
-              END IF;
+                ELSE
+                  IF v_parametros.importe >= 0 THEN
+                       RAISE EXCEPTION 'en decrementos el importe tiene que ser menor a cero';
+                  END IF;
+                END IF;
             END IF;
 
+            v_id_partida = v_parametros.id_partida;
+
+            IF v_parametros.descripcion = 'REGISTRO AUTOMATICO POR PRESUPUESTO' THEN
+                --11-06-2021 (may) registro PARTIDA segun el concepto de gasto
+                select cig.desc_ingas
+                into v_registros_cig
+                from param.tconcepto_ingas cig
+                where cig.id_concepto_ingas = v_parametros.id_concepto_ingas;
+
+                --tipo_obligacion
+                select a.nro_tramite, a.id_gestion
+                into v_ajuste
+                from pre.tajuste a
+                where a.id_ajuste = v_parametros.id_ajuste;
+
+                select op.tipo_obligacion
+                into v_tipo_obligacion
+                from tes.tobligacion_pago op
+                where op.num_tramite = v_ajuste.nro_tramite;
+
+                --centro de costo
+                select pcc.id_centro_costo
+                into v_id_centro_costo
+                from pre.vpresupuesto_cc pcc
+                where pcc.id_presupuesto = v_parametros.id_presupuesto;
+
+                --(may) el tipo de obligacion pago_especial_spi son para las estaciones internacionales SIP
+                IF v_tipo_obligacion = 'pago_especial' or v_tipo_obligacion = 'pago_especial_spi' THEN
+                    v_relacion = 'PAGOES';
+                ELSE
+                    v_relacion = 'CUECOMP';
+                END IF;
+
+                SELECT ps_id_partida
+                into v_id_partida
+                FROM conta.f_get_config_relacion_contable(v_relacion, v_ajuste.id_gestion, v_parametros.id_concepto_ingas, v_id_centro_costo, 'No se encontro relación contable para el concepto de gasto: '||v_registros_cig||'. <br> Mensaje: ');
+
+
+                IF v_id_partida is NULL THEN
+                    raise exception 'no se tiene una parametrización de partida  para este concepto de gasto en la relación contable de código  (%,%,%,%)','CUECOMP', v_relacion, v_parametros.id_concepto_ingas, v_id_centro_costo;
+                END IF;
+           END IF;
+            --
 
         	--Sentencia de la insercion
         	insert into pre.tajuste_det(
@@ -75,11 +128,16 @@ BEGIN
                 id_usuario_reg,
                 fecha_mod,
                 id_usuario_mod,
-                id_ajuste
+                id_ajuste,
+                --11-06-2021 (may) se aumenta campos de registro
+                id_orden_trabajo,
+                id_concepto_ingas,
+                descripcion
+
           	) values(
                 v_parametros.id_presupuesto,
                 v_parametros.importe,
-                v_parametros.id_partida,
+                v_id_partida,
                 'activo',
                 v_parametros.tipo_ajuste,
                 v_parametros._id_usuario_ai,
@@ -88,7 +146,12 @@ BEGIN
                 p_id_usuario,
                 null,
                 null,
-                v_parametros.id_ajuste
+                v_parametros.id_ajuste,
+                --11-06-2021 (may) se aumenta campos de registro
+                v_parametros.id_orden_trabajo,
+                v_parametros.id_concepto_ingas,
+                v_parametros.descripcion
+
 		  )RETURNING id_ajuste_det into v_id_ajuste_det;
 
 			--Definicion de la respuesta

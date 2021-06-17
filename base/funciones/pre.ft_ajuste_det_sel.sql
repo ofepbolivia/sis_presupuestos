@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.ft_ajuste_det_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -67,13 +65,17 @@ BEGIN
                             id_ajuste,
                             ajd.descripcion,
                             ajd.id_orden_trabajo,
-                            ot.desc_orden
+                            ot.desc_orden,
+                            ajd.id_concepto_ingas,
+                            ci.desc_ingas as nombre_ingas
+
 						from pre.tajuste_det ajd
                         inner join pre.vpresupuesto_cc pre on pre.id_presupuesto = ajd.id_presupuesto
                         inner join pre.tpartida par on par.id_partida = ajd.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = ajd.id_orden_trabajo                        
+				        left join param.tconcepto_ingas ci on ci.id_concepto_ingas = ajd.id_concepto_ingas
 				        where  ';
 
 			--Definicion de la respuesta
@@ -105,6 +107,7 @@ BEGIN
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
                         left join conta.torden_trabajo ot on ot.id_orden_trabajo = ajd.id_orden_trabajo                        
+				        left join param.tconcepto_ingas ci on ci.id_concepto_ingas = ajd.id_concepto_ingas
 				        where ';
 
 			--Definicion de la respuesta

@@ -31,7 +31,7 @@ Phx.vista.AjusteDetDec = {
 		this.maestro=m;
         
         this.store.baseParams={id_ajuste: this.maestro.id_ajuste, tipo_ajuste: 'decremento'};
-        
+
         if(this.maestro.tipo_ajuste == 'rev_comprometido'){
         	this.Cmp.id_presupuesto.store.baseParams.nro_tramite = this.maestro.nro_tramite;
         	this.Cmp.id_presupuesto.store.baseParams.tipo_ajuste = this.maestro.tipo_ajuste;

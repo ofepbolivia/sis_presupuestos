@@ -192,7 +192,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				                              	'decremento':'Decremento',
 				                              	'inc_comprometido':'Aumento Comprometido',
 				                              	'rev_comprometido':'Disminución Comprometido',
-                                                'rev_total_comprometido':'Reversión Comprometido'
+                                                'rev_total_comprometido':'Reversión Comprometido',
+                                                'ajuste_comprometido':'Ajuste Comprometido'
 				                              };
 				                               
 	                           return String.format('<b><font color="green">{0}</font></b>', ajustes[value]);
@@ -207,7 +208,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                       ['decremento','Decremento'],
                                       ['inc_comprometido','Aumento Comprometido -> [ADQ, TES]'],
                                       ['rev_comprometido','Disminución Comprometido -> [ADQ, TES]'],
-                                      ['rev_total_comprometido','Reversión Comprometido -> [ADQ, TES]']
+                                      ['rev_total_comprometido','Reversión Comprometido -> [ADQ, TES]'],
+                                      ['ajuste_comprometido','Ajuste Comprometido -> [ADQ, TES]']
                             ]}),
             },
             type:'ComboBox',
@@ -235,7 +237,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
-                    fields: ['nro_tramite','codigo','desc_moneda','id_moneda'],
+                    fields: ['nro_tramite','desc_moneda','id_moneda'],
                     // turn on remote sorting
                     remoteSort: true,
                     baseParams:{par_filtro:'pe.nro_tramite#pm.codigo'}
@@ -250,7 +252,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 triggerAction: 'all',
                 lazyRender:true,
                 mode:'remote',
-                pageSize:20,
+                pageSize:10,
                 queryDelay:1000,
                 width:250,
                 minChars:2
@@ -773,16 +775,18 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     },
   
     enableAllTab: function(){
-    	if(this.TabPanelEast && this.TabPanelEast.get(0) && this.TabPanelEast.get(1)){
+    	if(this.TabPanelEast && this.TabPanelEast.get(0) && this.TabPanelEast.get(1) && this.TabPanelEast.get(2)){
     	  this.TabPanelEast.get(0).enable();
     	  this.TabPanelEast.get(1).enable();
+    	  this.TabPanelEast.get(2).disable();
     	 }
     },
     
     disableAllTab: function(){
-    	if(this.TabPanelEast && this.TabPanelEast.get(0) && this.TabPanelEast.get(1)){
+    	if(this.TabPanelEast && this.TabPanelEast.get(0) && this.TabPanelEast.get(1) && this.TabPanelEast.get(2)){
     	   this.TabPanelEast.get(0).disable();
     	    this.TabPanelEast.get(1).disable();
+    	    this.TabPanelEast.get(2).disable();
     	 }
     },
     enableTabDecrementos:function(){
@@ -802,8 +806,9 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     disableTabDecrementos:function(){
      	if(this.TabPanelEast && this.TabPanelEast.get(0)){
      		      this.TabPanelEast.get(0).disable();
-     		      this.TabPanelEast.get(1).enable();	
-		          this.TabPanelEast.setActiveTab(1)
+     		      this.TabPanelEast.get(2).disable();
+     		      this.TabPanelEast.get(1).enable();
+		          this.TabPanelEast.setActiveTab(1);
 		          
 		}
     },
@@ -811,13 +816,35 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     disableTabIncrementos:function(){
     	if(this.TabPanelEast && this.TabPanelEast.get(1)){
      		      this.TabPanelEast.get(1).disable();	
+     		      this.TabPanelEast.get(2).disable();
      		      this.TabPanelEast.get(0).enable();
-		          this.TabPanelEast.setActiveTab(0)
+		          this.TabPanelEast.setActiveTab(0);
 		          
 		}
     },
-      
-	bdel:true,
+
+    //16-06-2021 (may) pestaña ajuste
+    enableTabAjuste:function(){
+        if(this.TabPanelEast && this.TabPanelEast.get(2)){
+            this.TabPanelEast.get(0).enable();
+            this.TabPanelEast.setActiveTab(0);
+
+            this.TabPanelEast.get(1).enable();
+            this.TabPanelEast.setActiveTab(1);
+        }
+    },
+
+    disableTabAjuste:function(){
+        if(this.TabPanelEast && this.TabPanelEast.get(2)){
+            this.TabPanelEast.get(1).disable();
+            this.TabPanelEast.get(0).disable();
+            this.TabPanelEast.get(2).enable();
+            this.TabPanelEast.setActiveTab(2)
+
+        }
+    },
+
+    bdel:true,
 	bsave:true,
 	
 	checkPresupuesto:function(){                   
@@ -849,6 +876,12 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     		  title:'Aumento (+)',
     		  width:'60%',
     		  cls:'AjusteDetInc'
+		  },
+          {
+    		  url:'../../../sis_presupuestos/vista/ajuste_det/AjusteDetAju.php',
+    		  title:'Ajuste (+/-)',
+    		  width:'60%',
+    		  cls:'AjusteDetAju'
 		  },
 		  
 		  ],

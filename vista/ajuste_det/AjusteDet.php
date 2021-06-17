@@ -71,6 +71,62 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             bottom_filter: true,
             form:true
         },
+
+        {
+            config:{
+                name:'id_concepto_ingas',
+                fieldLabel:'Concepto Ingreso Gasto',
+                allowBlank:false,
+                emptyText:'Concepto Ingreso Gasto...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+                    id: 'id_concepto_ingas',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'desc_ingas',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto' ,autorizacion_nulos: 'no'}
+                }),
+                valueField: 'id_concepto_ingas',
+                displayField: 'desc_ingas',
+                gdisplayField:'nombre_ingas',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><p>TIPO:{tipo}</p><p>MOVIMIENTO:{movimiento}</p> <p>PARTIDA:{desc_partida}</p></div></tpl>',
+                hiddenName: 'id_concepto_ingas',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:600,
+                resizable:true,
+                width: 350,
+                gwidth: 200,
+                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_ingas']);}
+
+                /*renderer:function(value, p, record){if (record.data['nombre_ingas'] != null){
+                    return String.format('{0}', record.data['nombre_ingas']);
+                }else{
+                    return '';
+                }*/
+
+            },
+            type:'ComboBox',
+            id_grupo:0,
+            filters:{
+                pfiltro:'cig.movimiento#cig.desc_ingas',
+                type:'string'
+            },
+            grid:false,
+            form:true
+        },
+
 	   	{
    			config:{
    				sysorigen:'sis_presupuestos',
@@ -93,12 +149,31 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
    			grid:true,   			
    			form:true
 	   	},
+        {
+            config:{
+                name:'id_orden_trabajo',
+                fieldLabel: 'Orden Trabajo',
+                sysorigen:'sis_contabilidad',
+                origen:'OT',
+                allowBlank:false,
+                width: 350,
+                gwidth:200,
+                baseParams:{par_filtro:'desc_orden#motivo_orden'},
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden']);}
+
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
+            grid:true,
+            form:true
+        },
 		{
 			config:{
 				name: 'importe',
-				fieldLabel: 'importe',
+				fieldLabel: 'Importe',
 				allowBlank: false,
-				anchor: '70%',
+                width: 350,
 				gwidth: 100,
 				maxLength:1310722,
 				renderer:function (value,p,record){
@@ -123,17 +198,19 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
                 name: 'descripcion',
                 fieldLabel: 'Descripción',
                 allowBlank: true,
-                anchor: '80%',
+                width: 350,
                 gwidth: 200,
-                maxLength:10
+                maxLength:10,
+                readOnly: false
             },
-            type:'TextField',
+            type:'TextArea',
             filters:{pfiltro:'ajd.descripcion',type:'string'},
+            //valorInicial: 'REGISTRO AUTOMATICO POR PRESUPUESTO',
             id_grupo:1,
             grid:true,
-            form:false
+            form:true
         },
-        {
+        /*{
             config:{
                 name: 'desc_orden',
                 fieldLabel: 'Orden Trabajo',
@@ -145,8 +222,8 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             grid:true,
             form:false
-        },		
-        {
+        },*/
+        /*{
             config:{
                 name:'id_concepto_ingas',
                 fieldLabel:'Concepto Ingreso Gasto',
@@ -197,7 +274,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             },
             grid:true,
             form:false
-        },		        
+        },	*/
 		{
 			config:{
 				name: 'estado_reg',
@@ -312,8 +389,10 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion','id_concepto_ingas','nombre_ingas','id_orden_trabajo','desc_orden'
-		
+        {name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion',
+        {name:'id_concepto_ingas', type: 'numeric'},
+        {name:'nombre_ingas', type: 'string'},
+        'id_orden_trabajo','desc_orden'
 	],
 	sortInfo:{
 		field: 'id_ajuste_det',
@@ -350,7 +429,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 
         this.Cmp.id_presupuesto.on('select', function (c, r, i) {
              this.Cmp.id_partida.reset();
-            if(this.maestro.tipo_ajuste == 'inc_comprometido' || this.maestro.tipo_ajuste == 'rev_comprometido'){
+            if(this.maestro.tipo_ajuste == 'inc_comprometido' || this.maestro.tipo_ajuste == ''){
 			    
 			    this.Cmp.id_partida.store.baseParams.id_presupuesto_ajuste = this.Cmp.id_presupuesto.getValue();
 			    delete this.Cmp.id_partida.store.baseParams.id_presupuesto;
@@ -361,14 +440,31 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				delete this.Cmp.id_partida.store.baseParams.id_presupuesto_ajuste;
 			}
 			this.Cmp.id_partida.modificado = true;
-           
+
         }, this);
+
+
+
     },
     onButtonEdit : function () {
         var selected = this.sm.getSelected().data;
         Phx.vista.AjusteDet.superclass.onButtonEdit.call(this);
         this.Cmp.id_presupuesto.disable();
         this.Cmp.id_partida.disable();
+
+        //14-06-2021 (may)
+        if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
+            this.mostrarComponente(this.Cmp.id_concepto_ingas);
+            this.Cmp.id_concepto_ingas.disable();
+            this.mostrarComponente(this.Cmp.id_orden_trabajo);
+            this.Cmp.id_orden_trabajo.disable();
+            this.ocultarComponente(this.Cmp.id_partida);
+            this.ocultarComponente(this.Cmp.descripcion);
+            this.Cmp.descripcion.setValue('REGISTRO AUTOMATICO POR PRESUPUESTO');
+        }else{
+            this.ocultarComponente(this.Cmp.id_concepto_ingas);
+            this.ocultarComponente(this.Cmp.id_orden_trabajo);
+        }
        
     },
      onButtonNew : function () {
@@ -376,6 +472,19 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.AjusteDet.superclass.onButtonNew.call(this);
         this.Cmp.id_presupuesto.enable();
         this.Cmp.id_partida.enable();
+
+         //14-06-2021 (may)
+         if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
+             this.mostrarComponente(this.Cmp.id_concepto_ingas);
+             this.mostrarComponente(this.Cmp.id_orden_trabajo);
+             this.ocultarComponente(this.Cmp.id_partida);
+             this.ocultarComponente(this.Cmp.descripcion);
+             this.Cmp.descripcion.setValue('REGISTRO AUTOMATICO POR PRESUPUESTO');
+         }else{
+             this.ocultarComponente(this.Cmp.id_concepto_ingas);
+             this.ocultarComponente(this.Cmp.id_orden_trabajo);
+             this.mostrarComponente(this.Cmp.id_partida);
+         }
        
     },
 	

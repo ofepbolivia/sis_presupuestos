@@ -43,8 +43,10 @@ class MODAjusteDet extends MODbase{
 		$this->captura('id_ajuste','int4');
 		$this->captura('descripcion','text');
 		$this->captura('id_orden_trabajo','int4');
-		$this->captura('desc_orden','varchar');		
-		
+		$this->captura('desc_orden','varchar');
+        $this->captura('id_concepto_ingas','int4');
+		$this->captura('nombre_ingas','varchar');
+
 		//Ejecuta la instruccion
         $this->armarConsulta();        
 		$this->ejecutarConsulta();
@@ -67,6 +69,10 @@ class MODAjusteDet extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_ajuste','tipo_ajuste','varchar');
 		$this->setParametro('id_ajuste','id_ajuste','int4');
+
+        $this->setParametro('id_orden_trabajo','id_orden_trabajo','int4');
+        $this->setParametro('id_concepto_ingas','id_concepto_ingas','int4');
+        $this->setParametro('descripcion','descripcion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

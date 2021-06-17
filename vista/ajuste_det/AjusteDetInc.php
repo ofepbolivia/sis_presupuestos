@@ -37,13 +37,14 @@ Phx.vista.AjusteDetInc = {
    onReloadPage:function(m){
 		this.maestro=m;
         this.store.baseParams={id_ajuste: this.maestro.id_ajuste, tipo_ajuste: 'incremento'};
-        
-        if(this.maestro.tipo_ajuste == 'inc_comprometido'){
-        	this.Cmp.id_presupuesto.store.baseParams.nro_tramite = this.maestro.nro_tramite;
-        	this.Cmp.id_presupuesto.store.baseParams.tipo_ajuste = this.maestro.tipo_ajuste;
-        	this.Cmp.id_partida.store.baseParams.nro_tramite = this.maestro.nro_tramite;
-        	this.Cmp.id_partida.store.baseParams.tipo_ajuste = this.maestro.tipo_ajuste;
-        }
+
+       if(this.maestro.tipo_ajuste == 'inc_comprometido'){
+           this.Cmp.id_presupuesto.store.baseParams.nro_tramite = this.maestro.nro_tramite;
+           this.Cmp.id_presupuesto.store.baseParams.tipo_ajuste = this.maestro.tipo_ajuste;
+           this.Cmp.id_partida.store.baseParams.nro_tramite = this.maestro.nro_tramite;
+           this.Cmp.id_partida.store.baseParams.tipo_ajuste = this.maestro.tipo_ajuste;
+
+       }
         else{
         	delete this.Cmp.id_presupuesto.store.baseParams.nro_tramite;
         	delete this.Cmp.id_presupuesto.store.baseParams.tipo_ajuste;

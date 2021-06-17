@@ -165,8 +165,8 @@ BEGIN
             raise notice '-> ges :%',v_id_gestion;
 
 
-    		--Sentencia de la consulta
-			v_consulta:='select
+    		--15-06-2021 (may) funcion se pone muy lenta
+            /*v_consulta:='select
                              DISTINCT ON (pe.nro_tramite)
                              pr.id_gestion,
                              pe.nro_tramite,
@@ -180,10 +180,33 @@ BEGIN
                           inner join param.tperiodo pr on pe.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
                           inner join param.tmoneda mon on mon.id_moneda = pe.id_moneda
                           where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
-                          and  pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
+                          and  pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';*/
+
+
+    		--Sentencia de la consulta
+			v_consulta:='select
+                             pr.id_gestion,
+                             pe.nro_tramite,
+                             pm.codigo,
+                             pe.id_moneda,
+                             mon.codigo as desc_moneda
+                          from pre.tpartida_ejecucion pe
+                          inner join tes.tobligacion_pago pag on pag.num_tramite = pe.nro_tramite
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on pe.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = pe.id_moneda
+                          where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
+                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' group by pr.id_gestion,
+                                              pe.nro_tramite,
+                                              pm.codigo,
+                                              pe.id_moneda,
+                                              mon.codigo ';
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			raise notice 'La consulta es:  %', v_consulta;
@@ -225,6 +248,7 @@ BEGIN
 			v_consulta:='select
                              count( DISTINCT pe.nro_tramite)
 					    from pre.tpartida_ejecucion pe
+                          inner join tes.tobligacion_pago pag on pag.num_tramite = pe.nro_tramite
                           inner join wf.tproceso_wf pwf on pwf.nro_tramite = pe.nro_tramite
                           inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
                           inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro

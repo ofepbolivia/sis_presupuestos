@@ -66,6 +66,10 @@ DECLARE
     v_tipo_ajuste					varchar;
     v_importe_total					numeric;
     v_tipo_proceso					varchar;
+
+    --16-06-2021 (may)
+    v_total_ajuste					numeric;
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_ajuste_ime';
@@ -124,7 +128,7 @@ BEGIN
          END IF;
 
          --recuperamos la moenda del tramite en partida ejecucion
-         IF  v_parametros.tipo_ajuste in ('inc_comprometido','rev_comprometido', 'rev_total_comprometido') and  v_parametros.nro_tramite_aux is not null and v_parametros.nro_tramite_aux != ''THEN
+         IF  v_parametros.tipo_ajuste in ('inc_comprometido','rev_comprometido', 'rev_total_comprometido', 'ajuste_comprometido') and  v_parametros.nro_tramite_aux is not null and v_parametros.nro_tramite_aux != ''THEN
             select
                pe.id_moneda
             into
@@ -141,7 +145,8 @@ BEGIN
          from pre.tajuste taj
          where taj.nro_tramite = v_parametros.nro_tramite_aux;
 
-          v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento' else 'decremento' end;
+          v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento'
+          						when v_parametros.tipo_ajuste = 'ajuste_comprometido' then 'ajuste'  else 'decremento' end;
 
 
 
@@ -608,6 +613,25 @@ BEGIN
 
                      IF v_total_decrementos != 0 THEN
                         raise exception 'elimine los decrementos registrados';
+                     END IF;
+
+                  ELSEIF v_registros_proc.tipo_ajuste = 'ajuste_comprometido'   THEN --16-06-2021(may)
+                     -- si es Ajuste
+                     --suma
+                     select
+                        sum(a.importe)
+                     into
+                        v_total_ajuste
+                     from pre.tajuste_det a
+                     where a.id_ajuste = v_registros_proc.id_ajuste
+                           and a.tipo_ajuste = 'ajuste'
+                           and a.estado_reg = 'activo';
+
+
+                     v_total_ajuste  =  COALESCE(v_total_ajuste ,0);
+
+                     IF v_total_ajuste != 0 THEN
+                     	raise exception 'No debe existir diferencia de importes entre la suma de los Incrementos y las Disminuciones, existe una diferencia de importes: %.', v_total_ajuste;
                      END IF;
 
                  ELSE
