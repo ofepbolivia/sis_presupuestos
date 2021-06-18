@@ -1099,3 +1099,11 @@ ALTER TABLE pre.tformulacion_presu_detalle
   OWNER TO postgres;
 
 /*****************************F-SCP-MAY-PRE-0-11/08/2020*************/
+
+/*****************************I-SCP-MAY-PRE-0-18/06/2021*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN id_concepto_ingas INTEGER;
+
+COMMENT ON COLUMN pre.tajuste_det.id_concepto_ingas
+IS 'identificador concepto de gasto';
+/*****************************F-SCP-MAY-PRE-0-18/06/2021*************/
