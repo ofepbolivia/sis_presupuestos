@@ -441,6 +441,40 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 			}
 			this.Cmp.id_partida.modificado = true;
 
+			//17-06-2021 (may) filtros
+
+            if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
+
+
+                    this.Cmp.id_concepto_ingas.reset();
+
+                    this.Cmp.id_orden_trabajo.reset();
+                    this.Cmp.id_orden_trabajo.store.baseParams.id_centro_costo = this.Cmp.id_presupuesto.getValue();
+                    this.Cmp.id_orden_trabajo.modificado = true;
+
+                    this.Cmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
+                        this.Cmp.id_orden_trabajo.reset();
+                    },this);
+
+                    this.Cmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
+                        console.log('llegainieventos1 ', this.Cmp.id_orden_trabajo.store.baseParams)
+                        console.log('llegainieventos2 ', rec)
+                        this.Cmp.id_orden_trabajo.store.baseParams = Ext.apply(this.Cmp.id_orden_trabajo.store.baseParams, {
+                            filtro_ot:rec.data.filtro_ot,
+                            requiere_ot:rec.data.requiere_ot,
+                            id_grupo_ots:rec.data.id_grupo_ots
+                        });
+
+                        this.Cmp.id_orden_trabajo.modificado = true;
+                        this.Cmp.id_orden_trabajo.enable();
+
+                        //this.Cmp.id_orden_trabajo.reset();
+
+                    },this);
+
+
+            }
+
         }, this);
 
 
@@ -456,11 +490,12 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
             this.mostrarComponente(this.Cmp.id_concepto_ingas);
             this.Cmp.id_concepto_ingas.disable();
+            this.Cmp.id_concepto_ingas.allowBlank = true;
             this.mostrarComponente(this.Cmp.id_orden_trabajo);
             this.Cmp.id_orden_trabajo.disable();
             this.ocultarComponente(this.Cmp.id_partida);
             this.ocultarComponente(this.Cmp.descripcion);
-            this.Cmp.descripcion.setValue('REGISTRO AUTOMATICO POR PRESUPUESTO');
+            this.Cmp.descripcion.setValue('REGISTRO AUTOMATICO POR PRESUPUESTO');            t
         }else{
             this.ocultarComponente(this.Cmp.id_concepto_ingas);
             this.ocultarComponente(this.Cmp.id_orden_trabajo);
@@ -476,6 +511,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
          //14-06-2021 (may)
          if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
              this.mostrarComponente(this.Cmp.id_concepto_ingas);
+             this.Cmp.id_concepto_ingas.allowBlank = false;
              this.mostrarComponente(this.Cmp.id_orden_trabajo);
              this.ocultarComponente(this.Cmp.id_partida);
              this.ocultarComponente(this.Cmp.descripcion);
