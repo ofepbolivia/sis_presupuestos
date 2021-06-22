@@ -265,35 +265,35 @@ Phx.vista.DireccionAdministrativa=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.DireccionAdministrativa.superclass.onButtonNew.call(this);
     },
 
-    onSubmit: function (o, x, force) {
+    // onSubmit: function (o, x, force) {
 
-        Ext.Ajax.request({
-            url:'../../sis_presupuestos/control/DireccionAdministrativa/validarCampos',
-            params:{
-                'codigo':this.Cmp.codigo.getValue(),
-                'nombre':this.Cmp.nombre.getValue()
-            },
-            success:function (resp) {
-                var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
-                if(JSON.parse(reg.ROOT.datos.v_valid)){
-                    Ext.Msg.show({
-                        title: 'Alerta',
-                        msg: '<p><b>Estimado Usuario,</b> informarle que el o los campo(s): ' +
-                        '</p><br><b>'+reg.ROOT.datos.v_mensaje+'</b> ya se encuentra registrado. Le sugerimos verificar los datos que esta tratando de registrar.',
-                        buttons: Ext.Msg.OK,
-                        width: 600,
-                        icon: Ext.Msg.WARNING
-                    });
-                }else{
-                    Phx.vista.DireccionAdministrativa.superclass.onSubmit.call(this, o);
-                }
+    //    Ext.Ajax.request({
+    //        url:'../../sis_presupuestos/control/DireccionAdministrativa/validarCampos',
+    //        params:{
+    //            'codigo':this.Cmp.codigo.getValue(),
+    //            'nombre':this.Cmp.nombre.getValue()
+    //        },
+    //        success:function (resp) {
+    //            var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+    //            if(JSON.parse(reg.ROOT.datos.v_valid)){
+    //                Ext.Msg.show({
+    //                    title: 'Alerta',
+    //                    msg: '<p><b>Estimado Usuario,</b> informarle que el o los campo(s): ' +
+    //                    '</p><br><b>'+reg.ROOT.datos.v_mensaje+'</b> ya se encuentra registrado. Le sugerimos verificar los datos que esta tratando de registrar.',
+    //                    buttons: Ext.Msg.OK,
+    //                    width: 600,
+    //                    icon: Ext.Msg.WARNING
+    //                });
+    //            }else{
+    //                Phx.vista.DireccionAdministrativa.superclass.onSubmit.call(this, o);
+    //            }
 
-            },
-            failure: this.conexionFailure,
-            timeout:this.timeout,
-            scope:this
-        });
-    }
+    //        },
+    //        failure: this.conexionFailure,
+    //        timeout:this.timeout,
+    //        scope:this
+    //    });
+    // }
 	}
 )
 </script>
