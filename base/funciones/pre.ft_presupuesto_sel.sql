@@ -925,12 +925,16 @@ BEGIN
               from adq.tsolicitud ts
               where ts.num_tramite =  v_record_ajuste.nro_tramite;
             else
-              select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,current_date) as id_uo
+              --(may) modificacion segun la fecha del proceso
+              --select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,current_date) as id_uo
+              select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,ts.fecha) as id_uo
               into v_record_sol
               from tes.tobligacion_pago ts
               where ts.num_tramite =  v_record_ajuste.nro_tramite;
               if v_record_sol is null then
-              	select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,current_date) as id_uo
+              	--(may) modificacion segun la fecha del proceso
+              	--select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,current_date) as id_uo
+                select ts.id_funcionario, orga.f_get_uo_gerencia(null,ts.id_funcionario,ts.fecha) as id_uo
               	into v_record_sol
                 from adq.tsolicitud ts
                 where ts.num_tramite =  v_record_ajuste.nro_tramite;
