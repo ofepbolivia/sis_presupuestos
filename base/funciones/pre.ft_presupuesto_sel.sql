@@ -974,7 +974,7 @@ BEGIN
               taj.fecha::date AS fecha_soli,
 
               COALESCE(tg.gestion, (extract(year from now()::date))::integer) AS gestion,
-              (case when substring(tpf.descripcion,12) = ''inc_comprometido'' then ''AUMENTO'' when substring(tpf.descripcion,12) = ''rev_comprometido'' then ''DISMINUCIÓN'' else ''REVERSIÓN'' end)::varchar as tipo_ajuste,
+              (case when substring(tpf.descripcion,12) = ''inc_comprometido'' then ''AUMENTO'' when substring(tpf.descripcion,12) = ''rev_comprometido'' then ''DISMINUCIÓN'' when substring(tpf.descripcion,12) = ''ajuste_comprometido'' then ''AJUSTE'' else ''REVERSIÓN'' end)::varchar as tipo_ajuste,
               taj.correlativo,
               COALESCE(taj.tipo_proceso,''normal'') as tipo_proceso
               FROM pre.tajuste taj
