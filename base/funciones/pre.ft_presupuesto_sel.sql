@@ -710,8 +710,8 @@ BEGIN
             INNER JOIN pre.tpresupuesto	tp ON tp.id_presupuesto = tsd.id_centro_costo --tpp.id_presupuesto
             INNER JOIN pre.vcategoria_programatica vcp ON vcp.id_categoria_programatica = tp.id_categoria_prog
 
-            INNER JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida --tpp.id_partida
-            INNER JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
+            left JOIN pre.tclase_gasto_partida tcgp ON tcgp.id_partida = tpar.id_partida --tpp.id_partida
+            left JOIN pre.tclase_gasto tcg ON tcg.id_clase_gasto = tcgp.id_clase_gasto
 
             INNER JOIN param.tmoneda tmo ON tmo.id_moneda = ts.id_moneda
 
