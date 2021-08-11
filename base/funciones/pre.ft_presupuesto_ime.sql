@@ -94,6 +94,10 @@ DECLARE
     v_justificacion						varchar;
     v_id_formulacion_presu_encontrada	integer;
 
+    --(may)
+    va_id_funcionarios					integer[];
+    va_funcionario						integer;
+
 
 BEGIN
 
@@ -611,24 +615,65 @@ BEGIN
                                                       and p.estado_reg = 'activo'
                                                       and p.estado = 'aprobado' ) loop
 
-                                          INSERT INTO  pre.tpresupuesto_funcionario
-                                          (
-                                            id_usuario_reg,
-                                            fecha_reg,
-                                            estado_reg,
-                                            id_presupuesto,
-                                            id_funcionario,
-                                            accion
-                                          )
-                                          VALUES (
-                                            p_id_usuario,
-                                            now(),
-                                            'activo',
-                                            v_id_centro_costo, --id_presupeusto tiene que ser igual al id centro de costo
-                                            v_funcionarios.id_funcionario,
-                                            v_funcionarios.accion
 
-                                          )RETURNING id_presupuesto_funcionario into v_id_presupuesto_funcionario;
+                              			  --05-08-2021 (may) solo para responsable automatico recupera el responsable de presupuesto de la gestion
+                                          IF (v_funcionarios.accion = 'responsable') THEN
+
+                                          		va_id_funcionarios =  orga.f_get_funcionarios_x_uo_ofi_fun(v_reg_cc_ori.id_uo, now()::date);
+                                                va_funcionario = va_id_funcionarios[1];
+
+                                                IF (va_funcionario is not null) THEN
+                                                    INSERT INTO  pre.tpresupuesto_funcionario
+                                                        (
+                                                          id_usuario_reg,
+                                                          fecha_reg,
+                                                          estado_reg,
+                                                          id_presupuesto,
+                                                          id_funcionario,
+                                                          accion
+                                                        )
+                                                        VALUES (
+                                                          p_id_usuario,
+                                                          now(),
+                                                          'activo',
+                                                          v_id_centro_costo, --id_presupeusto tiene que ser igual al id centro de costo
+                                                          va_funcionario,
+                                                          v_funcionarios.accion
+
+                                                        )RETURNING id_presupuesto_funcionario into v_id_presupuesto_funcionario;
+                                                END IF;
+
+                                          ELSE
+                                          		va_funcionario = v_funcionarios.id_funcionario;
+
+                                                IF EXISTS (select 1
+                                                             from orga.tuo_funcionario asig
+                                                             where asig.fecha_asignacion <= now()
+                                                             and coalesce(asig.fecha_finalizacion, now())>=now()
+                                                             and asig.estado_reg = 'activo'
+                                                             and asig.id_funcionario = va_funcionario ) THEN
+
+                                                             INSERT INTO  pre.tpresupuesto_funcionario(
+                                                                id_usuario_reg,
+                                                                fecha_reg,
+                                                                estado_reg,
+                                                                id_presupuesto,
+                                                                id_funcionario,
+                                                                accion
+                                                              )VALUES (
+                                                                p_id_usuario,
+                                                                now(),
+                                                                'activo',
+                                                                v_id_centro_costo, --id_presupeusto tiene que ser igual al id centro de costo
+                                                                va_funcionario,
+                                                                v_funcionarios.accion
+
+                                                              )RETURNING id_presupuesto_funcionario into v_id_presupuesto_funcionario;
+
+                                                 END IF;
+
+                                           END IF;
+                                          ---
 
                               end loop;
                   	/*******************************************************************************************************************************************************/
