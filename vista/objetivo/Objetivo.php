@@ -12,6 +12,9 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 
+    fwidth: '55%',
+    fheight: '65%',
+
 	constructor:function(config){
 		this.maestro=config.maestro;
 		this.initButtons=[this.cmbGestion];
@@ -309,7 +312,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 				grid:false,
 				form:true
 		},
-		{
+		/*{
 			config:{
 				name: 'sw_transaccional',
 				fieldLabel: 'Transaccional',
@@ -323,7 +326,49 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 				id_grupo:1,
 				grid:false,
 				form:true
-		},
+		},*/
+        {
+            config : {
+                name:'sw_transaccional',
+                fieldLabel : 'Transaccional',
+                resizable:true,
+                allowBlank:false,
+                anchor: '80%',
+                gwidth: 100,
+                emptyText:'Seleccione ...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/Catalogo/listarCatalogoCombo',
+                    id: 'id_catalogo',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'orden',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_catalogo','codigo','descripcion'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams: {par_filtro:'descripcion',cod_subsistema:'PRE',catalogo_tipo:'tobjetivo'}
+                }),
+                enableMultiSelect:true,
+                valueField: 'codigo',
+                displayField: 'descripcion',
+                gdisplayField: 'sw_transaccional',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                listWidth: 350,
+                queryDelay:1000
+            },
+            type : 'ComboBox',
+            id_grupo: 1,
+            form : true,
+            grid: false,
+        },
+
 		
 		{
 			config:{
