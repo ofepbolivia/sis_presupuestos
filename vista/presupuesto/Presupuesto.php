@@ -240,7 +240,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 },
                 type:'ComboBox',
                 bottom_filter: true,
-                filters:{pfiltro:'codigo_categoria',type:'string'},
+                filters:{pfiltro:'cp.codigo_categoria',type:'string'},
                 id_grupo:1,
                 grid:true,
                 form:true
