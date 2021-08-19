@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.f_lista_resp_presupuesto (
   p_id_usuario integer,
   p_id_tipo_estado integer,
@@ -83,9 +81,11 @@ BEGIN
       v_id_funcionarios
     from pre.tpresupuesto_funcionario pf
     inner join pre.tpresupuesto p on p.id_presupuesto = pf.id_presupuesto
-    where  pf.accion in ('responsable','formulacion')  and   p.id_estado_wf = p_id_estado_wf;
-    
-    
+    where pf.accion in ('responsable')
+     and   p.id_estado_wf = p_id_estado_wf;
+
+     -- 19-08-2021(may)solo responsable puede dar siguiente hasta para el estado formulacion
+     -- pf.accion in ('responsable','formulacion')
    
     IF not p_count then
     
