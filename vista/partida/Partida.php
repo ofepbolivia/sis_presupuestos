@@ -93,7 +93,7 @@ Phx.vista.Partida=Ext.extend(Phx.arbGridInterfaz,{
 		Phx.CP.loadingShow();
 		Ext.Ajax.request({
 						//url : '../../sis_contabilidad/control/IntComprobante/reporteComprobante',
-						url : '../../sis_presupuesto/control/Partida/reporteClasificador',
+						url : '../../sis_presupuestos/control/Partida/reporteClasificador', //Correcion de la ruta sis_presupuesto a sis_presupuestos
 						params : {
 							'id_gestion' : this.cmbGestion.getValue()
 						},
