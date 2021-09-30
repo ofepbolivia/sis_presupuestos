@@ -571,6 +571,8 @@ header("content-type: text/javascript; charset=UTF-8");
                 if (data['estado']!= 'aprobado'){
                     this.getBoton('fin_registro').enable();
                 }
+            }else{      //aportugal-rguancollo:     adicion de condicion para deshabilitar el boton siguiente. 30/09/2021
+                this.getBoton('fin_registro').disable();
             }
 
 
