@@ -124,7 +124,23 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid:true,
                 form:true
             },
+            {
+                config: {
+                    name: 'estado_reg_uo',
+                    fieldLabel: 'Estado Unidad',
+                    allowBlank: true,
+                    anchor: '30%',
+                    gwidth: 80,
+                    //gdisplayField: 'estado_reg_uo',//mapea al store del grid
+                    maxLength: 100
 
+                },
+                type: 'TextField',
+                filters: {pfiltro: 'estado_reg_uo', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: false
+            },
 
             {
                 config:{
@@ -462,7 +478,8 @@ header("content-type: text/javascript; charset=UTF-8");
             'desc_tipo_presupuesto','descripcion','movimiento_tipo_pres',
             'id_gestion','obs_wf','sw_consolidado','codigo_categoria','id_categoria_prog','mov_pres','momento_pres','id_uo','codigo_uo','nombre_uo','id_tipo_cc','desc_tcc',
             { name:'fecha_inicio_pres', type: 'date', dateFormat: 'Y-m-d'},
-            { name:'fecha_fin_pres', type: 'date', dateFormat: 'Y-m-d'}
+            { name:'fecha_fin_pres', type: 'date', dateFormat: 'Y-m-d'},
+            {name: 'estado_reg_uo', type: 'string'}
 
         ],
 

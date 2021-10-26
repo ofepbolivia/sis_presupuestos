@@ -167,7 +167,9 @@ BEGIN
                               pre.fecha_inicio_pres,
                               pre.fecha_fin_pres,
                               vcc.codigo_tcc,
-                              vcc.descripcion_tcc
+                              vcc.descripcion_tcc,
+                              uo.estado_reg as estado_reg_uo
+
 						from pre.tpresupuesto pre
                         inner join param.vcentro_costo vcc on vcc.id_centro_costo=pre.id_centro_costo
 						inner join segu.tusuario usu1 on usu1.id_usuario = pre.id_usuario_reg
@@ -176,6 +178,9 @@ BEGIN
                         left join pre.ttipo_presupuesto tp on tp.codigo = pre.tipo_pres
 						left join segu.tusuario usu2 on usu2.id_usuario = pre.id_usuario_mod
 				        left join pre.vcategoria_programatica cp on cp.id_categoria_programatica = pre.id_categoria_prog
+
+                        left join orga.tuo uo on uo.id_uo = vcc.id_uo
+
                         where  ' ||v_filadd;
 
 
@@ -271,6 +276,9 @@ BEGIN
                         left join pre.ttipo_presupuesto tp on tp.codigo = pre.tipo_pres
 						left join segu.tusuario usu2 on usu2.id_usuario = pre.id_usuario_mod
                         left join pre.vcategoria_programatica cp on cp.id_categoria_programatica = pre.id_categoria_prog
+
+                        left join orga.tuo uo on uo.id_uo = vcc.id_uo
+
                         where  ' ||v_filadd;
 
 
