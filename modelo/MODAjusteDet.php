@@ -47,6 +47,8 @@ class MODAjusteDet extends MODbase{
         $this->captura('id_concepto_ingas','int4');
 		$this->captura('nombre_ingas','varchar');
 
+		$this->captura('id_sol_origen','varchar');
+
 		//Ejecuta la instruccion
         $this->armarConsulta();        
 		$this->ejecutarConsulta();

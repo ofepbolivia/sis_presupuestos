@@ -67,7 +67,8 @@ BEGIN
                             ajd.id_orden_trabajo,
                             ot.desc_orden,
                             ajd.id_concepto_ingas,
-                            ci.desc_ingas as nombre_ingas
+                            ci.desc_ingas as nombre_ingas,
+                            ajd.id_sol_origen::varchar
 
 						from pre.tajuste_det ajd
                         inner join pre.vpresupuesto_cc pre on pre.id_presupuesto = ajd.id_presupuesto

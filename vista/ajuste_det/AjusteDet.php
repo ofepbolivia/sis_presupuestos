@@ -210,6 +210,21 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             grid:true,
             form:true
         },
+
+        {
+            config:{
+                name: 'id_sol_origen',
+                fieldLabel: 'ID. Origen',
+                allowBlank: true,
+                gwidth: 70,
+                maxLength:10
+            },
+            type:'TextField',
+            filters:{pfiltro:'ajd.id_sol_origen',type:'string'},
+            id_grupo:1,
+            grid:true,
+            form:false
+        },
         /*{
             config:{
                 name: 'desc_orden',
@@ -392,12 +407,14 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         {name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion',
         {name:'id_concepto_ingas', type: 'numeric'},
         {name:'nombre_ingas', type: 'string'},
-        'id_orden_trabajo','desc_orden'
+        'id_orden_trabajo','desc_orden',
+        {name:'id_sol_origen', type: 'string'}
 	],
 	sortInfo:{
 		field: 'id_ajuste_det',
 		direction: 'ASC'
 	},
+    arrayDefaultColumHidden: ['id_sol_origen'],
 	preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;

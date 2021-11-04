@@ -1107,3 +1107,11 @@ ALTER TABLE pre.tajuste_det
 COMMENT ON COLUMN pre.tajuste_det.id_concepto_ingas
 IS 'identificador concepto de gasto';
 /*****************************F-SCP-MAY-PRE-0-18/06/2021*************/
+
+/*****************************I-SCP-MAY-PRE-0-03/11/2021*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN id_sol_origen INTEGER;
+
+COMMENT ON COLUMN pre.tajuste_det.id_sol_origen
+IS 'identificador adq/op';
+/*****************************F-SCP-MAY-PRE-0-03/11/2021*************/
