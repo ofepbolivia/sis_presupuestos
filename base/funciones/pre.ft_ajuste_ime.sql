@@ -209,7 +209,8 @@ BEGIN
                 id_ajuste,
                 descripcion,
                 id_orden_trabajo,
-                id_sol_origen
+                id_sol_origen,
+                tabla_origen
 
             ) select
                 tsd.id_centro_costo,
@@ -226,7 +227,8 @@ BEGIN
                 v_id_ajuste,
                 tsd.descripcion,
                 tsd.id_orden_trabajo,
-                tsd.id_solicitud_det
+                tsd.id_solicitud_det,
+                'adq.tsolicitud'
 
             from adq.tsolicitud_det tsd
             inner join adq.tsolicitud ts on ts.id_solicitud = tsd.id_solicitud
@@ -247,7 +249,9 @@ BEGIN
                 id_ajuste,
                 descripcion,
                 id_orden_trabajo,
-                id_sol_origen
+                id_sol_origen,
+                tabla_origen
+
             ) select
                 tsd.id_centro_costo,
                 case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -tsd.monto_pago_mo end,
@@ -263,7 +267,8 @@ BEGIN
                 v_id_ajuste,
                 tsd.descripcion,
                 tsd.id_orden_trabajo,
-                tsd.id_obligacion_det
+                tsd.id_obligacion_det,
+                'tes.tobligacion_pago'
 
             from tes.tobligacion_det tsd
             inner join tes.tobligacion_pago ts on ts.id_obligacion_pago = tsd.id_obligacion_pago

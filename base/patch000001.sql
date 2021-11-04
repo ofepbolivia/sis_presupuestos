@@ -1115,3 +1115,11 @@ ALTER TABLE pre.tajuste_det
 COMMENT ON COLUMN pre.tajuste_det.id_sol_origen
 IS 'identificador adq/op';
 /*****************************F-SCP-MAY-PRE-0-03/11/2021*************/
+
+/*****************************I-SCP-MAY-PRE-0-04/11/2021*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN tabla_origen INTEGER;
+
+COMMENT ON COLUMN pre.tajuste_det.tabla_origen
+IS 'descripcion tabla origen ID';
+/*****************************F-SCP-MAY-PRE-0-04/11/2021*************/
