@@ -62,7 +62,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Documentos de la Solicitud</b><br/>Subir los documetos requeridos en la solicitud seleccionada.'
             }
         );
-        
+
         this.addButton('btnObs',{
                     text :'Obs Wf',
                     grupo:[1,2],
@@ -71,7 +71,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                     handler : this.onOpenObs,
                     tooltip : '<b>Observaciones</b><br/><b>Observaciones del WF</b>'
          });
-         
+
           this.addButton('chkpresupuesto',{
                     text :'Comp/Ejec',
                     grupo:[0,1,2],
@@ -81,8 +81,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                     tooltip: '<b>Revisar Presupuesto</b><p>Revisar estado de ejecución presupeustaria para el tramite</p>',
 
          });
-         
-         
+
+
 	},
     capturarEventos: function () {
 
@@ -123,7 +123,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
         hidden:false,
         width:80
     }),
-    
+
 	Atributos:[
 		{
 			//configuracion del componente
@@ -133,9 +133,9 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 					name: 'id_ajuste'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
-		
+
 		{
 			config:{
 				name: 'nro_tramite',
@@ -159,7 +159,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: false,
                 anchor: '80%',
                 gwidth: 80,
-                format: 'd/m/Y', 
+                format: 'd/m/Y',
                 renderer:function (value,p,record){return value?value.dateFormat('d/m/Y'):''}
             },
             type:'DateField',
@@ -184,7 +184,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 displayField: 'valor',
                 renderer:function(value,p,record){
                         if( record.data.total_pagado == record.data.monto_ejecutar_total_mo ){
-                               
+
                               var ajustes = {
 				                              	'traspaso':'Traspaso',
 				                              	'reformulacion':'Reformulación',
@@ -195,9 +195,9 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                                 'rev_total_comprometido':'Reversión Comprometido',
                                                 'ajuste_comprometido':'Ajuste Comprometido'
 				                              };
-				                               
+
 	                           return String.format('<b><font color="green">{0}</font></b>', ajustes[value]);
-	                          
+
                          }
                  },
                 store:new Ext.data.ArrayStore({
@@ -216,7 +216,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
             id_grupo:1,
             filters:{   pfiltro:'aju.tipo_ajuste',
                         type: 'list',
-                        options: ['reformulacion','reformulacion','incremento','decremento','inc_comprometido','rev_comprometido'],  
+                        options: ['reformulacion','reformulacion','incremento','decremento','inc_comprometido','rev_comprometido'],
                     },
             grid:true,
             form:true
@@ -233,14 +233,14 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                     id: 'nro_tramite',
                     root: 'datos',
                     sortInfo:{
-                        field: 'pe.nro_tramite',
+                        field: 'pag.num_tramite',
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
                     fields: ['nro_tramite','desc_moneda','id_moneda'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'pe.nro_tramite#pm.codigo'}
+                    baseParams:{par_filtro:'pag.num_tramite#pm.codigo'}
 
                 }),
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_tramite} ({desc_moneda})</p></div></tpl>',
@@ -279,7 +279,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 displayField: 'valor',
                 renderer:function(value,p,record){
                         if( record.data.total_pagado == record.data.monto_ejecutar_total_mo ){
-                               
+
                               var ajustes = {
 				                              	'recurso':'Recurso',
 				                              	'gasto':'Gasto',
@@ -318,7 +318,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				grid: true,
 				form: false
 		},
-        
+
         {
 			config:{
 				name: 'importe_ajuste',
@@ -409,7 +409,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -455,7 +455,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				allowBlank: true,
 				anchor: '80%',
 				gwidth: 100,
-							format: 'd/m/Y', 
+							format: 'd/m/Y',
 							renderer:function (value,p,record){return value?value.dateFormat('d/m/Y H:i:s'):''}
 			},
 				type:'DateField',
@@ -480,7 +480,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-	tam_pag:50,	
+	tam_pag:50,
 	title:'Ajustes',
 	ActSave:'../../sis_presupuestos/control/Ajuste/insertarAjuste',
 	ActDel:'../../sis_presupuestos/control/Ajuste/eliminarAjuste',
@@ -503,9 +503,9 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date', dateFormat:'Y-m-d H:i:s.u'},
 		{name:'fecha', type: 'date', dateFormat:'Y-m-d'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'}, 
+		{name:'usr_mod', type: 'string'},
 		'importe_ajuste','movimiento','id_gestion','nro_tramite_aux','desc_moneda','id_moneda'
-		
+
 	],
 	sortInfo:{
 		field: 'id_ajuste',
@@ -526,13 +526,13 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     },
 	onOpenObs:function() {
             var rec=this.sm.getSelected();
-            
+
             var data = {
             	id_proceso_wf: rec.data.id_proceso_wf,
             	id_estado_wf: rec.data.id_estado_wf,
             	num_tramite: rec.data.nro_tramite
             }
-            
+
             Phx.CP.loadWindows('../../../sis_workflow/vista/obs/Obs.php',
                     'Observaciones del WF',
                     {
@@ -544,7 +544,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                     'Obs'
         )
     },
-    diagramGantt:function(){           
+    diagramGantt:function(){
             var data=this.sm.getSelected().data.id_proceso_wf;
             Phx.CP.loadingShow();
             Ext.Ajax.request({
@@ -554,7 +554,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
-            });         
+            });
     },
     antEstado:function(res){
          var rec=this.sm.getSelected();
@@ -574,26 +574,26 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                scope:this
              })
    },
-   
+
    onAntEstado: function(wizard,resp){
             Phx.CP.loadingShow();
             Ext.Ajax.request({
                 url:'../../sis_presupuestos/control/Ajuste/anteriorEstadoAjuste',
                 params:{
                         id_proceso_wf: resp.id_proceso_wf,
-                        id_estado_wf:  resp.id_estado_wf,  
+                        id_estado_wf:  resp.id_estado_wf,
                         obs: resp.obs,
                         estado_destino: resp.estado_destino
                  },
-                argument: { wizard: wizard },  
+                argument: { wizard: wizard },
                 success:this.successEstadoSinc,
                 failure: this.conexionFailure,
                 timeout:this.timeout,
                 scope:this
             });
-           
+
      },
-     
+
    successEstadoSinc:function(resp){
         Phx.CP.loadingHide();
         resp.argument.wizard.panel.destroy()
@@ -689,7 +689,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
        }
 
    },
-	
+
 	mostrarWizard : function(rec) {
      	var configExtra = [],
      		obsValorInicial;
@@ -704,10 +704,10 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                 	configExtra: configExtra,
                                 	data:{
                                        id_estado_wf: rec.data.id_estado_wf,
-                                       id_proceso_wf: rec.data.id_proceso_wf, 
+                                       id_proceso_wf: rec.data.id_proceso_wf,
                                        id_ajuste: rec.data.id_ajuste,
                                        fecha_ini: rec.data.fecha_tentativa
-                                      
+
                                    },
                                    obsValorInicial : obsValorInicial,
                                 }, this.idContenedor, 'FormEstadoWf',
@@ -715,7 +715,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                     config:[{
                                               event:'beforesave',
                                               delegate: this.onSaveWizard,
-                                              
+
                                             },
 					                        {
 					                          event:'requirefields',
@@ -724,18 +724,18 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 										        	this.window.setTitle('Registre los campos antes de pasar al siguiente estado');
 										        	this.formulario_wizard = 'si';
 					                          }
-					                          
+
 					                        }],
-                                    
+
                                     scope:this
-                                 });        
+                                 });
      },
     onSaveWizard:function(wizard,resp){
         Phx.CP.loadingShow();
         Ext.Ajax.request({
             url: '../../sis_presupuestos/control/Ajuste/siguienteEstadoAjuste',
             params:{
-            	    
+
             	    id_ajuste: 			wizard.data.id_ajuste,
             	    id_proceso_wf_act:  resp.id_proceso_wf_act,
 	                id_estado_wf_act:   resp.id_estado_wf_act,
@@ -756,24 +756,24 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
         Phx.CP.loadingHide();
         resp.argument.wizard.panel.destroy()
         this.reload();
-    }, 
-    
-    
-    
-    
-    
+    },
+
+
+
+
+
     liberaMenu:function(){
         var tb = Phx.vista.Ajuste.superclass.liberaMenu.call(this);
         if(tb){
             this.getBoton('fin_registro').disable();
-            this.getBoton('ant_estado').disable(); 
-            this.getBoton('btnObs').disable();    
-            this.getBoton('btnChequeoDocumentosWf').disable(); 
+            this.getBoton('ant_estado').disable();
+            this.getBoton('btnObs').disable();
+            this.getBoton('btnChequeoDocumentosWf').disable();
             this.getBoton('diagrama_gantt').disable();
             this.getBoton('chkpresupuesto').disable();
          }
     },
-  
+
     enableAllTab: function(){
     	if(this.TabPanelEast && this.TabPanelEast.get(0) && this.TabPanelEast.get(1) && this.TabPanelEast.get(2)){
     	  this.TabPanelEast.get(0).enable();
@@ -781,7 +781,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     	  this.TabPanelEast.get(2).disable();
     	 }
     },
-    
+
     disableAllTab: function(){
     	if(this.TabPanelEast && this.TabPanelEast.get(0) && this.TabPanelEast.get(1) && this.TabPanelEast.get(2)){
     	   this.TabPanelEast.get(0).disable();
@@ -795,31 +795,31 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 			      this.TabPanelEast.setActiveTab(0);
 		        }
      },
-     
+
     enableTabIncrementos:function(){
      	if(this.TabPanelEast && this.TabPanelEast.get(1)){
      		      this.TabPanelEast.get(1).enable();
 			      this.TabPanelEast.setActiveTab(1);
 		        }
-     }, 
-     
+     },
+
     disableTabDecrementos:function(){
      	if(this.TabPanelEast && this.TabPanelEast.get(0)){
      		      this.TabPanelEast.get(0).disable();
      		      this.TabPanelEast.get(2).disable();
      		      this.TabPanelEast.get(1).enable();
 		          this.TabPanelEast.setActiveTab(1);
-		          
+
 		}
     },
-    
+
     disableTabIncrementos:function(){
     	if(this.TabPanelEast && this.TabPanelEast.get(1)){
-     		      this.TabPanelEast.get(1).disable();	
+     		      this.TabPanelEast.get(1).disable();
      		      this.TabPanelEast.get(2).disable();
      		      this.TabPanelEast.get(0).enable();
 		          this.TabPanelEast.setActiveTab(0);
-		          
+
 		}
     },
 
@@ -846,8 +846,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 
     bdel:true,
 	bsave:true,
-	
-	checkPresupuesto:function(){                   
+
+	checkPresupuesto:function(){
 			  var rec=this.sm.getSelected();
 			  var configExtra = [];
 			  this.objChkPres = Phx.CP.loadWindows('../../../sis_presupuestos/vista/presup_partida/ChkPresupuesto.php',
@@ -858,12 +858,12 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 											height:450
 										}, {
 											data:{
-											   nro_tramite: rec.data.nro_tramite								  
+											   nro_tramite: rec.data.nro_tramite
 											}}, this.idContenedor,'ChkPresupuesto');
-			   
+
 	 },
-	
-	
+
+
 	tabeast:[
 	      {
     		  url:'../../../sis_presupuestos/vista/ajuste_det/AjusteDetDec.php',
@@ -883,8 +883,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
     		  width:'60%',
     		  cls:'AjusteDetAju'
 		  },
-		  
+
 		  ],
-	
+
 });
 </script>
