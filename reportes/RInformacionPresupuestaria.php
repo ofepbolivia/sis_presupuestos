@@ -50,7 +50,7 @@ class RInformacionPresupuestaria extends  ReportePDF{
         $fecha_presupuesto = '';
 
      $date = date("Y");
-     if ($this->datos[0]['gestion'] > $date ){
+     if ($this->datos[0]['gestion'] >= $date ){
 
         if(count($firmas)>1) {
 
@@ -307,16 +307,17 @@ class RInformacionPresupuestaria extends  ReportePDF{
                             <table border="0">
                                 <tr>
                                     <td style="width: 0.5%"></td>
-                                    <td style="width: 97.5%; text-align: justify; font-family: Calibri; font-size: 10px;">&nbsp;<b>NOTA:</b><br>El Presupuesto Plurianual Ajustado, Plan Operativo Anual (POA) y el Anteproyecto de Presupuesto 
-                                                                                                                        Institucional '.$this->datos[0]['gestion'].', de la Empresa Pública Nacional Estratégica Boliviana de Aviación  - BoA, 
-                                                                                                                        aprobado mediante Resoluciones Administrativas de Directorio N° '.$this->datos[0]['nro_directorio'].', respectivamente, 
-                                                                                                                        fueron remitidos al Ministerio de Economía y Finanzas Públicas (MEFP) mediante Nota '.$this->datos[0]['nro_nota'].', 
-                                                                                                                        en atención a la Nota '.$this->datos[0]['nro_nota2'].', para su inclusión en el Presupuesto General del 
-                                                                                                                        Estado '.$this->datos[0]['gestion'].'.<br><br align="justify">En dicho Anteproyecto en la (s) 
-                                                                                                                        Categoría (s) Programática (s) descrita (s) en el presente documento, 
-                                                                                                                        se contempla la (s) partida (s) presupuestaria (s) detallada (s).
-                                                                                                                        <b>Sin embargo, dicho Anteproyecto de Presupuesto está sujeto a aprobación mediante LEY</b><br></td>
+                                    <!-- 30-11-2021 (may) modificacion en nota segun Casiana -->
+                                    <td style="width: 97.5%; text-align: justify; font-family: Calibri; font-size: 10px;">&nbsp;<b>NOTA:</b><br>El Anteproyecto de Presupuesto Institucional Gestión '.$this->datos[0]['gestion'].' de Boliviana de Aviación, 
+                                                                fue aprobado mediante Resolución Administrativa de Directorio N° '.$this->datos[0]['nro_directorio'].', 
+                                                                documento remitido al Ministerio de Economía y Finanzas Públicas (MEFP) mediante Nota  '.$this->datos[0]['nro_nota'].', 
+                                                                en atención a la Nota '.$this->datos[0]['nro_nota2'].', para su inclusión en el Presupuesto General del 
+                                                                Estado '.$this->datos[0]['gestion'].'.<br><br align="justify">En dicho Anteproyecto en la (s) 
+                                                                Categoría (s) Programática (s) descrita (s) en el presente documento, 
+                                                                se contempla la (s) partida (s) presupuestaria (s) detallada (s).
+                                                                <b>Sin embargo, dicho Anteproyecto de Presupuesto está sujeto a aprobación mediante LEY</b><br></td>
                                     <td style="width: 2%"> </td>
+                                   
                                 </tr>
                             </table>
                         </td>
