@@ -571,5 +571,44 @@ class MODPartida extends MODbase{
 			return $this->respuesta;
 		}
 
+		//18-10-2021 (may) listado de partidas, solo para fondos en avance
+        function listarPartidaFA(){
+            //Definicion de variables para ejecucion del procedimientp
+            $this->procedimiento='pre.ft_partida_sel';
+            $this->transaccion='PRE_PARAFA_SEL';
+            $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+            $this->setParametro('filtro_ges','filtro_ges','varchar');
+            $this->setParametro('id_cuenta','id_cuenta','int4');
+            //Definicion de la lista del resultado del query
+            $this->captura('id_partida','int4');
+            $this->captura('estado_reg','varchar');
+            $this->captura('id_partida_fk','int4');
+            $this->captura('tipo','varchar');
+            $this->captura('descripcion','varchar');
+            $this->captura('codigo','varchar');
+            $this->captura('id_usuario_reg','int4');
+            $this->captura('fecha_reg','timestamp');
+            $this->captura('id_usuario_mod','int4');
+            $this->captura('fecha_mod','timestamp');
+            $this->captura('usr_reg','varchar');
+            $this->captura('usr_mod','varchar');
+
+            $this->captura('nombre_partida','varchar');
+            $this->captura('sw_movimiento','varchar');
+            $this->captura('sw_transaccional','varchar');
+            $this->captura('id_gestion','integer');
+            $this->captura('desc_gestion','integer');
+
+
+            //Ejecuta la instruccion
+            $this->armarConsulta();
+            //echo $this->consulta;exit;
+            $this->ejecutarConsulta();
+
+            //Devuelve la respuesta
+            return $this->respuesta;
+        }
+
 }
 ?>

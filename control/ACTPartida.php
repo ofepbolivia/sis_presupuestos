@@ -31,6 +31,7 @@ class ACTPartida extends ACTbase{
 		if($this->objParam->getParametro('id_concepto_ingas')!=''){
 	    	$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tconcepto_partida cp where cp.id_concepto_ingas = " . $this->objParam->getParametro('id_concepto_ingas') . ")");
 		}
+
 		if($this->objParam->getParametro('tipo')!=''){
 
 			if($this->objParam->getParametro('tipo') == 'ingreso_egreso'){
@@ -44,6 +45,12 @@ class ACTPartida extends ACTbase{
 		if($this->objParam->getParametro('sw_transaccional')!=''){
 	    	$this->objParam->addFiltro("par.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''");
 		}
+
+		//08-12-2020 (may) filtro para partida solo muestre gasto
+		if($this->objParam->getParametro('tipo_gasto')=='si'){
+			$this->objParam->addFiltro("par.tipo in (''gasto'') ");;
+		}
+		//
 		if($this->objParam->getParametro('partida_tipo')!=''){
 			$tmp=$this->objParam->getParametro('partida_tipo');
 			if($tmp=='flujo'||$tmp=='presupuestaria'){
@@ -73,8 +80,6 @@ class ACTPartida extends ACTbase{
 
 	    	  $this->objParam->addFiltro("id_partida in (select x.id_partida from pre.vpe_check_partida x where x.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto_ajuste')." and x.id_gestion =  ".$this->objParam->getParametro('id_gestion')." and  x.nro_tramite = ''".$this->objParam->getParametro('nro_tramite')."'')");
 	     }
-
-
 
 		/////////////////////
 		//Llamada al Modelo
@@ -307,6 +312,111 @@ class ACTPartida extends ACTbase{
 			$this->res->imprimirRespuesta($this->res->generarJson());
 		}
 		// fin
+
+		function listarPartidaFA(){
+			$this->objParam->defecto('ordenacion','id_partida');
+
+			/////////////////
+			//	FILTROS
+			////////////////
+			//var_dump($this->objParam->getParametro('gestion'));
+			if($this->objParam->getParametro('gestion')!=''){
+				$this->objParam->addFiltro("par.sw_transaccional=''movimiento'' and par.tipo=''gasto'' and  par.id_gestion = ".$this->objParam->getParametro('gestion'));
+			}
+
+			if($this->objParam->getParametro('id_gestion')!=''){
+				$this->objParam->addFiltro("par.id_gestion = ".$this->objParam->getParametro('id_gestion'));
+			}
+
+			if($this->objParam->getParametro('id_periodo_anexo')!=''){
+				$this->objParam->addFiltro("par.id_partida in (Select pp.id_partida from kaf.tpartida_periodo pp where pp.id_periodo_anexo=".$this->objParam->getParametro('id_periodo_anexo').")");
+			}
+
+			if($this->objParam->getParametro('id_concepto_ingas')!=''){
+				$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tconcepto_partida cp where cp.id_concepto_ingas = " . $this->objParam->getParametro('id_concepto_ingas') . ")");
+			}
+
+			if($this->objParam->getParametro('tipo')!=''){
+
+				if($this->objParam->getParametro('tipo') == 'ingreso_egreso'){
+					$this->objParam->addFiltro("par.tipo in (''recurso'',''gasto'')");
+				}
+				else{
+					$this->objParam->addFiltro("par.tipo = ''".$this->objParam->getParametro('tipo')."''");
+				}
+
+			}
+			if($this->objParam->getParametro('sw_transaccional')!=''){
+				$this->objParam->addFiltro("par.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''");
+			}
+
+			//08-12-2020 (may) filtro para partida solo muestre gasto
+			if($this->objParam->getParametro('tipo_gasto')=='si'){
+				$this->objParam->addFiltro("par.tipo in (''gasto'') ");;
+			}
+			//
+			if($this->objParam->getParametro('partida_tipo')!=''){
+				$tmp=$this->objParam->getParametro('partida_tipo');
+				if($tmp=='flujo'||$tmp=='presupuestaria'){
+					$this->objParam->addFiltro("par.sw_movimiento = ''$tmp'' ");
+				}
+			}
+			if($this->objParam->getParametro('partida_rubro')!=''){
+				$tmp=$this->objParam->getParametro('partida_rubro');
+				if($tmp == 'recurso' || $tmp == 'gasto'){
+					$this->objParam->addFiltro("par.tipo = ''$tmp'' ");
+				}
+			}
+
+			if($this->objParam->getParametro('id_centro_costo')!=''){
+				$this->objParam->addFiltro("(par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_centro_costo') . ") or par.sw_movimiento=''flujo'' ) ");
+			}
+
+			if($this->objParam->getParametro('id_presupuesto')!=''){
+				$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_presupuesto') . ") ");
+			}
+
+			if($this->objParam->getParametro('tipo_ajuste')!='' &&
+				$this->objParam->getParametro('nro_tramite')!='' &&
+				$this->objParam->getParametro('id_gestion')!='' &&
+				$this->objParam->getParametro('id_presupuesto_ajuste')!=''
+			){
+
+				$this->objParam->addFiltro("id_partida in (select x.id_partida from pre.vpe_check_partida x where x.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto_ajuste')." and x.id_gestion =  ".$this->objParam->getParametro('id_gestion')." and  x.nro_tramite = ''".$this->objParam->getParametro('nro_tramite')."'')");
+			}
+
+
+			/////////////////////
+			//Llamada al Modelo
+			/////////////////////
+
+			$this->objParam->defecto('dir_ordenacion','asc');
+			if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
+				$this->objReporte = new Reporte($this->objParam, $this);
+				$this->res = $this->objReporte->generarReporteListado('MODPartida','listarPartidaFA');
+			} else{
+				$this->objFunc=$this->create('MODPartida');
+				$this->res=$this->objFunc->listarPartidaFA();
+			}
+
+
+			if($this->objParam->getParametro('_adicionar')!=''){
+
+				$respuesta = $this->res->getDatos();
+
+
+				array_unshift ( $respuesta, array(  'id_partida'=>'0',
+					'nombre_partida'=>'Todos',
+					'codigo'=>'Todos',
+					'sw_movimiento'=>'Todos',
+					'sw_transaccional'=>'Todos',
+					'desc_gestion'=>'Todos',
+					'tipo'=>'Todos'));
+				//var_dump($respuesta);
+				$this->res->setDatos($respuesta);
+			}
+			$this->res->imprimirRespuesta($this->res->generarJson());
+		}
 
 }
 
