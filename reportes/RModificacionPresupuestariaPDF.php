@@ -370,7 +370,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
 
         $centimos = explode('.', $total_general);
 
-        if($tipo == 'gasto') {
+        if($tipo == 'gasto' || $tipo == 'recurso') {
             $tbl .= '<tr>
                                <td colspan="10" align="center" ><b> TOTAL GENERAL ' . $tipo_aj . '</b></td>
                                <td align="right" ><b>' . number_format($total_general, 2, ',', '.') . '</b></td>
