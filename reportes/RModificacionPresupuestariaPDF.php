@@ -103,8 +103,10 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
         $tipo_aj    = '';
 
         $tipo = '';
+
         foreach( $this->datos as $key => $record){
-            if($record['tipo'] == 'gasto'){
+            //10-12-2021 (may) en el reporte modificacion presupuestaria se aumenta el de tipo RECURSO que sirve para los que son INCREMENTOS
+            if($record['tipo'] == 'gasto' || $record['tipo'] == 'recurso'){
                 if ($this->datos[$key-1]['tipo_ajuste_det'] == null) {
                     if ($record['tipo_ajuste_det'] == 'incremento'){
                         $tipo = 'Incrementadas';
