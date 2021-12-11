@@ -103,8 +103,10 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
         $tipo_aj    = '';
 
         $tipo = '';
+
         foreach( $this->datos as $key => $record){
-            if($record['tipo'] == 'gasto'){
+            //10-12-2021 (may) en el reporte modificacion presupuestaria se aumenta el de tipo RECURSO que sirve para los que son INCREMENTOS
+            if($record['tipo'] == 'gasto' || $record['tipo'] == 'recurso'){
                 if ($this->datos[$key-1]['tipo_ajuste_det'] == null) {
                     if ($record['tipo_ajuste_det'] == 'incremento'){
                         $tipo = 'Incrementadas';
@@ -368,7 +370,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
 
         $centimos = explode('.', $total_general);
 
-        if($tipo == 'gasto') {
+        if($tipo == 'gasto' || $tipo == 'recurso') {
             $tbl .= '<tr>
                                <td colspan="10" align="center" ><b> TOTAL GENERAL ' . $tipo_aj . '</b></td>
                                <td align="right" ><b>' . number_format($total_general, 2, ',', '.') . '</b></td>
