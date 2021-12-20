@@ -35,6 +35,11 @@ DECLARE
     v_desde							 varchar;
     v_hasta							 varchar;
 
+    --17-12-2021(may)
+    v_sql_tabla_todo		varchar;
+    v_reg_op				record;
+    v_reg_cd				record;
+
 BEGIN
 
 	v_nombre_funcion = 'pre.ft_partida_ejecucion_sel';
@@ -207,7 +212,7 @@ BEGIN
                                               pe.id_moneda,
                                               mon.codigo ';*/
 
-            v_consulta:='select
+            /*v_consulta:='select
                               pr.id_gestion,
                               pag.num_tramite,
                               pm.codigo,
@@ -230,7 +235,91 @@ BEGIN
                                               pm.codigo,
                                               pag.id_moneda,
                                               mon.codigo';
+             */
 
+            --(may)modificacion listado se aumenta para FA
+            v_sql_tabla_todo = 'CREATE TEMPORARY TABLE temp_list
+                                            (	id_gestion INTEGER,
+                                                nro_tramite VARCHAR,
+                                                codigo VARCHAR,
+                                                id_moneda INTEGER,
+                                                desc_moneda VARCHAR
+                                            ) ON COMMIT DROP';
+            EXECUTE(v_sql_tabla_todo);
+
+
+
+            FOR v_reg_op in ( (select pr.id_gestion,
+                                    pag.num_tramite,
+                                    pm.codigo,
+                                    pag.id_moneda,
+                                    mon.codigo as desc_moneda
+                          from  tes.tobligacion_pago pag
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
+                          where pm.codigo in ('CINTPD','CNAPD','CINTBR','PCE','PCP','PD','PGA','PPM','TES-PD','PU')
+                          and pr.id_gestion = v_id_gestion
+                          group by pr.id_gestion,
+                                    pag.num_tramite,
+                                    pm.codigo,
+                                    pag.id_moneda,
+                                    mon.codigo)
+
+                        union
+
+                          (select
+                              pr.id_gestion,
+                              cdoc.nro_tramite as num_tramite,
+                              pm.codigo,
+                              cdoc.id_moneda,
+                              mon.codigo as desc_moneda
+                          from  cd.tcuenta_doc cdoc
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = cdoc.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on cdoc.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = cdoc.id_moneda
+                          where pm.codigo in ('FA')
+                          and pr.id_gestion = v_id_gestion
+                          group by pr.id_gestion,
+                                    cdoc.nro_tramite,
+                                    pm.codigo,
+                                    cdoc.id_moneda,
+                                    mon.codigo)
+            			)LOOP
+
+
+
+                        insert into temp_list (id_gestion,
+                                               nro_tramite,
+                                              codigo,
+                                              id_moneda,
+                                              desc_moneda
+
+                                              ) values (
+
+                                              v_reg_op.id_gestion,
+                                              v_reg_op.num_tramite,
+                                              v_reg_op.codigo,
+                                              v_reg_op.id_moneda,
+                                              v_reg_op.desc_moneda
+                                              );
+
+            END LOOP;
+
+            v_consulta:='select
+                              tlist.id_gestion,
+                              tlist.nro_tramite,
+                              tlist.codigo,
+                              tlist.id_moneda,
+                              tlist.desc_moneda
+                          from  temp_list tlist
+                          where ';
+
+            v_consulta:=v_consulta||v_parametros.filtro;
 
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
@@ -282,7 +371,7 @@ BEGIN
                           where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
                           and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';*/
 
-            v_consulta:='select
+            /*v_consulta:='select
                              count( DISTINCT pag.num_tramite)
                           from  tes.tobligacion_pago pag
                           inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
@@ -291,7 +380,83 @@ BEGIN
                           inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
                           inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
                           where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
-                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
+                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';*/
+
+                      v_sql_tabla_todo = 'CREATE TEMPORARY TABLE temp_list
+                                            (	id_gestion INTEGER,
+                                                nro_tramite VARCHAR,
+                                                codigo VARCHAR,
+                                                id_moneda INTEGER,
+                                                desc_moneda VARCHAR
+                                            ) ON COMMIT DROP';
+                      EXECUTE(v_sql_tabla_todo);
+
+
+
+                      FOR v_reg_op in ( (select pr.id_gestion,
+                                              pag.num_tramite,
+                                              pm.codigo,
+                                              pag.id_moneda,
+                                              mon.codigo as desc_moneda
+                                    from  tes.tobligacion_pago pag
+                                    inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                                    inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                                    inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                                    inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                                    inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
+                                    where pm.codigo in ('CINTPD','CNAPD','CINTBR','PCE','PCP','PD','PGA','PPM','TES-PD','PU')
+                                    and pr.id_gestion = v_id_gestion
+                                    group by pr.id_gestion,
+                                              pag.num_tramite,
+                                              pm.codigo,
+                                              pag.id_moneda,
+                                              mon.codigo)
+
+                                  union
+
+                                    (select
+                                        pr.id_gestion,
+                                        cdoc.nro_tramite as num_tramite,
+                                        pm.codigo,
+                                        cdoc.id_moneda,
+                                        mon.codigo as desc_moneda
+                                    from  cd.tcuenta_doc cdoc
+                                    inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = cdoc.id_proceso_wf
+                                    inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                                    inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                                    inner join param.tperiodo pr on cdoc.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                                    inner join param.tmoneda mon on mon.id_moneda = cdoc.id_moneda
+                                    where pm.codigo in ('FA')
+                                    and pr.id_gestion = v_id_gestion
+                                    group by pr.id_gestion,
+                                              cdoc.nro_tramite,
+                                              pm.codigo,
+                                              cdoc.id_moneda,
+                                              mon.codigo)
+                                  )LOOP
+
+
+
+                                  insert into temp_list (id_gestion,
+                                                         nro_tramite,
+                                                        codigo,
+                                                        id_moneda,
+                                                        desc_moneda
+
+                                                        ) values (
+
+                                                        v_reg_op.id_gestion,
+                                                        v_reg_op.num_tramite,
+                                                        v_reg_op.codigo,
+                                                        v_reg_op.id_moneda,
+                                                        v_reg_op.desc_moneda
+                                                        );
+
+                      END LOOP;
+
+                         v_consulta:='select count( tlist.nro_tramite)
+                          from  temp_list tlist
+                          where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;

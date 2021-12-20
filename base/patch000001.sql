@@ -1141,3 +1141,13 @@ IS 'Gestion Actual de la partida';
 ALTER TABLE pre.tmatriz_conversion_deuda
   OWNER TO postgres;
 /*****************************F-SCP-IRVA-PRE-0-11/12/2021*************/
+
+/*****************************I-SCP-MAY-PRE-0-19/12/2021*************/
+ALTER TABLE pre.tajuste_det DROP COLUMN tabla_origen;
+
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN tabla_origen VARCHAR(300);
+
+COMMENT ON COLUMN pre.tajuste_det.tabla_origen
+IS 'descripcion tabla origen ID';
+/*****************************F-SCP-MAY-PRE-0-19/12/2021*************/

@@ -62,6 +62,8 @@ DECLARE
     v_id_obligacion_det			integer;
 	v_tipo_cambio_op			numeric;
     v_id_partida_ejecu			integer;
+    v_id_sol_origen				integer;
+    v_tabla_origen				varchar;
 
 
 BEGIN
@@ -610,12 +612,31 @@ BEGIN
 
                           if v_codigo = 'ref' or v_codigo = 'base' then
 
-                            select tpe.id_partida_ejecucion, tpe.columna_origen
+                            /*select tpe.id_partida_ejecucion, tpe.columna_origen
                             into v_id_partida_ejecucion, v_columna_origen
                             from pre.tpartida_ejecucion tpe
                             where tpe.nro_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
                             	    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen in ('id_solicitud_compra','id_obligacion_pago') and
-                                  tpe.id_partida_ejecucion_fk is null;
+                                  tpe.id_partida_ejecucion_fk is null;*/
+
+                            IF (v_registros_det.tabla_origen= 'cd.tcuenta_doc') THEN
+
+                              		select pe.id_partida_ejecucion, pe.columna_origen
+                                    into v_id_partida_ejecucion, v_columna_origen
+                                    from cd.tcuenta_doc_det cdet
+                                    inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = cdet.id_partida_ejecucion
+                                    where cdet.id_cuenta_doc_det = v_registros_det.id_sol_origen
+                                    and pe.id_partida_ejecucion_fk is null;
+                            ELSE
+
+                                    select tpe.id_partida_ejecucion, tpe.columna_origen
+                                    into v_id_partida_ejecucion, v_columna_origen
+                                    from pre.tpartida_ejecucion tpe
+                                    where tpe.nro_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
+                            	    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen in ('id_solicitud_compra','id_obligacion_pago') and
+                                    tpe.id_partida_ejecucion_fk is null;
+
+                             END IF;
 
 
                             if v_id_partida_ejecucion is null then

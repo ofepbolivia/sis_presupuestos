@@ -947,6 +947,15 @@ BEGIN
                 from adq.tsolicitud ts
                 where ts.num_tramite =  v_record_ajuste.nro_tramite;
               end if;
+
+              if v_record_sol is null then
+                --(may) para FA
+                select cdoc.id_funcionario, orga.f_get_uo_gerencia(null,cdoc.id_funcionario,cdoc.fecha) as id_uo
+              	into v_record_sol
+                from cd.tcuenta_doc cdoc
+                where cdoc.nro_tramite =  v_record_ajuste.nro_tramite;
+              end if;
+
             end if;
 
               --Sentencia de la consulta de conteo de registros

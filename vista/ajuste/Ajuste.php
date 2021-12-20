@@ -209,7 +209,7 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                       ['inc_comprometido','Aumento Comprometido -> [ADQ, TES]'],
                                       ['rev_comprometido','Disminución Comprometido -> [ADQ, TES]'],
                                       ['rev_total_comprometido','Reversión Comprometido -> [ADQ, TES]'],
-                                      ['ajuste_comprometido','Ajuste Comprometido -> [ADQ, TES]']
+                                      ['ajuste_comprometido','Ajuste Comprometido -> [ADQ, TES, FA]']
                             ]}),
             },
             type:'ComboBox',
@@ -233,14 +233,18 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                     id: 'nro_tramite',
                     root: 'datos',
                     sortInfo:{
-                        field: 'pag.num_tramite',
+                        //field: 'pag.num_tramite',
+                        //field: 'num_tramite',
+                        field: 'nro_tramite',
                         direction: 'ASC'
                     },
                     totalProperty: 'total',
                     fields: ['nro_tramite','desc_moneda','id_moneda'],
                     // turn on remote sorting
                     remoteSort: true,
-                    baseParams:{par_filtro:'pag.num_tramite#pm.codigo'}
+                    //baseParams:{par_filtro:'pag.num_tramite#pm.codigo'}
+                    //baseParams:{par_filtro:'cdoc.nro_tramite#pm.codigo'}
+                    baseParams:{par_filtro:'tlist.nro_tramite#tlist.codigo'}
 
                 }),
                 tpl:'<tpl for="."><div class="x-combo-list-item"><p>{nro_tramite} ({desc_moneda})</p></div></tpl>',

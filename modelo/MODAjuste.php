@@ -232,7 +232,7 @@ class MODAjuste extends MODbase{
         $this->armarConsulta();
         //echo($this->consulta);exit;
         $this->ejecutarConsulta();
-
+//var_dump('llegabd ',$this->respuesta );
         //Devuelve la respuesta
         return $this->respuesta;
     }
