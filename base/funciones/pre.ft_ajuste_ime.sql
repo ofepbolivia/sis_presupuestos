@@ -70,6 +70,17 @@ DECLARE
     --16-06-2021 (may)
     v_total_ajuste					numeric;
 
+    sw_incremento				boolean;
+    sw_decremento				boolean;
+    v_sw_error 					boolean;
+    sw_revertir 				boolean;
+    sw_comprometer				boolean;
+    sw_ajuste 					boolean;
+    v_registros_det				record;
+    v_resultado_ges				numeric[];
+    v_id_moneda_base			integer;
+    v_columna_origen			varchar;
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_ajuste_ime';
@@ -233,8 +244,10 @@ BEGIN
             from adq.tsolicitud_det tsd
             inner join adq.tsolicitud ts on ts.id_solicitud = tsd.id_solicitud
             where ts.num_tramite = v_parametros.nro_tramite_aux and tsd.estado_reg = 'activo';
-    	else
-        	insert into pre.tajuste_det(
+
+        --17-12-2021(may)aumentando para FA
+        else if v_tipo_proceso in ('FA') then
+       		insert into pre.tajuste_det(
                 id_presupuesto,
                 importe,
                 id_partida,
@@ -252,6 +265,48 @@ BEGIN
                 id_sol_origen,
                 tabla_origen
 
+            )
+            select
+                cdet.id_cc as id_centro_costo,
+                case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -cdet.importe end,
+                cdet.id_partida ,
+                'activo',
+                v_tipo_ajuste,
+                v_parametros._id_usuario_ai,
+                now(),
+                v_parametros._nombre_usuario_ai,
+                p_id_usuario,
+                null,
+                null,
+                v_id_ajuste,
+                cdet.detalle, --descripcion,
+                null,
+                cdet.id_cuenta_doc_det,
+                'cd.tcuenta_doc'
+
+            from cd.tcuenta_doc_det cdet
+            inner join cd.tcuenta_doc cdoc on cdoc.id_cuenta_doc = cdet.id_cuenta_doc
+            where cdoc.nro_tramite = v_parametros.nro_tramite_aux and cdet.estado_reg = 'activo';
+          --
+        else
+
+        	insert into pre.tajuste_det(
+                id_presupuesto,
+                importe,
+                id_partida,
+                estado_reg,
+                tipo_ajuste,
+                id_usuario_ai,
+                fecha_reg,
+                usuario_ai,
+                id_usuario_reg,
+                fecha_mod,
+                id_usuario_mod,
+                id_ajuste,
+                descripcion,
+                id_orden_trabajo,
+                id_sol_origen,
+                tabla_origen
             ) select
                 tsd.id_centro_costo,
                 case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -tsd.monto_pago_mo end,
@@ -274,6 +329,7 @@ BEGIN
             inner join tes.tobligacion_pago ts on ts.id_obligacion_pago = tsd.id_obligacion_pago
             where ts.num_tramite = v_parametros.nro_tramite_aux and tsd.estado_reg = 'activo';
         end if;
+       end if;
 
        SELECT tf.id_funcionario
        INTO v_id_funcionario
