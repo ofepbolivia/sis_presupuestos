@@ -193,7 +193,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				                              	'inc_comprometido':'Aumento Comprometido',
 				                              	'rev_comprometido':'Disminución Comprometido',
                                                 'rev_total_comprometido':'Reversión Comprometido',
-                                                'ajuste_comprometido':'Ajuste Comprometido'
+                                                'ajuste_comprometido':'Ajuste Comprometido',
+                                                'ajuste_mod_presupuestaria':'Ajuste Formulación Presupuestaria (+/-)'
 				                              };
 
 	                           return String.format('<b><font color="green">{0}</font></b>', ajustes[value]);
@@ -209,7 +210,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                       ['inc_comprometido','Aumento Comprometido -> [ADQ, TES]'],
                                       ['rev_comprometido','Disminución Comprometido -> [ADQ, TES]'],
                                       ['rev_total_comprometido','Reversión Comprometido -> [ADQ, TES]'],
-                                      ['ajuste_comprometido','Ajuste Comprometido -> [ADQ, TES, FA]']
+                                      ['ajuste_comprometido','Ajuste Comprometido -> [ADQ, TES, FA]'],
+                                      ['ajuste_mod_presupuestaria','Ajuste Formulación Presupuestaria (+/-)']
                             ]}),
             },
             type:'ComboBox',

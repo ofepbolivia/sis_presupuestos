@@ -306,7 +306,8 @@ BEGIN
                 descripcion,
                 id_orden_trabajo,
                 id_sol_origen,
-                tabla_origen
+                tabla_origen,
+                id_concepto_ingas
             ) select
                 tsd.id_centro_costo,
                 case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -tsd.monto_pago_mo end,
@@ -323,7 +324,8 @@ BEGIN
                 tsd.descripcion,
                 tsd.id_orden_trabajo,
                 tsd.id_obligacion_det,
-                'tes.tobligacion_pago'
+                'tes.tobligacion_pago',
+                tsd.id_concepto_ingas
 
             from tes.tobligacion_det tsd
             inner join tes.tobligacion_pago ts on ts.id_obligacion_pago = tsd.id_obligacion_pago
@@ -702,6 +704,14 @@ BEGIN
                      	raise exception 'No debe existir diferencia de importes entre la suma de los Incrementos y las Disminuciones, existe una diferencia de importes: %.', v_total_ajuste;
                      END IF;
 
+                 ELSEIF  v_registros_proc.tipo_ajuste = 'ajuste_mod_presupuestaria'   THEN
+                  -- si es Ajuste Modificación Presupuestaria igual que insertar presupuestos
+
+                     -- validar que el monto de incremento iguala al monto del decremento
+                     IF (v_total_decrementos*-1) !=  v_total_incrementos THEN
+                        raise exception 'Los incrementos deben ser proporcionales a los decrementos';
+                     END IF;
+
                  ELSE
                     raise exception 'no se reconoce el tipo de ajuste %', v_registros_proc.tipo_ajuste;
                  END IF;
@@ -798,15 +808,35 @@ BEGIN
           --------------------------------------------------
           --  ACTUALIZA EL NUEVO ESTADO DE AJUSTES
           ----------------------------------------------------
+          --obtenermos datos basicos
+          select a.tipo_ajuste
+          into v_registros_proc
+          from pre.tajuste a
+          where a.id_ajuste = v_parametros.id_ajuste;
+
+          IF (v_registros_proc.tipo_ajuste = 'ajuste_mod_presupuestaria' and v_codigo_estado_siguiente = 'aprobado') THEN
+
+          		IF  pre.f_fun_inicio_presupuesto_ajuste_wf(p_id_usuario,
+                                                          v_parametros._id_usuario_ai,
+                                                          v_parametros._nombre_usuario_ai,
+                                                          v_id_estado_actual,
+                                                          v_id_proceso_wf,
+                                                          v_codigo_estado_siguiente) THEN
 
 
-          IF  pre.f_fun_inicio_ajuste_wf(p_id_usuario,
-           									v_parametros._id_usuario_ai,
-                                            v_parametros._nombre_usuario_ai,
-                                            v_id_estado_actual,
-                                            v_id_proceso_wf,
-                                            v_codigo_estado_siguiente) THEN
+          		END IF;
 
+          ELSE
+
+              IF  pre.f_fun_inicio_ajuste_wf(p_id_usuario,
+                                              v_parametros._id_usuario_ai,
+                                              v_parametros._nombre_usuario_ai,
+                                              v_id_estado_actual,
+                                              v_id_proceso_wf,
+                                              v_codigo_estado_siguiente) THEN
+
+
+              END IF;
 
           END IF;
 
