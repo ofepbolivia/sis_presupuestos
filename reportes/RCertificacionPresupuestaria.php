@@ -128,7 +128,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         if($this->datos[0]['gestion'] == $anio ){
             $fecha_certificacion = $fecha;
         }else{
-            $fecha_certificacion = $this->datos[0]['fecha_certificacion'];
+            $fecha_certificacion = $this->datos[0]['fecha_certificacion_por_generar'];
         }
 
         /*$tbl = '<table border="0" style="font-size: 7pt;">
