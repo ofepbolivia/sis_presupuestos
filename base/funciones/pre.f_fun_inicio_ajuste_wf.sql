@@ -475,7 +475,9 @@ BEGIN
 
                                           ad.descripcion,
                                           ad.id_concepto_ingas,
-                                          ad.id_orden_trabajo
+                                          ad.id_orden_trabajo,
+                                          ad.id_sol_origen,
+                                          ad.tabla_origen
 
                                         from pre.tajuste_det ad
                                         inner join pre.tpresupuesto pre on pre.id_presupuesto = ad.id_presupuesto
