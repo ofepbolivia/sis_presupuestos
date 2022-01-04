@@ -408,7 +408,8 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         {name:'id_concepto_ingas', type: 'numeric'},
         {name:'nombre_ingas', type: 'string'},
         'id_orden_trabajo','desc_orden',
-        {name:'id_sol_origen', type: 'string'}
+        {name:'id_sol_origen', type: 'string'},
+        'estado_ajuste'
 	],
 	sortInfo:{
 		field: 'id_ajuste_det',
@@ -418,6 +419,8 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 	preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
+
+
 		if (rec.data.tipo_reg == 'summary'){
 			if( this.getBoton('edit') ){
 				this.getBoton('edit').disable();
@@ -434,6 +437,14 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		else{
 		   Phx.vista.AjusteDet.superclass.preparaMenu.call(this);
 		}
+
+        //04-01-2022 para que botones no esten activos cuando se apruebe el ajuste
+        if (rec.data.estado_ajuste == 'aprobado'){
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+            this.getBoton('new').disable();
+            this.getBoton('save').disable();
+        }
    },
 	
     liberaMenu: function() {
