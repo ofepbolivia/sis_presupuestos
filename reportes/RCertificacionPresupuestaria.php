@@ -359,7 +359,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         }
 
         if($this->datos[0]['codigo_poa']!=''){
-            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.$fecha/*date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y')*/.'</b>
+            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.$fecha_certificacion/*date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y')*/.'</b>
             acerca de: <b>'.$this->datos[0]['justificacion'].'</b>, certificar que el mismo se encuentra contemplado en el Plan Operativo gestión <b>'.$this->datos[0]['gestion'].'</b>,
             en la operación <b>'.$this->datos[0]['codigo_descripcion'].'.</b>';
 
