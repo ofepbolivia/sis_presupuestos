@@ -336,7 +336,8 @@ BEGIN
                                           ad.id_partida,
                                           ad.importe ,
                                           par.codigo as codigo_partida,
-                                          pre.estado as estado_presupuesto
+                                          pre.estado as estado_presupuesto,
+                                          ad.id_sol_origen
                                         from pre.tajuste_det ad
                                         inner join pre.tpresupuesto pre on pre.id_presupuesto = ad.id_presupuesto
                                         inner join pre.tpartida par on par.id_partida = ad.id_partida
@@ -365,13 +366,20 @@ BEGIN
 
                           if v_codigo = 'ref' or v_codigo = 'base' then
 
-                            select tpe.id_partida_ejecucion, tpe.columna_origen
+                          /*  select tpe.id_partida_ejecucion, tpe.columna_origen
                             into v_id_partida_ejecucion, v_columna_origen
                             from pre.tpartida_ejecucion tpe
                             where tpe.nro_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
                             	    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen in ('id_solicitud_compra','id_obligacion_pago') and
-                                  tpe.id_partida_ejecucion_fk is null;
+                                  tpe.id_partida_ejecucion_fk is null;*/
 
+                            --adicion breydi.vasquez 30/11/2021 optener la id_partida_ejecucion segun el detalle de origen
+                              select pe.id_partida_ejecucion, pe.columna_origen
+                                  into v_id_partida_ejecucion, v_columna_origen
+                              from tes.tobligacion_det odet
+                              inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = odet.id_partida_ejecucion_com
+                              where odet.id_obligacion_det = v_registros_det.id_sol_origen
+                              and pe.id_partida_ejecucion_fk is null;
 
                             if v_id_partida_ejecucion is null then
                                     raise exception 'El proceso aun no fue certificado en la Unidad de Presupuestos.';
@@ -463,7 +471,7 @@ BEGIN
 
               IF sw_ajuste  THEN
 
-                 --listar incrementos
+                 --registro previo de detalle obligacion de pago, para acualizar id_sol_origen, antes de finalizacion 
                  FOR v_registros_det in (
                                         select
                                           ad.id_ajuste_det,
@@ -594,12 +602,37 @@ BEGIN
 
                               )RETURNING id_obligacion_det into v_id_obligacion_det;
 
-
+							                update pre.tajuste_det a set
+                              id_sol_origen = v_id_obligacion_det
+                              where a.id_ajuste_det  =  v_registros_det.id_ajuste_det;
 
 
                         END IF;
                         ---
+                      END LOOP;
 
+                      --listar incrementos
+                      FOR v_registros_det in (
+                                        select
+                                          ad.id_ajuste_det,
+                                          ad.id_presupuesto,
+                                          ad.id_partida,
+                                          ad.importe ,
+                                          par.codigo as codigo_partida,
+                                          pre.estado as estado_presupuesto,                                          
+                                          ad.descripcion,
+                                          ad.id_concepto_ingas,
+                                          ad.id_orden_trabajo,
+                                          ad.id_sol_origen,
+                                          ad.tabla_origen                                          
+                                          
+                                        from pre.tajuste_det ad
+                                        inner join pre.tpresupuesto pre on pre.id_presupuesto = ad.id_presupuesto
+                                        inner join pre.tpartida par on par.id_partida = ad.id_partida
+                                        where ad.id_ajuste = v_registros.id_ajuste and
+                                        ad.tipo_ajuste = 'ajuste'
+                                        and ad.estado_reg = 'activo'
+                                       ) LOOP
                         -- valida estado del presupuesto
                         IF v_registros_det.estado_presupuesto != 'aprobado'  THEN
                           raise exception 'el pesupuesto id %, no esta aprobado', v_registros_det.id_presupuesto;
@@ -621,6 +654,9 @@ BEGIN
                             	    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen in ('id_solicitud_compra','id_obligacion_pago') and
                                   tpe.id_partida_ejecucion_fk is null;*/
 
+							              --20-12-2021 (may) se aumenta para lo procesos de FA, ahora se distingue segun la columna tabla_origen
+                            --para FA tabla_origen= cd.tcuenta_doc
+
                             IF (v_registros_det.tabla_origen= 'cd.tcuenta_doc') THEN
 
                               		select pe.id_partida_ejecucion, pe.columna_origen
@@ -631,12 +667,20 @@ BEGIN
                                     and pe.id_partida_ejecucion_fk is null;
                             ELSE
 
-                                    select tpe.id_partida_ejecucion, tpe.columna_origen
+                                  /*  select tpe.id_partida_ejecucion, tpe.columna_origen
                                     into v_id_partida_ejecucion, v_columna_origen
                                     from pre.tpartida_ejecucion tpe
                                     where tpe.nro_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
                             	    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen in ('id_solicitud_compra','id_obligacion_pago') and
-                                    tpe.id_partida_ejecucion_fk is null;
+                                    tpe.id_partida_ejecucion_fk is null;*/
+
+                            --adicion breydi.vasquez 03/12/2021 optener la id_partida_ejecucion segun el detalle de origen
+                                    select pe.id_partida_ejecucion, pe.columna_origen
+                                    into v_id_partida_ejecucion, v_columna_origen
+                                    from tes.tobligacion_det odet
+                                    inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = odet.id_partida_ejecucion_com
+                                    where odet.id_obligacion_det = v_registros_det.id_sol_origen
+                                    and pe.id_partida_ejecucion_fk is null;
 
                              END IF;
 
