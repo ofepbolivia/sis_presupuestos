@@ -147,62 +147,47 @@ BEGIN
 	***********************************/
 
 	elsif(p_transaccion='PRE_CLOCUE_IME')then
-
 		begin
-
              --  definir id de la gestion siguiente
-              select
-              ges.id_gestion,
-              ges.gestion,
-              ges.id_empresa
-           into
-              v_registros_ges
-           from
-           param.tgestion ges
-           where ges.id_gestion = v_parametros.id_gestion;
+        	select ges.id_gestion, ges.gestion, ges.id_empresa
+        	into v_registros_ges
+           	from param.tgestion ges
+           	where ges.id_gestion = v_parametros.id_gestion;
 
-            select
-              ges.id_gestion
-           into
-              v_id_gestion_destino
-           from
-           param.tgestion ges
-           where       ges.gestion = v_registros_ges.gestion + 1
-                   and ges.id_empresa = v_registros_ges.id_empresa
-                   and ges.estado_reg = 'activo';
-            IF v_id_gestion_destino is null THEN
-                   raise exception 'no se encontró una siguiente gestión preparada (primero cree  gestión siguiente)';
-          END IF;
-          --recuperar informacion de las partidas
+           	select ges.id_gestion
+           	into v_id_gestion_destino
+           	from param.tgestion ges
+           	where ges.gestion = v_registros_ges.gestion + 1 and ges.id_empresa = v_registros_ges.id_empresa and ges.estado_reg = 'activo';
+
+          	IF v_id_gestion_destino is null THEN
+          		raise exception 'no se encontró una siguiente gestión preparada (primero cree  gestión siguiente)';
+          	END IF;
+          	--recuperar informacion de las partidas
 
 
-          for v_registros in (select *
-                              /*cgp.id_clase_gasto_partida,
-                              cgp.id_partida,
-                              p.id_gestion*/
-                              from pre.tclase_gasto_cuenta cgp
-                              inner join segu.tusuario usu1 on usu1.id_usuario = cgp.id_usuario_reg
-                              inner join  pre.tpartida p on p.id_partida = cgp.id_partida
-                              left join segu.tusuario usu2 on usu2.id_usuario = cgp.id_usuario_mod
-                              where  p.id_gestion = v_parametros.id_gestion)loop
+          	for v_registros in  select cgc.id_cuenta, p.id_gestion, cgc.id_clase_gasto
+                              	from pre.tclase_gasto_cuenta cgc
+                              	inner join  conta.tcuenta p on p.id_cuenta = cgc.id_cuenta
+                              	where  p.id_gestion = v_parametros.id_gestion and cgc.id_clase_gasto = v_parametros.id_clase_gasto loop
 
-          		--buscamos si existe la relacion de partidas para la siguiente gestion
+          		--buscamos si existe la relacion de cuentas para la siguiente gestion
                if exists (select 1
-                          from pre.tpartida_ids
-                          where id_partida_uno = v_registros.id_partida) then
-                          --encontramos el id_partida de la gestion siguiente
-                          select pid.id_partida_dos
+                          from conta.tcuenta_ids
+                          where id_cuenta_uno = v_registros.id_cuenta) then
+
+                          --encontramos el id_cuenta de la gestion siguiente
+                          select cid.id_cuenta_dos
                           into v_cuenta_dos
-                          from pre.tpartida_ids pid
-                          where pid.id_partida_uno = v_registros.id_partida;
+                          from conta.tcuenta_ids cid
+                          where cid.id_cuenta_uno = v_registros.id_cuenta;
+
                           --si no existe registrado la relacion de partidas con clases de gasto realizamos la insercion en la tabla
                           if not exists ( select 1
-                                          from pre.tclase_gasto_partida cgp
-                                          inner join segu.tusuario usu1 on usu1.id_usuario = cgp.id_usuario_reg
-                                          inner join  pre.tpartida p on p.id_partida = cgp.id_partida
-                                          left join segu.tusuario usu2 on usu2.id_usuario = cgp.id_usuario_mod
-                                          where cgp.id_clase_gasto = v_registros.id_clase_gasto and cgp.id_partida =v_partida_dos )then
-                          	insert into pre.tclase_gasto_partida(
+                                          from pre.tclase_gasto_cuenta cgc
+                                          inner join  conta.tcuenta c on c.id_cuenta = cgc.id_cuenta
+                                          where cgc.id_clase_gasto = v_registros.id_clase_gasto and cgc.id_cuenta =v_cuenta_dos )then
+
+                          	insert into pre.tclase_gasto_cuenta(
                             	id_usuario_reg,
                                 id_usuario_mod,
                                 fecha_reg,
@@ -211,7 +196,7 @@ BEGIN
                                 id_usuario_ai,
                                 usuario_ai,
                                 id_clase_gasto,
-                                id_partida
+                                id_cuenta
                             )values(
                             	p_id_usuario,
                                 null,
@@ -221,7 +206,7 @@ BEGIN
                                 null,
                                 null,
                                 v_registros.id_clase_gasto,
-                                v_partida_dos
+                                v_cuenta_dos
                             );
                           end if;
                end if;
@@ -230,14 +215,13 @@ BEGIN
           end loop;
 
             --Definicion de la respuesta
-            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','partidas clonadas');
+            v_resp = pxp.f_agrega_clave(v_resp,'mensaje','cuentas clonadas');
             v_resp = pxp.f_agrega_clave(v_resp,'gestion destino',v_id_gestion_destino::varchar);
 
             --Devuelve la respuesta
             return v_resp;
 
 		end;
-
 	else
 
     	raise exception 'Transaccion inexistente: %',p_transaccion;
@@ -260,3 +244,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION pre.ft_clase_gasto_cuenta_ime (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

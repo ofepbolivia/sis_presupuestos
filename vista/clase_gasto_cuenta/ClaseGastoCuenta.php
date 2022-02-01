@@ -46,7 +46,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
                 if(this.cmbGestion.getValue()){
                     Ext.Ajax.request({
-                        url: '../../sis_presupuestos/control/ClaseGastoPartida/clonarCuenta',
+                        url: '../../sis_presupuestos/control/ClaseGastoCuenta/clonarCuenta',
                         params: {
                             id_gestion: rec,
                             id_clase_gasto:gasto

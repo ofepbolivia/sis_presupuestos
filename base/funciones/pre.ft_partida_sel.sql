@@ -435,6 +435,132 @@ BEGIN
 
               end;
 
+    /*********************************
+ 	#TRANSACCION:  'PRE_PAR_SEL_REC'
+ 	#DESCRIPCION:	Consulta de datos - Recursos
+ 	#AUTOR:		ruben.guancollo
+ 	#FECHA:		10-08-2021 14:30.00
+	***********************************/
+
+	elseif(p_transaccion='PRE_PAR_SEL_REC')then
+
+    	begin
+
+            v_inner = '';
+
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
+
+             v_inner = 'inner join conta.tcuenta_partida c on  c.id_partida = par.id_partida and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+
+            END IF;
+
+            -- si existe el filtro de gestion actual , filtramos en funcion a la fecha actual
+            IF  pxp.f_existe_parametro(p_tabla,'filtro_ges')   THEN
+
+               --recuepra gestion actual
+                v_gestion =  EXTRACT(YEAR FROM  now())::varchar;
+
+                select
+                 ges.id_gestion
+                into
+                 v_id_gestion
+                from param.tgestion ges
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+            END IF;
+
+            v_add_filtro = '0=0 and ';
+            IF  v_id_gestion is not null THEN
+              v_add_filtro = ' par.id_gestion = '||v_id_gestion::varchar|| ' and par.tipo=''recurso'' and  par.estado_reg = ''activo'' and ';
+            END IF;
+
+    		--Sentencia de la consulta
+			v_consulta:='select
+						par.id_partida,
+						par.estado_reg,
+						par.id_partida_fk,
+						par.tipo,
+						par.descripcion,
+						par.codigo,
+						par.id_usuario_reg,
+						par.fecha_reg,
+						par.id_usuario_mod,
+						par.fecha_mod,
+						usu1.cuenta as usr_reg,
+						usu2.cuenta as usr_mod,
+
+                        par.nombre_partida,
+                        par.sw_movimiento,
+                        par.sw_transaccional,
+                        par.id_gestion,
+                        ges.gestion as desc_gestion
+
+                        from pre.tpartida par
+						inner join segu.tusuario usu1 on usu1.id_usuario = par.id_usuario_reg
+                        inner join param.tgestion ges on ges.id_gestion = par.id_gestion
+						left join segu.tusuario usu2 on usu2.id_usuario = par.id_usuario_mod  '||
+                        v_inner || '
+				        where  par.tipo=''recurso'' and '||v_add_filtro;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+			raise notice 'resp %',v_consulta;
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+    /*********************************
+ 	#TRANSACCION:  'PRE_PAR_CONT_REC'
+ 	#DESCRIPCION:	Conteo de registros
+ 	#AUTOR:		ruben.guancollo
+ 	#FECHA:		11-08-2021 10.45:00
+	***********************************/
+
+	elsif(p_transaccion='PRE_PAR_CONT_REC')then
+
+		begin
+
+        v_inner = '';
+
+            IF pxp.f_existe_parametro(p_tabla,'id_cuenta') THEN
+             v_inner = 'inner join conta.tcuenta_partida c on  c.id_partida = par.id_partida and c.id_cuenta ='|| v_parametros.id_cuenta::varchar;
+            END IF;
+
+            -- si existe el filtro de gestion actual , filtramos en funcion a la fecha actual
+            IF  pxp.f_existe_parametro(p_tabla,'filtro_ges')   THEN
+
+               --recuepra gestion actual
+                v_gestion =  EXTRACT(YEAR FROM  now())::varchar;
+
+                select
+                 ges.id_gestion
+                into
+                 v_id_gestion
+                from param.tgestion ges
+              where ges.gestion::varchar  = v_gestion and ges.estado_reg = 'activo';
+            END IF;
+
+            v_add_filtro = '0=0 and ';
+            IF  v_id_gestion is not null THEN
+              v_add_filtro = ' par.id_gestion = '||v_id_gestion::varchar|| '  and  par.tipo=''recurso'' and  par.estado_reg = ''activo'' and ';
+            END IF;
+			--Sentencia de la consulta de conteo de registros
+			v_consulta:='select count(par.id_partida)
+					    from pre.tpartida par
+						inner join segu.tusuario usu1 on usu1.id_usuario = par.id_usuario_reg
+                        inner join param.tgestion ges on ges.id_gestion = par.id_gestion
+						left join segu.tusuario usu2 on usu2.id_usuario = par.id_usuario_mod  '||
+                        v_inner || '
+				       where  par.tipo=''recurso'' and '||v_add_filtro;
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+			--Devuelve la respuesta
+			return v_consulta;
+
+		end;
+
 	else
 
 		raise exception 'Transaccion inexistente';
@@ -456,3 +582,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION pre.ft_partida_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;
