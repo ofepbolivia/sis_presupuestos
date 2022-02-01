@@ -665,6 +665,17 @@ BEGIN
                                     inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = cdet.id_partida_ejecucion
                                     where cdet.id_cuenta_doc_det = v_registros_det.id_sol_origen
                                     and pe.id_partida_ejecucion_fk is null;
+
+                            ELSE IF (v_registros_det.tabla_origen= 'adq.tsolicitud') THEN
+
+                              		select pe.id_partida_ejecucion, pe.columna_origen
+                                    into v_id_partida_ejecucion, v_columna_origen
+                                    from adq.tsolicitud_det sold
+                                    inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = sold.id_partida_ejecucion
+                                    where sold.id_solicitud_det = v_registros_det.id_sol_origen
+                                    and pe.id_partida_ejecucion_fk is null;
+
+
                             ELSE
 
                                   /*  select tpe.id_partida_ejecucion, tpe.columna_origen
@@ -683,6 +694,7 @@ BEGIN
                                     and pe.id_partida_ejecucion_fk is null;
 
                              END IF;
+                            END IF;
 
 
                             if v_id_partida_ejecucion is null then
@@ -759,7 +771,7 @@ BEGIN
                  END LOOP;
 
 				IF v_sw_error THEN
-                  if v_columna_origen in ('id_solicitud_compra','id_obligacion_pago') and v_id_partida_ejecucion is not null then
+                  if v_columna_origen in ('id_solicitud_compra','id_obligacion_pago', 'id_cuenta_doc') and v_id_partida_ejecucion is not null then
                     raise exception 'Estimado Usuario:<br> El Incremento y Disminucion del proceso % supera al formulado del presupuesto %',v_registros.nro_tramite, v_mensaje_error;
                   else
                     raise exception 'Error al reformular presupuesto: %', v_mensaje_error;
