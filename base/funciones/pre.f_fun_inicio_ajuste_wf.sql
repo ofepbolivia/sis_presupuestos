@@ -64,6 +64,10 @@ DECLARE
     v_id_partida_ejecu			integer;
     v_id_sol_origen				integer;
     v_tabla_origen				varchar;
+    v_id_solicitud_proceso		integer;
+
+    --(may) 08-02-2022
+    v_id_cuenta_doc_det			integer;
 
 
 BEGIN
@@ -500,13 +504,34 @@ BEGIN
 
                         	--recupera id_obligacion_pago
                             SELECT op.id_obligacion_pago, op.tipo_cambio_conv
-                            INTO v_id_obligacion_pag, v_tipo_cambio_op
+                            INTO v_id_solicitud_proceso, v_tipo_cambio_op
                             FROM tes.tobligacion_pago op
                             WHERE op.num_tramite = v_registros.nro_tramite
                             and op.estado_reg = 'activo';
 
                             --tipo de cambio, calcula monto en moneda base
-          					v_monto_mb = v_registros_det.importe * v_tipo_cambio_op;
+                            v_monto_mb = v_registros_det.importe * COALESCE(v_tipo_cambio_op, 1);
+                            v_columna_origen = 'id_obligacion_pago' ;
+
+
+                           	IF v_id_solicitud_proceso is null THEN
+								--recupera fondos en avance
+                                SELECT cdoc.id_cuenta_doc
+                                INTO v_id_solicitud_proceso
+                                FROM cd.tcuenta_doc cdoc
+                                WHERE cdoc.nro_tramite = v_registros.nro_tramite
+                                and cdoc.estado_reg = 'activo';
+
+                                v_monto_mb = v_registros_det.importe;
+                                v_columna_origen = 'id_cuenta_doc' ;
+
+                           	END IF;
+
+                            IF (v_id_solicitud_proceso is null) THEN
+                              RAISE EXCEPTION 'El numero de proceso % no puede realizar el Registro automático de presupuesto.', v_registros.nro_tramite;
+                            END IF;
+
+
 
 
                             --centro de costo
@@ -546,14 +571,14 @@ BEGIN
                               v_registros_det.id_partida,
                               v_registros.nro_tramite,
                               NULL, --tipo_cambio,
-                              'id_obligacion_pago', --v_parametros.columna_origen, ------
+                              v_columna_origen, --'id_obligacion_pago', --v_parametros.columna_origen, ------
                               'comprometido', --tipo_movimiento,
                               NULL,--id_partida_ejecucion_fk,
                               'activo',
                               now(), --fecha,
                               0,
                               0,
-                              v_id_obligacion_pag, --valor_id_origen,
+                              v_id_solicitud_proceso, --v_id_obligacion_pag, --valor_id_origen,
                               p_id_usuario,
                               now(),
                               NULL,
@@ -563,48 +588,93 @@ BEGIN
 
                               )RETURNING id_partida_ejecucion into v_id_partida_ejecu;
 
-                            --Sentencia de la insercion
-                            insert into tes.tobligacion_det(
-                              estado_reg,
-                              --id_cuenta,
-                              id_partida,
-                              --id_auxiliar,
-                              id_concepto_ingas,
-                              monto_pago_mo,
-                              id_obligacion_pago,
-                              id_centro_costo,
-                              monto_pago_mb,
-                              descripcion,
-                              fecha_reg,
-                              id_usuario_reg,
-                              fecha_mod,
-                              id_usuario_mod,
-                              id_orden_trabajo,
-            				  id_partida_ejecucion_com
 
-                            )values(
-                              'activo',
-                              --v_parametros.id_cuenta,
-                              v_registros_det.id_partida,
-                              --v_parametros.id_auxiliar,
-                              v_registros_det.id_concepto_ingas,
-                              0,
-                              v_id_obligacion_pag,
-                              v_id_centro_costo,
-                              0,
-                              v_registros_det.descripcion,
-                              now(),
-                              p_id_usuario,
-                              null,
-                              null,
-                              v_registros_det.id_orden_trabajo,
-            				  v_id_partida_ejecu
+                            --insertando en los detallles segun el proceso
+                            IF (v_columna_origen= 'id_cuenta_doc') THEN
 
-                              )RETURNING id_obligacion_det into v_id_obligacion_det;
+                                        --Sentencia de la insercion
+                                        insert into cd.tcuenta_doc_det(
+                                        id_cuenta_doc,
+                                        id_cc,
+                                        id_partida,
+                                        importe,
+                                        detalle,
+                                        estado_reg,
+                                        id_usuario_reg,
+                                        fecha_reg,
+                                        id_usuario_mod,
+                                        fecha_mod,
+                                        id_partida_ejecucion
 
-							                update pre.tajuste_det a set
-                              id_sol_origen = v_id_obligacion_det
-                              where a.id_ajuste_det  =  v_registros_det.id_ajuste_det;
+                                        ) values(
+                                        v_id_solicitud_proceso,
+                                        v_id_centro_costo,
+                                        v_registros_det.id_partida,
+                                        v_registros_det.importe, -- 0, --importe --no se registra con 0 porque existen controles en los importes para la rendicion
+                                        v_registros_det.descripcion,
+                                        'activo',
+                                        p_id_usuario,
+                                        now(),
+                                        null,
+                                        null,
+                                        v_id_partida_ejecu
+                                        )RETURNING id_cuenta_doc_det into v_id_cuenta_doc_det;
+
+                                        update pre.tajuste_det a set
+                                          id_sol_origen = v_id_cuenta_doc_det
+                                        where a.id_ajuste_det  =  v_registros_det.id_ajuste_det;
+
+                            ELSIF (v_columna_origen= 'id_obligacion_pago') THEN
+
+                                          --Sentencia de la insercion
+                                          insert into tes.tobligacion_det(
+                                            estado_reg,
+                                            --id_cuenta,
+                                            id_partida,
+                                            --id_auxiliar,
+                                            id_concepto_ingas,
+                                            monto_pago_mo,
+                                            id_obligacion_pago,
+                                            id_centro_costo,
+                                            monto_pago_mb,
+                                            descripcion,
+                                            fecha_reg,
+                                            id_usuario_reg,
+                                            fecha_mod,
+                                            id_usuario_mod,
+                                            id_orden_trabajo,
+                                            id_partida_ejecucion_com
+
+                                          )values(
+                                            'activo',
+                                            --v_parametros.id_cuenta,
+                                            v_registros_det.id_partida,
+                                            --v_parametros.id_auxiliar,
+                                            v_registros_det.id_concepto_ingas,
+                                            0,
+                                            v_id_solicitud_proceso, --v_id_obligacion_pago,
+                                            v_id_centro_costo,
+                                            0,
+                                            v_registros_det.descripcion,
+                                            now(),
+                                            p_id_usuario,
+                                            null,
+                                            null,
+                                            v_registros_det.id_orden_trabajo,
+                                            v_id_partida_ejecu
+
+                                            )RETURNING id_obligacion_det into v_id_obligacion_det;
+
+                                            update pre.tajuste_det a set
+                                              id_sol_origen = v_id_obligacion_det
+                                            where a.id_ajuste_det  =  v_registros_det.id_ajuste_det;
+
+                                 ELSE
+                                    RAISE EXCEPTION 'El numero de proceso % no tiene permiso para el Registro automático del detalle.', v_registros.nro_tramite;
+
+                            END IF;
+
+
 
 
                         END IF;
@@ -654,31 +724,27 @@ BEGIN
                             	    tpe.id_partida = v_registros_det.id_partida and tpe.columna_origen in ('id_solicitud_compra','id_obligacion_pago') and
                                   tpe.id_partida_ejecucion_fk is null;*/
 
-							              --20-12-2021 (may) se aumenta para lo procesos de FA, ahora se distingue segun la columna tabla_origen
+							--20-12-2021 (may) se aumenta para lo procesos de FA, ahora se distingue segun la columna tabla_origen
                             --para FA tabla_origen= cd.tcuenta_doc
 
-                            IF (v_registros_det.tabla_origen= 'cd.tcuenta_doc') THEN
+                            select pe.id_partida_ejecucion, pe.columna_origen
+                            into v_id_partida_ejecucion, v_columna_origen
+                            from cd.tcuenta_doc_det cdet
+                            inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = cdet.id_partida_ejecucion
+                            where cdet.id_cuenta_doc_det = v_registros_det.id_sol_origen
+                            and pe.id_partida_ejecucion_fk is null;
 
-                              		select pe.id_partida_ejecucion, pe.columna_origen
-                                    into v_id_partida_ejecucion, v_columna_origen
-                                    from cd.tcuenta_doc_det cdet
-                                    inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = cdet.id_partida_ejecucion
-                                    where cdet.id_cuenta_doc_det = v_registros_det.id_sol_origen
-                                    and pe.id_partida_ejecucion_fk is null;
-
-                            ELSE IF (v_registros_det.tabla_origen= 'adq.tsolicitud') THEN
-
-                              		select pe.id_partida_ejecucion, pe.columna_origen
-                                    into v_id_partida_ejecucion, v_columna_origen
-                                    from adq.tsolicitud_det sold
-                                    inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = sold.id_partida_ejecucion
-                                    where sold.id_solicitud_det = v_registros_det.id_sol_origen
-                                    and pe.id_partida_ejecucion_fk is null;
+                            IF (v_id_partida_ejecucion is null) THEN
+                                  select pe.id_partida_ejecucion, pe.columna_origen
+                                  into v_id_partida_ejecucion, v_columna_origen
+                                  from adq.tsolicitud_det sold
+                                  inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = sold.id_partida_ejecucion
+                                  where sold.id_solicitud_det = v_registros_det.id_sol_origen
+                                  and pe.id_partida_ejecucion_fk is null;
+                            END IF;
 
 
-                            ELSE
-
-                                  /*  select tpe.id_partida_ejecucion, tpe.columna_origen
+ /*                                   select tpe.id_partida_ejecucion, tpe.columna_origen
                                     into v_id_partida_ejecucion, v_columna_origen
                                     from pre.tpartida_ejecucion tpe
                                     where tpe.nro_tramite = v_registros.nro_tramite and tpe.id_presupuesto = v_registros_det.id_presupuesto and
@@ -686,14 +752,13 @@ BEGIN
                                     tpe.id_partida_ejecucion_fk is null;*/
 
                             --adicion breydi.vasquez 03/12/2021 optener la id_partida_ejecucion segun el detalle de origen
-                                    select pe.id_partida_ejecucion, pe.columna_origen
-                                    into v_id_partida_ejecucion, v_columna_origen
-                                    from tes.tobligacion_det odet
-                                    inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = odet.id_partida_ejecucion_com
-                                    where odet.id_obligacion_det = v_registros_det.id_sol_origen
-                                    and pe.id_partida_ejecucion_fk is null;
-
-                             END IF;
+                            IF (v_id_partida_ejecucion is null) THEN
+                                  select pe.id_partida_ejecucion, pe.columna_origen
+                                  into v_id_partida_ejecucion, v_columna_origen
+                                  from tes.tobligacion_det odet
+                                  inner join pre.tpartida_ejecucion pe on pe.id_partida_ejecucion = odet.id_partida_ejecucion_com
+                                  where odet.id_obligacion_det = v_registros_det.id_sol_origen
+                                  and pe.id_partida_ejecucion_fk is null;
                             END IF;
 
 
