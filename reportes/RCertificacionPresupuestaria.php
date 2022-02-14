@@ -302,6 +302,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                 ';
             $this->Ln(5);
             $this->writeHTML($tbl, true, false, false, false, '');
+            //var_dump('rep ', $tbl);exit;
         }else{
             $tbl = '<table>
                     <tr>
@@ -477,6 +478,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $cadena_qr = 'Nombre: '.$nom. "\n" . 'Cargo: '.$car."\n".'Oficina: '.$ofi ;
         $barcodeobj = new TCPDF2DBarcode($cadena_qr, 'QRCODE,M');
         $png = $barcodeobj->getBarcodePngData($w = 8, $h = 8, $color = array(0, 0, 0));
+        $nom = preg_replace('([^A-Za-z0-9])', '_', $nom);
         $im = imagecreatefromstring($png);
         if ($im !== false) {
             header('Content-Type: image/png');
