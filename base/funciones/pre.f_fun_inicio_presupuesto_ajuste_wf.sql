@@ -99,7 +99,8 @@ BEGIN
                         INTO v_regitros_pp
                         FROM pre.tpartida_ejecucion pej
                         WHERE pej.id_presupuesto = v_registros.id_presupuesto
-                        and pej.id_partida = v_registros.id_partida;
+                        and pej.id_partida = v_registros.id_partida
+                        and par.tipo_movimiento = 'formulado';
 
 
                        INSERT INTO  pre.tpartida_ejecucion
