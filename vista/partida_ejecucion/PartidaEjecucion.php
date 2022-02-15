@@ -140,8 +140,22 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 				fieldLabel: 'Monto Moneda Base',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 100,
-				maxLength:-5
+				gwidth: 120,
+				maxLength:-5,
+				renderer:(value, p, record) => {                         
+					Number.prototype.formatDinero = function(c, d, t){
+						var n = this,
+							c = isNaN(c = Math.abs(c)) ? 2 : c,
+							d = d == undefined ? "." : d,
+							t = t == undefined ? "," : t,
+							s = n < 0 ? "-" : "",
+							i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+							j = (j = i.length) > 3 ? j % 3 : 0;
+						return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+					};
+
+					return  String.format('<div style="vertical-align:middle;text-align:right;"><b>{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+				}				
 			},
 			type:'NumberField',
 			filters:{pfiltro:'pareje.monto_mb',type:'numeric'},
@@ -187,7 +201,7 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 						return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
 					};
 
-					return  String.format('<div style="vertical-align:middle;text-align:right;"><span >{0}</span></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+					return  String.format('<div style="vertical-align:middle;text-align:right;"><b>{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
 				}
 			},
 			type:'NumberField',
@@ -210,6 +224,29 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		{
+			config:{
+				name: 'tipo_cambio',
+				fieldLabel: 'Tipo de Cambio',
+				allowBlank: true,
+				anchor: '80%',
+				gwidth: 80,
+				maxLength:-5,
+				renderer:(value, p, record) => {     
+					var tc = record.data.monto_mb / record.data.monto;
+					if (tc>0 && record.data.moneda != 'Bolivianos'){
+						return  String.format('<div style="text-align:right;"><b>{0}</b></div>',Ext.util.Format.number(tc.toFixed(2)));                        
+					} else {
+						return '';
+					}                        
+				}
+			},
+			type:'NumberField',
+			filters:{pfiltro:'pareje.tipo_cambio',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:true
+		},		
 		{
 			//configuracion del componente
 			config:{
@@ -350,21 +387,6 @@ Phx.vista.PartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 			filters: {pfiltro: 'pareje.id_int_comprobante',type: 'string'},
 			grid: true,
 			form: true
-		},
-		{
-			config:{
-				name: 'tipo_cambio',
-				fieldLabel: 'Tipo de Cambio',
-				allowBlank: true,
-				anchor: '80%',
-				gwidth: 100,
-				maxLength:-5
-			},
-			type:'NumberField',
-			filters:{pfiltro:'pareje.tipo_cambio',type:'numeric'},
-			id_grupo:1,
-			grid:true,
-			form:true
 		},
 		{
 			config:{

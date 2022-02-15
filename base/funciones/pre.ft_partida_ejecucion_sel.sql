@@ -500,15 +500,19 @@ BEGIN
                   id_partida		 integer,
                   id_moneda			 integer,
                   comprometido		 numeric,
+                  comprometido_mb	 numeric,
                   ejecutado			 numeric,
+                  ejecutado_mb		 numeric,
                   pagado			 numeric,
+                  pagado_mb			 numeric,
                   saldo              numeric,
+                  saldo_mb            numeric,
                   desde				 date,
                   hasta				 date
                 )on commit drop;
 
                 v_consul:= 'with recursive detalle (id_int_comprobante, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
-										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado)
+										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado, c_mb, e_mb, p_mb)
                                                       as
                 (select
                   pareje.id_int_comprobante,
@@ -536,7 +540,22 @@ BEGIN
                           pareje.monto
                       else
                           0.00
-                      end
+                      end,
+                  case when pareje.tipo_movimiento = ''comprometido'' then
+                          pareje.monto_mb
+                       else
+                           0.00
+                       end,
+                  case when pareje.tipo_movimiento = ''ejecutado'' then
+                          pareje.monto_mb
+                      else
+                          0.00
+                      end,
+                  case when pareje.tipo_movimiento = ''pagado'' then
+                          pareje.monto_mb
+                      else
+                          0.00
+                      end                      
                   from pre.tpartida_ejecucion pareje
                   inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
                   INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
@@ -560,9 +579,13 @@ BEGIN
                   de.id_partida,
                   de.id_moneda,
                   sum(de.comprometido) as comprometido,
+                  sum(c_mb) as comprometido_mb,
                   sum(de.ejecutado) as ejecutado,
+                  sum(e_mb) as ejecutado_mb,
                   sum(de.pagado)	as pagado,
+                  sum(p_mb) as pagado_mb,
                   (sum(de.comprometido) - sum(de.ejecutado)) as saldo,
+                  (sum(c_mb) - sum(e_mb)) as saldo_mb,
                   '||v_desde||',
                   '||v_hasta||'
                 from detalle de
