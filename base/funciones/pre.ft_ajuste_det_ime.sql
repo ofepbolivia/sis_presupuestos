@@ -41,6 +41,9 @@ DECLARE
     v_id_partida			integer;
     v_id_centro_costo		integer;
 
+    --18-02-2022(may)
+    v_tabla_origen			varchar;
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_ajuste_det_ime';
@@ -56,6 +59,8 @@ BEGIN
 	if(p_transaccion='PRE_AJD_INS')then
 
         begin
+
+        	v_tabla_origen = '' ;
 
 			--16-06-2021 (may) para tipo AJUSTE estaran con incremento y decremento
 			IF v_parametros.tipo_ajuste != 'ajuste' THEN
@@ -113,7 +118,21 @@ BEGIN
                     raise exception 'no se tiene una parametrización de partida  para este concepto de gasto en la relación contable de código  (%,%,%,%)','CUECOMP', v_relacion, v_parametros.id_concepto_ingas, v_id_centro_costo;
                 END IF;
            END IF;
+
+                --(may) para asignar la tabla_origen,de donde viene el proceso
+                --ver tabla origen de los demas
+                select ad.tabla_origen
+                into v_tabla_origen
+                from pre.tajuste_det ad
+                where ad.id_ajuste = v_parametros.id_ajuste
+                and ad.tabla_origen is not null
+                group by ad.tabla_origen;
+
+                --
+
+           END IF;
             --
+
 
         	--Sentencia de la insercion
         	insert into pre.tajuste_det(
@@ -132,7 +151,8 @@ BEGIN
                 --11-06-2021 (may) se aumenta campos de registro
                 id_orden_trabajo,
                 id_concepto_ingas,
-                descripcion
+                descripcion,
+                tabla_origen
 
           	) values(
                 v_parametros.id_presupuesto,
@@ -150,7 +170,8 @@ BEGIN
                 --11-06-2021 (may) se aumenta campos de registro
                 v_parametros.id_orden_trabajo,
                 v_parametros.id_concepto_ingas,
-                v_parametros.descripcion
+                v_parametros.descripcion,
+                v_tabla_origen
 
 		  )RETURNING id_ajuste_det into v_id_ajuste_det;
 
