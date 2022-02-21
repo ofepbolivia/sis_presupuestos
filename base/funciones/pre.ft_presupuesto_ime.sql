@@ -309,6 +309,10 @@ BEGIN
 			delete from pre.tpresupuesto
             where id_presupuesto=v_parametros.id_presupuesto;
 
+            delete from param.tcentro_costo c
+            where id_presupuesto=v_parametros.id_presupuesto;
+
+
             --Definicion de la respuesta
             v_resp = pxp.f_agrega_clave(v_resp,'mensaje','Presupuestos eliminado(a)');
             v_resp = pxp.f_agrega_clave(v_resp,'id_presupuesto',v_parametros.id_presupuesto::varchar);
