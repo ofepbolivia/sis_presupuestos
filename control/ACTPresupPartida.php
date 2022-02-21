@@ -136,6 +136,7 @@ class ACTPresupPartida extends ACTbase{
 			$temp['comprometido'] = $this->res->extraData['total_importe_comprometido'];
 			$temp['ejecutado'] = $this->res->extraData['total_importe_ejecutado'];
 			$temp['pagado'] = $this->res->extraData['total_importe_pagado'];
+			$temp['rendido'] = $this->res->extraData['total_importe_rendido'];
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_presup_partida'] = 0;
 
