@@ -114,7 +114,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     allowBlank:false,
                     gdisplayField:'nombre_uo',//mapea al store del grid
                     gwidth:200,
-                    width:250,
+                    width:350,
                     baseParams:{presupuesta:'si'},
                     renderer:function (value, p, record){return String.format('{0} {1}' , record.data['codigo_uo'], record.data['nombre_uo']);}
                 },
@@ -147,7 +147,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'descripcion',
                     fieldLabel: 'Descripcion',
                     allowBlank: true,
-                    anchor: '80%',
+                    width:350,
                     gwidth: 200,
                     maxLength:200
                 },
@@ -205,7 +205,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     queryDelay:1000,
                     width: 150,
                     listWidth: 280,
-                    gwidth: 150,
+                    width:350,
                     minChars:2,
                     renderer:function(value, p, record){return String.format('{0}', record.data['desc_tipo_presupuesto']);}
                 },
@@ -232,7 +232,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['codigo_categoria','id_categoria_programatica','descripcion'],
+                        fields: ['codigo_categoria','id_categoria_programatica','descripcion', 'gestion'],
                         remoteSort: true,
                         baseParams:{par_filtro:'descripcion#codigo_categoria'}
                     }),
@@ -247,11 +247,11 @@ header("content-type: text/javascript; charset=UTF-8");
                     mode:'remote',
                     pageSize:10,
                     queryDelay:1000,
-                    width: 150,
+                    width:350,
                     listWidth: 280,
                     gwidth: 150,
                     minChars:2,
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>',
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo_categoria}</b></p><p>{descripcion}</p> <p>Gestión: {gestion}</p> </div></tpl>',
                     renderer:function(value, p, record){return String.format('{0}', record.data['codigo_categoria']);}
                 },
                 type:'ComboBox',
@@ -286,6 +286,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     allowBlank:false,
                     typeAhead: true,
                     triggerAction: 'all',
+                    width:350,
                     lazyRender:true,
                     mode: 'local',
                     store: ['si','no']
@@ -307,7 +308,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_inicio_pres',
                     fieldLabel: 'Fecha Inicio Presupuesto',
                     allowBlank: false,
-                    anchor: '42.3%',
+                    width:350,
                     gwidth: 100,
 
 
@@ -328,7 +329,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_fin_pres',
                     fieldLabel: 'Fecha Fin Presupuesto',
                     allowBlank: false,
-                    anchor: '42.3%',
+                    width:350,
                     gwidth: 100,
 
 
