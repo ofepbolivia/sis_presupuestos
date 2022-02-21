@@ -193,6 +193,7 @@ class MODPresupPartida extends MODbase{
 			$this->capturaCount('total_importe_ejecutado','numeric');
 			$this->capturaCount('total_importe_pagado','numeric');
 			$this->capturaCount('total_importe_rendido','numeric');
+			$this->capturaCount('total_saldo_rendir','numeric');
 
 
 			$this->captura('id_presup_partida','int4');
@@ -211,6 +212,7 @@ class MODPresupPartida extends MODbase{
             $this->captura('pagado','numeric');
 
             $this->captura('rendido','numeric');
+            $this->captura('saldo_rendir','numeric');
 
 
 			//Ejecuta la instruccion

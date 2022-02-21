@@ -161,6 +161,27 @@ Phx.vista.ChkPresupuesto=Ext.extend(Phx.gridInterfaz,{
 				id_grupo: 1,
 				grid: true,
 				form: false
+		},
+        {
+			config:{
+				name: 'saldo_rendir',
+				fieldLabel: 'Saldo a Rendir',
+				gwidth: 100,
+				renderer:function (value,p,record){
+						if(record.data.tipo_reg != 'summary'){
+							return  String.format('<font color="#00008b">{0}</font>', Ext.util.Format.number(value,'0,000.00'));
+						}
+						else{
+							return  String.format('<b><font color="#00008b" size=2 >{0}</font><b>', Ext.util.Format.number(value,'0,000.00'));
+						}
+
+					}
+			},
+				type: 'NumberField',
+				//filters: { pfiltro:'saldo_rendir', type: 'numeric' },
+				id_grupo: 1,
+				grid: true,
+				form: false
 		}
 		
 		
@@ -177,7 +198,7 @@ Phx.vista.ChkPresupuesto=Ext.extend(Phx.gridInterfaz,{
 		{name:'id_presupuesto', type: 'numeric'},
 		'codigo_cc','desc_partida','tipo_reg',
 		'comprometido','ejecutado','pagado',
-        'rendido'
+        'rendido', 'saldo_rendir'
 		
 	],
 	
