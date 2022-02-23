@@ -227,14 +227,24 @@ BEGIN
                              and dc.id_partida = prpa.id_partida
                              and dc.id_centro_costo = prpa.id_centro_costo ),0)::numeric  as rendido,
 
-                            coalesce (comprometido - (coalesce ((SELECT sum(dc.precio_total)
+
+                            ( coalesce ((SELECT sum(dc.precio_total) - sum(dcv.importe_iva )
+                            FROM cd.tcuenta_doc cdoc
+                            inner join cd.trendicion_det rd on rd.id_cuenta_doc_rendicion = cdoc.id_cuenta_doc
+                            inner join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = rd.id_doc_compra_venta
+                            inner join conta.tdoc_concepto dc on dc.id_doc_compra_venta = dcv.id_doc_compra_venta
+                            WHERE cdoc.nro_tramite = prpa.nro_tramite
+                             and dc.id_partida = prpa.id_partida
+                             and dc.id_centro_costo = prpa.id_centro_costo),0)::numeric ) as rendido_impuestos,
+
+                            coalesce (comprometido - (SELECT sum(dc.precio_total) - sum(dcv.importe_iva )
                                                         FROM cd.tcuenta_doc cdoc
                                                         inner join cd.trendicion_det rd on rd.id_cuenta_doc_rendicion = cdoc.id_cuenta_doc
                                                         inner join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = rd.id_doc_compra_venta
                                                         inner join conta.tdoc_concepto dc on dc.id_doc_compra_venta = dcv.id_doc_compra_venta
                                                         WHERE cdoc.nro_tramite = prpa.nro_tramite
                                                          and dc.id_partida = prpa.id_partida
-                                                         and dc.id_centro_costo = prpa.id_centro_costo ),0)) , 0)::numeric as saldo_rendir
+                                                         and dc.id_centro_costo = prpa.id_centro_costo) , 0)::numeric as saldo_rendir
 
                         FROM pre.vestado_presupuesto_por_tramite prpa
 				        where  ';
@@ -275,15 +285,24 @@ BEGIN
                              and dc.id_partida = prpa.id_partida
                              and dc.id_centro_costo = prpa.id_centro_costo ),0)::numeric),0)::numeric  as total_rendido,
 
-                         COALESCE(sum( coalesce (comprometido - (coalesce ((SELECT sum(dc.precio_total)
+                         COALESCE(sum(  ( coalesce ((SELECT sum(dc.precio_total) - sum(dcv.importe_iva )
+                            FROM cd.tcuenta_doc cdoc
+                            inner join cd.trendicion_det rd on rd.id_cuenta_doc_rendicion = cdoc.id_cuenta_doc
+                            inner join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = rd.id_doc_compra_venta
+                            inner join conta.tdoc_concepto dc on dc.id_doc_compra_venta = dcv.id_doc_compra_venta
+                            WHERE cdoc.nro_tramite = prpa.nro_tramite
+                             and dc.id_partida = prpa.id_partida
+                             and dc.id_centro_costo = prpa.id_centro_costo),0)::numeric )  ),0)::numeric  as total_rendido_impuestos,
+
+                         COALESCE(sum(  coalesce (comprometido - (SELECT sum(dc.precio_total) - sum(dcv.importe_iva )
                                                         FROM cd.tcuenta_doc cdoc
                                                         inner join cd.trendicion_det rd on rd.id_cuenta_doc_rendicion = cdoc.id_cuenta_doc
                                                         inner join conta.tdoc_compra_venta dcv on dcv.id_doc_compra_venta = rd.id_doc_compra_venta
                                                         inner join conta.tdoc_concepto dc on dc.id_doc_compra_venta = dcv.id_doc_compra_venta
                                                         WHERE cdoc.nro_tramite = prpa.nro_tramite
                                                          and dc.id_partida = prpa.id_partida
-                                                         and dc.id_centro_costo = prpa.id_centro_costo ),0)) , 0)::numeric
-                         ),0)::numeric  as  total_saldo_rendir
+                                                         and dc.id_centro_costo = prpa.id_centro_costo) , 0)::numeric  ),0)::numeric  as total_saldo_rendir
+
 
                         FROM pre.vestado_presupuesto_por_tramite prpa
 				        where    ';
