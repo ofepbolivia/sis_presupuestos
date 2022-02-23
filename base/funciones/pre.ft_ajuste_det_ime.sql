@@ -117,7 +117,6 @@ BEGIN
                 IF v_id_partida is NULL THEN
                     raise exception 'no se tiene una parametrización de partida  para este concepto de gasto en la relación contable de código  (%,%,%,%)','CUECOMP', v_relacion, v_parametros.id_concepto_ingas, v_id_centro_costo;
                 END IF;
-           END IF;
 
                 --(may) para asignar la tabla_origen,de donde viene el proceso
                 --ver tabla origen de los demas
