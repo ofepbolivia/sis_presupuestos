@@ -143,11 +143,12 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro: 'par.codigo_partida#par.nombre_partida',
+		        pfiltro: 'par.codigo#par.nombre_partida',
 				type: 'string'
 			},   		   
    			grid:true,   			
-   			form:true
+   			form:true,
+            bottom_filter: true
 	   	},
         {
             config:{
@@ -166,7 +167,8 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             id_grupo:0,
             filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
             grid:true,
-            form:true
+            form:true,
+            bottom_filter: true
         },
 		{
 			config:{
