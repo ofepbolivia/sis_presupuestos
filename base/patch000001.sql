@@ -4,7 +4,7 @@
 *	Date: 11/2012
 *	Description: Build the menu definition and composition
 */
- 
+
 /* (1) Tables creation */
 
 --Presupuestos
@@ -12,16 +12,16 @@
 CREATE TABLE pre.tpresupuesto (
   id_presupuesto  SERIAL NOT NULL,
   id_centro_costo INTEGER NOT NULL,
-  tipo_pres VARCHAR(30), 
-  estado_pres VARCHAR(30), 
-  id_categoria_prog INTEGER, 
-  id_parametro INTEGER, 
-  id_fuente_financiamiento INTEGER, 
-  id_concepto_colectivo INTEGER, 
-  cod_fin VARCHAR(10), 
-  cod_prg VARCHAR(10), 
-  cod_pry VARCHAR(10), 
-  cod_act VARCHAR(10), 
+  tipo_pres VARCHAR(30),
+  estado_pres VARCHAR(30),
+  id_categoria_prog INTEGER,
+  id_parametro INTEGER,
+  id_fuente_financiamiento INTEGER,
+  id_concepto_colectivo INTEGER,
+  cod_fin VARCHAR(10),
+  cod_prg VARCHAR(10),
+  cod_pry VARCHAR(10),
+  cod_act VARCHAR(10),
   CONSTRAINT pk_tpresupuesto__id_presupuesto PRIMARY KEY (id_presupuesto)
 ) INHERITS (pxp.tbase)
 WITH (
@@ -31,10 +31,10 @@ ALTER TABLE pre.tpresupuesto OWNER TO postgres;
 
 
 CREATE TABLE pre.tpartida (
-  id_partida SERIAL, 
-  id_partida_fk integer, 
-  codigo VARCHAR(20), 
-  descripcion VARCHAR(200), 
+  id_partida SERIAL,
+  id_partida_fk integer,
+  codigo VARCHAR(20),
+  descripcion VARCHAR(200),
   tipo varchar(15),
   CONSTRAINT tpartida__id_partida PRIMARY KEY(id_partida),
   CONSTRAINT chk_tpartida__tipo check (tipo in ('trans','no_trans'))
@@ -69,21 +69,21 @@ ALTER TABLE pre.tpresup_partida OWNER TO postgres;
 DROP TABLE pre.tpartida;  --elimina tabla creada para mantenimiento
 
 CREATE TABLE pre.tpartida (
-  id_partida SERIAL, 
-  id_partida_fk INTEGER, 
-  id_gestion INTEGER, 
-  id_parametros INTEGER, 
-  codigo VARCHAR(30), 
-  nombre_partida VARCHAR(150), 
-  descripcion VARCHAR(1000), 
-  nivel_partida INTEGER, 
-  sw_transaccional VARCHAR(20), 
-  tipo VARCHAR(20), 
-  sw_movimiento VARCHAR(20), 
-  cod_trans VARCHAR(40), 
-  cod_ascii VARCHAR(2), 
-  cod_excel VARCHAR(2), 
-  ent_trf VARCHAR(4), 
+  id_partida SERIAL,
+  id_partida_fk INTEGER,
+  id_gestion INTEGER,
+  id_parametros INTEGER,
+  codigo VARCHAR(30),
+  nombre_partida VARCHAR(150),
+  descripcion VARCHAR(1000),
+  nivel_partida INTEGER,
+  sw_transaccional VARCHAR(20),
+  tipo VARCHAR(20),
+  sw_movimiento VARCHAR(20),
+  cod_trans VARCHAR(40),
+  cod_ascii VARCHAR(2),
+  cod_excel VARCHAR(2),
+  ent_trf VARCHAR(4),
   CONSTRAINT pk_tpartida__id_partida PRIMARY KEY(id_partida)
 ) INHERITS (pxp.tbase)
 WITHOUT OIDS;
@@ -98,12 +98,12 @@ COMMENT ON COLUMN pre.tpartida.sw_movimiento
 IS 'flujo, presupuestaria';
 
 CREATE TABLE pre.tconcepto_cta(
-  id_concepto_cta SERIAL NOT NULL, 
-  id_centro_costo int4, 
-  id_concepto_ingas int4 NOT NULL, 
-  id_cuenta int4, 
+  id_concepto_cta SERIAL NOT NULL,
+  id_centro_costo int4,
+  id_concepto_ingas int4 NOT NULL,
+  id_cuenta int4,
   id_auxiliar int4,
-  id_partida int4, 
+  id_partida int4,
   CONSTRAINT pk_tconcepto_cta__id_concepto_cta PRIMARY KEY(id_concepto_cta)
 ) INHERITS (pxp.tbase);
 
@@ -121,19 +121,19 @@ CREATE TABLE pre.tconcepto_partida(
 
 /***********************************I-SCP-RCM-PRE-0-18/12/2013*****************************************/
 CREATE TABLE pre.tpartida_ids (
-  id_partida_uno INTEGER NOT NULL, 
-  id_partida_dos INTEGER NOT NULL, 
-  sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion'::character varying, 
+  id_partida_uno INTEGER NOT NULL,
+  id_partida_dos INTEGER NOT NULL,
+  sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion'::character varying,
   CONSTRAINT tpartida_ids_pkey PRIMARY KEY(id_partida_uno)
 ) WITHOUT OIDS;
 /***********************************F-SCP-RCM-PRE-0-18/12/2013*****************************************/
 
 /***********************************I-SCP-JRR-PRE-0-29/05/2014*****************************************/
 CREATE TABLE pre.tpresupuesto_ids (
-  id_presupuesto_uno INTEGER NOT NULL, 
-  id_presupuesto_dos INTEGER NOT NULL, 
-  sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion'::character varying NOT NULL, 
-  CONSTRAINT tpresupuesto_ids_pkey PRIMARY KEY(id_presupuesto_uno)  
+  id_presupuesto_uno INTEGER NOT NULL,
+  id_presupuesto_dos INTEGER NOT NULL,
+  sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion'::character varying NOT NULL,
+  CONSTRAINT tpresupuesto_ids_pkey PRIMARY KEY(id_presupuesto_uno)
 ) WITH OIDS;
 
 /***********************************F-SCP-JRR-PRE-0-29/05/2014*****************************************/
@@ -143,11 +143,11 @@ CREATE TABLE pre.tpresupuesto_ids (
 
 /***********************************I-SCP-JRR-PRE-0-02/01/2015*****************************************/
 CREATE TABLE pre.tcategoria_programatica (
-  id_categoria_programatica INTEGER NOT NULL, 
-  id_gestion INTEGER NOT NULL, 
-  descripcion TEXT NOT NULL, 
-  CONSTRAINT tcategoria_programatica_pkey PRIMARY KEY(id_categoria_programatica)) 
-INHERITS (pxp.tbase); 
+  id_categoria_programatica INTEGER NOT NULL,
+  id_gestion INTEGER NOT NULL,
+  descripcion TEXT NOT NULL,
+  CONSTRAINT tcategoria_programatica_pkey PRIMARY KEY(id_categoria_programatica))
+INHERITS (pxp.tbase);
 
 
 /***********************************F-SCP-JRR-PRE-0-02/01/2015*****************************************/
@@ -279,23 +279,23 @@ IS 'gasto o recurso';
 
 ALTER TABLE pre.tpresupuesto
   ADD COLUMN estado VARCHAR DEFAULT 'borrador' NOT NULL;
-  
+
 --------------- SQL ---------------
 
 ALTER TABLE pre.tpresupuesto
   ADD COLUMN nro_tramite VARCHAR;
-  
+
 --------------- SQL ---------------
 
 ALTER TABLE pre.tpresupuesto
-  ADD COLUMN id_proceso_wf INTEGER;  
-  
+  ADD COLUMN id_proceso_wf INTEGER;
+
 
 --------------- SQL ---------------
 
 ALTER TABLE pre.tpresupuesto
   ADD COLUMN descripcion VARCHAR;
-  
+
 /***********************************F-SCP-RAC-PRE-1-26/02/2016*****************************************/
 
 
@@ -350,9 +350,9 @@ COMMENT ON COLUMN pre.tpresup_partida.importe_aprobado
 IS 'este es el importe final que se traduce a partida ejecucion como formulado, segun WF en el estado vobopre, se determina el monto';
 
 update pre.tpresup_partida pp set
- importe = 0.00 
+ importe = 0.00
  where importe is null;
- 
+
 --------------- SQL ---------------
 
 ALTER TABLE pre.tpresup_partida
@@ -370,10 +370,10 @@ ALTER TABLE pre.tpresup_partida
 --------------- SQL ---------------
 
 ALTER TABLE pre.tpresupuesto
-  ADD COLUMN id_estado_wf INTEGER; 
-  
-   
-  
+  ADD COLUMN id_estado_wf INTEGER;
+
+
+
 /***********************************F-SCP-RAC-PRE-0-16/03/2016*****************************************/
 
 
@@ -447,7 +447,7 @@ IS '(traspaso) - de una partida a la misma de otro presupuesto pero del mismo ti
 (disminución) -  solo disminuye';
 
 
-  
+
 --------------- SQL ---------------
 
 CREATE TABLE pre.tajuste_det (
@@ -480,7 +480,7 @@ IS 'incremento o decremento';
 
 ALTER TABLE pre.tajuste
   ADD COLUMN fecha DATE DEFAULT now() NOT NULL;
-  
+
 --------------- SQL ---------------
 
 ALTER TABLE pre.tajuste
@@ -677,14 +677,14 @@ ALTER TABLE pre.tmemoria_det
 
 ALTER TABLE pre.tmemoria_det
   ADD COLUMN importe_unitario NUMERIC(18,2) DEFAULT 0 NOT NULL;
-  
+
 --------------- SQL ---------------
 
 ALTER TABLE pre.tmemoria_calculo
   ADD COLUMN id_partida INTEGER;
 
 COMMENT ON COLUMN pre.tmemoria_calculo.id_partida
-IS 'se llena con el triguer de memoria de calculo';  
+IS 'se llena con el triguer de memoria de calculo';
 
 /*****************************F-SCP-RAC-PRE-0-20/04/2016*************/
 
@@ -728,7 +728,7 @@ CREATE TABLE pre.tcp_programa_ids (
   id_cp_programa_uno INTEGER NOT NULL,
   id_cp_programa_dos INTEGER NOT NULL,
   sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
-) 
+)
 WITH (oids = false);
 
 
@@ -736,7 +736,7 @@ CREATE TABLE pre.tcp_proyecto_ids (
   id_cp_proyecto_uno INTEGER NOT NULL,
   id_cp_proyecto_dos INTEGER NOT NULL,
   sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
-) 
+)
 WITH (oids = false);
 
 
@@ -744,7 +744,7 @@ CREATE TABLE pre.tcp_actividad_ids (
   id_cp_actividad_uno INTEGER NOT NULL,
   id_cp_actividad_dos INTEGER NOT NULL,
   sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
-) 
+)
 WITH (oids = false);
 
 
@@ -753,7 +753,7 @@ CREATE TABLE pre.tcp_fuente_fin_ids (
   id_cp_fuente_fin_uno INTEGER NOT NULL,
   id_cp_fuente_fin_dos INTEGER NOT NULL,
   sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
-) 
+)
 WITH (oids = false);
 
 
@@ -762,7 +762,7 @@ CREATE TABLE pre.tcp_organismo_fin_ids (
   id_cp_organismo_fin_uno INTEGER NOT NULL,
   id_cp_organismo_fin_dos INTEGER NOT NULL,
   sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
-) 
+)
 WITH (oids = false);
 
 
@@ -770,7 +770,7 @@ CREATE TABLE pre.tcategoria_programatica_ids (
   id_categoria_programatica_uno INTEGER NOT NULL,
   id_categoria_programatica_dos INTEGER NOT NULL,
   sw_cambio_gestion VARCHAR(10) DEFAULT 'gestion' NOT NULL
-) 
+)
 WITH (oids = false);
 
 /*****************************F-SCP-RAC-PRE-0-24/07/2017*************/
@@ -801,7 +801,7 @@ CREATE TABLE pre.tformulacion_tmp (
   migrado VARCHAR(3) DEFAULT 'no'::character varying NOT NULL,
   obs VARCHAR,
   CONSTRAINT tformulacion_tmp_pkey PRIMARY KEY(id_formulacion_tmp)
-) 
+)
 WITH (oids = false);
 
 
@@ -1015,7 +1015,7 @@ ALTER TABLE pre.tpartida_usuario
 
 
 ALTER TABLE pre.tpartida_usuario
-  ADD COLUMN id_gestion INTEGER;  
+  ADD COLUMN id_gestion INTEGER;
 /*****************************F-SCP-MAY-PRE-0-24/07/2018*************/
 
 /*****************************I-SCP-FEA-PRE-0-07/08/2019*************/
@@ -1044,3 +1044,110 @@ WITH (oids = false);
 ALTER TABLE pre.tclase_gasto_cuenta
   OWNER TO postgres;
 /*****************************F-SCP-MAY-PRE-0-22/08/2019*************/
+
+/*****************************I-SCP-BVP-PRE-0-01/04/2020*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN id_orden_trabajo INTEGER;
+/*****************************F-SCP-BVP-PRE-0-01/08/2020*************/
+
+/*****************************I-SCP-MAY-PRE-0-11/08/2020*************/
+CREATE TABLE pre.tformulacion_presu (
+  id_formulacion_presu SERIAL,
+  id_usuario_responsable INTEGER,
+  observaciones TEXT,
+  id_memoria_calculo INTEGER,
+  id_gestion INTEGER,
+  CONSTRAINT tformulacion_presu_pkey PRIMARY KEY(id_formulacion_presu)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE pre.tformulacion_presu
+  OWNER TO postgres;
+
+CREATE TABLE pre.tformulacion_presu_detalle (
+  id_formulacion_presu_detalle SERIAL,
+  id_centro_costo INTEGER,
+  id_concepto_gasto INTEGER,
+  justificacion VARCHAR,
+  nro_contrato VARCHAR(200),
+  proveedor VARCHAR,
+  hoja_respaldo VARCHAR,
+  periodo_enero NUMERIC,
+  periodo_febrero NUMERIC,
+  periodo_marzo NUMERIC,
+  periodo_abril NUMERIC,
+  periodo_mayo NUMERIC,
+  periodo_junio NUMERIC,
+  periodo_julio NUMERIC,
+  periodo_agosto NUMERIC,
+  periodo_septiembre NUMERIC,
+  periodo_octubre NUMERIC,
+  periodo_noviembre NUMERIC,
+  periodo_diciembre NUMERIC,
+  importe_total NUMERIC,
+  id_partida INTEGER,
+  id_formulacion_presu INTEGER,
+  id_memoria_calculo INTEGER,
+  CONSTRAINT tformulacion_presu_detalle_pkey PRIMARY KEY(id_formulacion_presu_detalle)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+ALTER TABLE pre.tformulacion_presu_detalle
+  ALTER COLUMN id_partida SET STATISTICS 0;
+
+ALTER TABLE pre.tformulacion_presu_detalle
+  OWNER TO postgres;
+
+/*****************************F-SCP-MAY-PRE-0-11/08/2020*************/
+
+/*****************************I-SCP-MAY-PRE-0-18/06/2021*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN id_concepto_ingas INTEGER;
+
+COMMENT ON COLUMN pre.tajuste_det.id_concepto_ingas
+IS 'identificador concepto de gasto';
+/*****************************F-SCP-MAY-PRE-0-18/06/2021*************/
+
+/*****************************I-SCP-MAY-PRE-0-03/11/2021*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN id_sol_origen INTEGER;
+
+COMMENT ON COLUMN pre.tajuste_det.id_sol_origen
+IS 'identificador adq/op';
+/*****************************F-SCP-MAY-PRE-0-03/11/2021*************/
+
+/*****************************I-SCP-MAY-PRE-0-04/11/2021*************/
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN tabla_origen INTEGER;
+
+COMMENT ON COLUMN pre.tajuste_det.tabla_origen
+IS 'descripcion tabla origen ID';
+/*****************************F-SCP-MAY-PRE-0-04/11/2021*************/
+
+/*****************************I-SCP-IRVA-PRE-0-11/12/2021*************/
+CREATE TABLE pre.tmatriz_conversion_deuda (
+  id_matriz_conversion SERIAL,
+  id_gestion_origen INTEGER,
+  id_partida_origen INTEGER,
+  id_partida_destino INTEGER,
+  id_gestion_destino INTEGER,
+  CONSTRAINT tmatriz_conversion_deuda_pkey PRIMARY KEY(id_matriz_conversion)
+) INHERITS (pxp.tbase)
+WITH (oids = false);
+
+COMMENT ON COLUMN pre.tmatriz_conversion_deuda.id_gestion_origen
+IS 'Gestion Actual de la partida';
+
+ALTER TABLE pre.tmatriz_conversion_deuda
+  OWNER TO postgres;
+/*****************************F-SCP-IRVA-PRE-0-11/12/2021*************/
+
+/*****************************I-SCP-MAY-PRE-0-19/12/2021*************/
+ALTER TABLE pre.tajuste_det DROP COLUMN tabla_origen;
+
+ALTER TABLE pre.tajuste_det
+  ADD COLUMN tabla_origen VARCHAR(300);
+
+COMMENT ON COLUMN pre.tajuste_det.tabla_origen
+IS 'descripcion tabla origen ID';
+/*****************************F-SCP-MAY-PRE-0-19/12/2021*************/

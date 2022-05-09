@@ -140,7 +140,7 @@ BEGIN
 			/*delete from pre.tpresupuesto_partida_entidad
             where id_presupuesto_partida_entidad=v_parametros.id_presupuesto_partida_entidad;*/
             update pre.tpresupuesto_partida_entidad  set
-            	t.estado_reg = 'inactivo'
+            	estado_reg = 'inactivo'
             where id_presupuesto_partida_entidad=v_parametros.id_presupuesto_partida_entidad;
 
             --Definicion de la respuesta

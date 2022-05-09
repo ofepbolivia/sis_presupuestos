@@ -64,7 +64,7 @@ BEGIN
                         array_to_string( conig.id_grupo_ots,'','',''null'')::varchar,
                         conig.filtro_ot,
                         conig.requiere_ot,
-                        array_to_string( conig.sw_autorizacion, '','',''null'')::varchar,
+                        array_to_string( conig.sw_autorizacion, '', '',''null'')::varchar,
                         conig.id_entidad,
                         conig.descripcion_larga,
                         conig.id_unidad_medida,
@@ -80,7 +80,15 @@ BEGIN
                         (case when''fondo_avance'' = ANY (conig.sw_autorizacion) then ''fondo_avance'' else ''X'' end)::varchar as fondo_avance,
                         (case when''pago_unico'' = ANY (conig.sw_autorizacion) then ''pago_unico'' else ''X'' end)::varchar as pago_unico,
                         (case when''contrato'' = ANY (conig.sw_autorizacion) then ''contrato'' else ''X'' end)::varchar as contrato,
-                        (case when''especial'' = ANY (conig.sw_autorizacion) then ''especial'' else ''X'' end)::varchar as especial
+                        (case when''especial'' = ANY (conig.sw_autorizacion) then ''especial'' else ''X'' end)::varchar as especial,
+
+                        (select array_to_string( array_agg(mmod.referencia||''-''|| mmod.tipo_contratacion), '', '' )
+                         from adq.tmatriz_modalidad mmod
+                         inner join adq.tmatriz_concepto mcon on mcon.id_matriz_modalidad = mmod.id_matriz_modalidad
+                         where mmod.estado_reg = ''activo''
+                         and mcon.estado_reg = ''activo''
+                         and mcon.id_concepto_ingas = conig.id_concepto_ingas)::VARCHAR as tipo_contrataciones
+
                         from param.tconcepto_ingas conig
 						inner join segu.tusuario usu1 on usu1.id_usuario = conig.id_usuario_reg
                         left join param.tunidad_medida um on um.id_unidad_medida = conig.id_unidad_medida

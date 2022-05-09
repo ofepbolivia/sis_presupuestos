@@ -71,6 +71,62 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             bottom_filter: true,
             form:true
         },
+
+        {
+            config:{
+                name:'id_concepto_ingas',
+                fieldLabel:'Concepto Ingreso Gasto',
+                allowBlank:false,
+                emptyText:'Concepto Ingreso Gasto...',
+                store: new Ext.data.JsonStore({
+                    url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngasMasPartida',
+                    id: 'id_concepto_ingas',
+                    root: 'datos',
+                    sortInfo:{
+                        field: 'desc_ingas',
+                        direction: 'ASC'
+                    },
+                    totalProperty: 'total',
+                    fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                    // turn on remote sorting
+                    remoteSort: true,
+                    baseParams:{par_filtro:'desc_ingas#par.codigo#par.nombre_partida',movimiento:'gasto' ,autorizacion_nulos: 'no'}
+                }),
+                valueField: 'id_concepto_ingas',
+                displayField: 'desc_ingas',
+                gdisplayField:'nombre_ingas',
+                tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><p>TIPO:{tipo}</p><p>MOVIMIENTO:{movimiento}</p> <p>PARTIDA:{desc_partida}</p></div></tpl>',
+                hiddenName: 'id_concepto_ingas',
+                forceSelection:true,
+                typeAhead: false,
+                triggerAction: 'all',
+                lazyRender:true,
+                mode:'remote',
+                pageSize:10,
+                queryDelay:1000,
+                listWidth:600,
+                resizable:true,
+                width: 350,
+                gwidth: 200,
+                renderer:function(value, p, record){return String.format('{0}', record.data['nombre_ingas']);}
+
+                /*renderer:function(value, p, record){if (record.data['nombre_ingas'] != null){
+                    return String.format('{0}', record.data['nombre_ingas']);
+                }else{
+                    return '';
+                }*/
+
+            },
+            type:'ComboBox',
+            id_grupo:0,
+            filters:{
+                pfiltro:'cig.movimiento#cig.desc_ingas',
+                type:'string'
+            },
+            grid:false,
+            form:true
+        },
+
 	   	{
    			config:{
    				sysorigen:'sis_presupuestos',
@@ -87,18 +143,39 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
    			type:'ComboRec',
    			id_grupo:0,
    			filters:{	
-		        pfiltro: 'par.codigo_partida#par.nombre_partida',
+		        pfiltro: 'par.codigo#par.nombre_partida',
 				type: 'string'
 			},   		   
    			grid:true,   			
-   			form:true
+   			form:true,
+            bottom_filter: true
 	   	},
+        {
+            config:{
+                name:'id_orden_trabajo',
+                fieldLabel: 'Orden Trabajo',
+                sysorigen:'sis_contabilidad',
+                origen:'OT',
+                allowBlank:false,
+                width: 350,
+                gwidth:200,
+                baseParams:{par_filtro:'desc_orden#motivo_orden'},
+                renderer:function(value, p, record){return String.format('{0}', record.data['desc_orden']);}
+
+            },
+            type:'ComboRec',
+            id_grupo:0,
+            filters:{pfiltro:'ot.motivo_orden#ot.desc_orden',type:'string'},
+            grid:true,
+            form:true,
+            bottom_filter: true
+        },
 		{
 			config:{
 				name: 'importe',
-				fieldLabel: 'importe',
+				fieldLabel: 'Importe',
 				allowBlank: false,
-				anchor: '70%',
+                width: 350,
 				gwidth: 100,
 				maxLength:1310722,
 				renderer:function (value,p,record){
@@ -123,17 +200,47 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
                 name: 'descripcion',
                 fieldLabel: 'Descripción',
                 allowBlank: true,
-                anchor: '80%',
+                width: 350,
                 gwidth: 200,
+                maxLength:10,
+                readOnly: false
+            },
+            type:'TextArea',
+            filters:{pfiltro:'ajd.descripcion',type:'string'},
+            //valorInicial: 'REGISTRO AUTOMATICO POR PRESUPUESTO',
+            id_grupo:1,
+            grid:true,
+            form:true
+        },
+
+        {
+            config:{
+                name: 'id_sol_origen',
+                fieldLabel: 'ID. Origen',
+                allowBlank: true,
+                gwidth: 70,
                 maxLength:10
             },
             type:'TextField',
-            filters:{pfiltro:'ajd.descripcion',type:'string'},
+            filters:{pfiltro:'ajd.id_sol_origen',type:'string'},
             id_grupo:1,
             grid:true,
             form:false
         },
-        {
+        /*{
+            config:{
+                name: 'desc_orden',
+                fieldLabel: 'Orden Trabajo',
+                allowBlank: true,
+                anchor: '80%',
+                gwidth: 200                
+            },
+            type:'TextField',            
+            id_grupo:1,
+            grid:true,
+            form:false
+        },*/
+        /*{
             config:{
                 name:'id_concepto_ingas',
                 fieldLabel:'Concepto Ingreso Gasto',
@@ -184,7 +291,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             },
             grid:true,
             form:false
-        },        
+        },	*/
 		{
 			config:{
 				name: 'estado_reg',
@@ -299,16 +406,23 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		{name:'fecha_mod', type: 'date',dateFormat:'Y-m-d H:i:s.u'},
 		{name:'id_usuario_mod', type: 'numeric'},
 		{name:'usr_reg', type: 'string'},
-		{name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion','id_concepto_ingas','nombre_ingas'
-		
+        {name:'usr_mod', type: 'string'},'desc_presupuesto','desc_partida','tipo_reg','descripcion',
+        {name:'id_concepto_ingas', type: 'numeric'},
+        {name:'nombre_ingas', type: 'string'},
+        'id_orden_trabajo','desc_orden',
+        {name:'id_sol_origen', type: 'string'},
+        'estado_ajuste'
 	],
 	sortInfo:{
 		field: 'id_ajuste_det',
 		direction: 'ASC'
 	},
+    arrayDefaultColumHidden: ['id_sol_origen'],
 	preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
+
+
 		if (rec.data.tipo_reg == 'summary'){
 			if( this.getBoton('edit') ){
 				this.getBoton('edit').disable();
@@ -325,6 +439,14 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		else{
 		   Phx.vista.AjusteDet.superclass.preparaMenu.call(this);
 		}
+
+        //04-01-2022 para que botones no esten activos cuando se apruebe el ajuste
+        if (rec.data.estado_ajuste == 'aprobado'){
+            this.getBoton('edit').disable();
+            this.getBoton('del').disable();
+            this.getBoton('new').disable();
+            this.getBoton('save').disable();
+        }
    },
 	
     liberaMenu: function() {
@@ -337,7 +459,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 
         this.Cmp.id_presupuesto.on('select', function (c, r, i) {
              this.Cmp.id_partida.reset();
-            if(this.maestro.tipo_ajuste == 'inc_comprometido' || this.maestro.tipo_ajuste == 'rev_comprometido'){
+            if(this.maestro.tipo_ajuste == 'inc_comprometido' || this.maestro.tipo_ajuste == ''){
 			    
 			    this.Cmp.id_partida.store.baseParams.id_presupuesto_ajuste = this.Cmp.id_presupuesto.getValue();
 			    delete this.Cmp.id_partida.store.baseParams.id_presupuesto;
@@ -348,14 +470,66 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				delete this.Cmp.id_partida.store.baseParams.id_presupuesto_ajuste;
 			}
 			this.Cmp.id_partida.modificado = true;
-           
+
+			//17-06-2021 (may) filtros
+
+            if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
+
+
+                    this.Cmp.id_concepto_ingas.reset();
+
+                    this.Cmp.id_orden_trabajo.reset();
+                    this.Cmp.id_orden_trabajo.store.baseParams.id_centro_costo = this.Cmp.id_presupuesto.getValue();
+                    this.Cmp.id_orden_trabajo.modificado = true;
+
+                    this.Cmp.id_concepto_ingas.on('change',function( cmb, rec, ind){
+                        this.Cmp.id_orden_trabajo.reset();
+                    },this);
+
+                    this.Cmp.id_concepto_ingas.on('select',function( cmb, rec, ind){
+                        console.log('llegainieventos1 ', this.Cmp.id_orden_trabajo.store.baseParams)
+                        console.log('llegainieventos2 ', rec)
+                        this.Cmp.id_orden_trabajo.store.baseParams = Ext.apply(this.Cmp.id_orden_trabajo.store.baseParams, {
+                            filtro_ot:rec.data.filtro_ot,
+                            requiere_ot:rec.data.requiere_ot,
+                            id_grupo_ots:rec.data.id_grupo_ots
+                        });
+
+                        this.Cmp.id_orden_trabajo.modificado = true;
+                        this.Cmp.id_orden_trabajo.enable();
+
+                        //this.Cmp.id_orden_trabajo.reset();
+
+                    },this);
+
+
+            }
+
         }, this);
+
+
+
     },
     onButtonEdit : function () {
         var selected = this.sm.getSelected().data;
         Phx.vista.AjusteDet.superclass.onButtonEdit.call(this);
         this.Cmp.id_presupuesto.disable();
         this.Cmp.id_partida.disable();
+
+        //14-06-2021 (may)
+        if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
+            this.mostrarComponente(this.Cmp.id_concepto_ingas);
+            this.Cmp.id_concepto_ingas.disable();
+            this.Cmp.id_concepto_ingas.allowBlank = true;
+            this.mostrarComponente(this.Cmp.id_orden_trabajo);
+            this.Cmp.id_orden_trabajo.disable();
+            this.ocultarComponente(this.Cmp.id_partida);
+            this.ocultarComponente(this.Cmp.descripcion);
+            this.Cmp.descripcion.setValue('REGISTRO AUTOMATICO POR PRESUPUESTO');            t
+        }else{
+            this.ocultarComponente(this.Cmp.id_concepto_ingas);
+            this.ocultarComponente(this.Cmp.id_orden_trabajo);
+        }
        
     },
      onButtonNew : function () {
@@ -363,6 +537,20 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         Phx.vista.AjusteDet.superclass.onButtonNew.call(this);
         this.Cmp.id_presupuesto.enable();
         this.Cmp.id_partida.enable();
+
+         //14-06-2021 (may)
+         if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
+             this.mostrarComponente(this.Cmp.id_concepto_ingas);
+             this.Cmp.id_concepto_ingas.allowBlank = false;
+             this.mostrarComponente(this.Cmp.id_orden_trabajo);
+             this.ocultarComponente(this.Cmp.id_partida);
+             this.ocultarComponente(this.Cmp.descripcion);
+             this.Cmp.descripcion.setValue('REGISTRO AUTOMATICO POR PRESUPUESTO');
+         }else{
+             this.ocultarComponente(this.Cmp.id_concepto_ingas);
+             this.ocultarComponente(this.Cmp.id_orden_trabajo);
+             this.mostrarComponente(this.Cmp.id_partida);
+         }
        
     },
 	

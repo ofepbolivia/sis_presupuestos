@@ -89,12 +89,18 @@ Phx.vista.AjusteVb = {
           	if (data['tipo_ajuste'] == 'decremento' || data['tipo_ajuste'] == 'rev_comprometido'){ 
           	  this.disableTabIncrementos();
             }
-            else{
-            	this.enableAllTab();
+            //16-06-2021 (may)
+            else {
+                if (data['tipo_ajuste'] == 'ajuste_comprometido'){
+                    this.disableTabAjuste();
+                }
+                else{
+                    this.enableAllTab();
+                }
             }
           }
           
-          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido'){
+          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'ajuste_comprometido'){
           	 this.getBoton('chkpresupuesto').enable();
           } 
           else{

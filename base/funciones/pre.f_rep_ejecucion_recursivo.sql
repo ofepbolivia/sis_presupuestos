@@ -1,6 +1,7 @@
 --------------- SQL ---------------
 
 CREATE OR REPLACE FUNCTION pre.f_rep_ejecucion_recursivo (
+  p_id_temp integer,
   p_id_partida_padre integer,
   p_codigo_partida_padre varchar,
   p_nombre_partida_padre varchar,
@@ -50,7 +51,7 @@ BEGIN
 
 
           v_nombre_funcion = 'pre.f_rep_ejecucion_recursivo';
-          
+
           ps_importe_total = 0;
           ps_importe_aprobado_total = 0;
           ps_formulado_total = 0;
@@ -58,12 +59,12 @@ BEGIN
           ps_ejecutado_total = 0;
           ps_pagado_total = 0;
           ps_ajustado_total = 0;
-         
-          
-          -- iniciamos miembros es cero 
-          
+
+
+          -- iniciamos miembros es cero
+
           FOR v_registros in (
-           			          SELECT 
+           			          SELECT
                                    par.id_partida,
                                    par.codigo as codigo_partida,
                                    par.id_partida_fk,
@@ -72,11 +73,11 @@ BEGIN
                                    par.nivel_partida
                               FROM pre.tpartida par
                               WHERE par.id_partida_fk = p_id_partida_padre )LOOP
-                       
-                       
+
+
                        -- si es partida de movimiento
                        IF v_registros.sw_transaccional = 'movimiento' THEN
-                       
+
                              v_importe = 0;
                              v_importe_aprobado = 0;
                              v_formulado = 0;
@@ -84,9 +85,9 @@ BEGIN
                              v_ejecutado = 0;
                              v_pagado = 0;
                              v_ajustado = 0;
-                       
+
                             -- calculamos ejecucion para partida de movimiento
-                            SELECT 
+                            SELECT
                                       prpa.id_partida,
                                       sum(COALESCE(prpa.importe, 0::numeric)) AS importe,
                                       sum(prpa.importe_aprobado) as importe_aprobado,
@@ -94,37 +95,37 @@ BEGIN
                                       sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'comprometido',p_fecha_ini,p_fecha_fin)) AS comprometido,
                                       sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida,'ejecutado',p_fecha_ini,p_fecha_fin)) AS ejecutado,
                                       sum(pre.f_get_estado_presupuesto_mb_x_fechas(prpa.id_presupuesto, prpa.id_partida, 'pagado',p_fecha_ini,p_fecha_fin)) AS pagado
-                                                      
+
                             into
                                v_reg_mov
                             FROM pre.tpresup_partida prpa
-                            WHERE  
+                            WHERE
                                  prpa.id_partida = v_registros.id_partida
-                                 and (CASE WHEN p_id_presupuesto[1] != 0 THEN 
+                                 and (CASE WHEN p_id_presupuesto[1] != 0 THEN
                                         prpa.id_presupuesto = ANY(p_id_presupuesto)
-                                 	  when p_id_presupuesto is null then 
-                                      	prpa.id_presupuesto is null                                         
+                                 	  when p_id_presupuesto is null then
+                                      	prpa.id_presupuesto is null
                                       ELSE
                                         0 = 0
                                       END)
                              GROUP BY prpa.id_partida;
-                              
+
                              v_importe = COALESCE(v_reg_mov.importe,0);
                              v_importe_aprobado = COALESCE(v_reg_mov.importe_aprobado,0);
                              v_formulado = COALESCE(v_reg_mov.formulado,0);
                              v_comprometido = COALESCE(v_reg_mov.comprometido,0);
                              v_ejecutado = COALESCE(v_reg_mov.ejecutado,0);
                              v_pagado = COALESCE(v_reg_mov.pagado,0);
-                             
+
                              v_ajustado =  COALESCE(v_formulado,0)  - COALESCE(v_importe_aprobado,0);
-                             
+
                              IF  v_importe_aprobado != 0 THEN
                                v_porc_ejecucion = round((v_reg_mov.ejecutado/v_importe_aprobado)*100,2);
                              ELSE
                                v_porc_ejecucion = 0;
                              END IF;
-                         
-                             --  insertamos partida 
+
+                             --  insertamos partida
                           IF  v_importe != 0  or
                               v_importe_aprobado != 0  or
                               v_formulado != 0  or
@@ -132,8 +133,9 @@ BEGIN
                               v_ejecutado != 0  or
                               v_pagado != 0  or
                               v_ajustado != 0  THEN
-                             
+
                              INSERT into temp_prog (
+                                      id_temp,
                                       id_partida,
                                       codigo_partida,
                                       nombre_partida,
@@ -149,6 +151,7 @@ BEGIN
                                       ajustado ,
                                       porc_ejecucion)
                                 values (
+                                      p_id_temp,
                                       v_registros.id_partida,
                                       v_registros.codigo_partida,
                                       v_registros.nombre_partida,
@@ -163,10 +166,10 @@ BEGIN
                                       v_pagado,
                                       v_ajustado ,
                                       v_porc_ejecucion);
-                          
+
                            END IF;
                            -- sumamos miembros
-                           
+
                             ps_importe_total = ps_importe_total + v_importe;
                             ps_importe_aprobado_total = ps_importe_aprobado_total + v_importe_aprobado;
                             ps_formulado_total = ps_formulado_total + v_formulado;
@@ -174,12 +177,12 @@ BEGIN
                             ps_ejecutado_total = ps_ejecutado_total + v_ejecutado;
                             ps_pagado_total = ps_pagado_total + v_pagado;
                             ps_ajustado_total = ps_ajustado_total + v_ajustado;
-                           
-                       
+
+
                        ELSE
-                       
+
                           --llamada recursiva
-                          SELECT  
+                          SELECT
                                   rec.ps_importe_total,
                                   rec.ps_importe_aprobado_total,
                                   rec.ps_formulado_total,
@@ -187,20 +190,21 @@ BEGIN
                                   rec.ps_ejecutado_total,
                                   rec.ps_pagado_total,
                                   rec.ps_ajustado_total
-                              INTO  
-                                 v_reg_resp 
+                              INTO
+                                 v_reg_resp
                            FROM  pre.f_rep_ejecucion_recursivo(
-                                                               v_registros.id_partida, 
-                                                               v_registros.codigo_partida, 
-                                                               v_registros.nombre_partida, 
-                                                               p_id_presupuesto, 
-                                                               p_fecha_ini, 
-                                                               p_fecha_fin, 
-                                                               v_registros.sw_transaccional, 
+                                                               p_id_temp,
+                                                               v_registros.id_partida,
+                                                               v_registros.codigo_partida,
+                                                               v_registros.nombre_partida,
+                                                               p_id_presupuesto,
+                                                               p_fecha_ini,
+                                                               p_fecha_fin,
+                                                               v_registros.sw_transaccional,
                                                                v_registros.nivel_partida) rec;
-                                                             
-                       
-                       
+
+
+
                         -- sumamos miembros
                          ps_importe_total = ps_importe_total + v_reg_resp.ps_importe_total;
                          ps_importe_aprobado_total = ps_importe_aprobado_total + v_reg_resp.ps_importe_aprobado_total;
@@ -209,18 +213,18 @@ BEGIN
                          ps_ejecutado_total = ps_ejecutado_total + v_reg_resp.ps_ejecutado_total;
                          ps_pagado_total = ps_pagado_total + v_reg_resp.ps_pagado_total;
                          ps_ajustado_total = ps_ajustado_total + v_reg_resp.ps_ajustado_total;
-                       
+
                        END IF;
-                       
+
           END LOOP;
-          
+
           -- insertamos datos para el padre (con la suma de miembros)
           IF  ps_importe_aprobado_total != 0 THEN
            v_porc_ejecucion = round((ps_ejecutado_total/ps_importe_aprobado_total)*100,2);
           ELSE
            v_porc_ejecucion = 0;
-          END IF;          
-          
+          END IF;
+
           IF  ps_importe_total != 0  or
               ps_importe_aprobado_total != 0  or
               ps_formulado_total != 0  or
@@ -228,8 +232,9 @@ BEGIN
               ps_ejecutado_total != 0  or
               ps_pagado_total != 0  or
               ps_ajustado_total != 0  THEN
-              
+
           INSERT into temp_prog (
+                        id_temp,
                         id_partida,
                         codigo_partida,
                         nombre_partida,
@@ -244,6 +249,7 @@ BEGIN
                         ajustado ,
                         porc_ejecucion)
                   values (
+                        p_id_temp,
                         p_id_partida_padre,
                         p_codigo_partida_padre,
                         p_nombre_partida_padre,
@@ -257,18 +263,18 @@ BEGIN
                         ps_pagado_total,
                         ps_ajustado_total ,
                         v_porc_ejecucion);
-          
+
          END IF;
 
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
 		raise exception '%',v_resp;
-				        
+
 END;
 $body$
 LANGUAGE 'plpgsql'

@@ -33,7 +33,12 @@ DECLARE
     --breydi.vasquez 10-11-2019
     v_consul						 varchar;
     v_desde							 varchar;
-    v_hasta							 varchar;    
+    v_hasta							 varchar;
+
+    --17-12-2021(may)
+    v_sql_tabla_todo		varchar;
+    v_reg_op				record;
+    v_reg_cd				record;
 
 BEGIN
 
@@ -164,9 +169,8 @@ BEGIN
 
             raise notice '-> ges :%',v_id_gestion;
 
-
-    		--Sentencia de la consulta
-			v_consulta:='select
+			--15-06-2021 (may) funcion se pone muy lenta
+            /*v_consulta:='select
                              DISTINCT ON (pe.nro_tramite)
                              pr.id_gestion,
                              pe.nro_tramite,
@@ -180,10 +184,143 @@ BEGIN
                           inner join param.tperiodo pr on pe.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
                           inner join param.tmoneda mon on mon.id_moneda = pe.id_moneda
                           where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
-                          and  pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
+                          and  pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';*/
+
+
+    		--Sentencia de la consulta
+			/*v_consulta:='select
+                             pr.id_gestion,
+                             pe.nro_tramite,
+                             pm.codigo,
+                             pe.id_moneda,
+                             mon.codigo as desc_moneda
+                          from pre.tpartida_ejecucion pe
+                          inner join tes.tobligacion_pago pag on pag.num_tramite = pe.nro_tramite
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on pe.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = pe.id_moneda
+                          where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
+                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
+            v_consulta:=v_consulta||' group by pr.id_gestion,
+                                              pe.nro_tramite,
+                                              pm.codigo,
+                                              pe.id_moneda,
+                                              mon.codigo ';*/
+
+            /*v_consulta:='select
+                              pr.id_gestion,
+                              pag.num_tramite,
+                              pm.codigo,
+                              pag.id_moneda,
+                              mon.codigo as desc_moneda
+                          from  tes.tobligacion_pago pag
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
+                          where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
+                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
+
+			--Definicion de la respuesta
+			v_consulta:=v_consulta||v_parametros.filtro;
+
+            v_consulta:=v_consulta||' group by pr.id_gestion,
+                                              pag.num_tramite,
+                                              pm.codigo,
+                                              pag.id_moneda,
+                                              mon.codigo';
+             */
+
+            --(may)modificacion listado se aumenta para FA
+            v_sql_tabla_todo = 'CREATE TEMPORARY TABLE temp_list
+                                            (	id_gestion INTEGER,
+                                                nro_tramite VARCHAR,
+                                                codigo VARCHAR,
+                                                id_moneda INTEGER,
+                                                desc_moneda VARCHAR
+                                            ) ON COMMIT DROP';
+            EXECUTE(v_sql_tabla_todo);
+
+
+
+            FOR v_reg_op in ( (select pr.id_gestion,
+                                    pag.num_tramite,
+                                    pm.codigo,
+                                    pag.id_moneda,
+                                    mon.codigo as desc_moneda
+                          from  tes.tobligacion_pago pag
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
+                          where pm.codigo in ('CINTPD','CNAPD','CINTBR','PCE','PCP','PD','PGA','PPM','TES-PD','PU')
+                          and pr.id_gestion = v_id_gestion
+                          group by pr.id_gestion,
+                                    pag.num_tramite,
+                                    pm.codigo,
+                                    pag.id_moneda,
+                                    mon.codigo)
+
+                        union
+
+                          (select
+                              pr.id_gestion,
+                              cdoc.nro_tramite as num_tramite,
+                              pm.codigo,
+                              cdoc.id_moneda,
+                              mon.codigo as desc_moneda
+                          from  cd.tcuenta_doc cdoc
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = cdoc.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on cdoc.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = cdoc.id_moneda
+                          where pm.codigo in ('FA')
+                          and pr.id_gestion = v_id_gestion
+                          group by pr.id_gestion,
+                                    cdoc.nro_tramite,
+                                    pm.codigo,
+                                    cdoc.id_moneda,
+                                    mon.codigo)
+            			)LOOP
+
+
+
+                        insert into temp_list (id_gestion,
+                                               nro_tramite,
+                                              codigo,
+                                              id_moneda,
+                                              desc_moneda
+
+                                              ) values (
+
+                                              v_reg_op.id_gestion,
+                                              v_reg_op.num_tramite,
+                                              v_reg_op.codigo,
+                                              v_reg_op.id_moneda,
+                                              v_reg_op.desc_moneda
+                                              );
+
+            END LOOP;
+
+            v_consulta:='select
+                              tlist.id_gestion,
+                              tlist.nro_tramite,
+                              tlist.codigo,
+                              tlist.id_moneda,
+                              tlist.desc_moneda
+                          from  temp_list tlist
+                          where ';
+
+            v_consulta:=v_consulta||v_parametros.filtro;
+
 			v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
 
 			raise notice 'La consulta es:  %', v_consulta;
@@ -222,16 +359,104 @@ BEGIN
 
 
 			--Sentencia de la consulta de conteo de registros
-			v_consulta:='select
+			/*v_consulta:='select
                              count( DISTINCT pe.nro_tramite)
-					    from pre.tpartida_ejecucion pe
-                          inner join wf.tproceso_wf pwf on pwf.nro_tramite = pe.nro_tramite
+					     from pre.tpartida_ejecucion pe
+                          inner join tes.tobligacion_pago pag on pag.num_tramite = pe.nro_tramite
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
                           inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
                           inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
                           inner join param.tperiodo pr on pe.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
                           inner join param.tmoneda mon on mon.id_moneda = pe.id_moneda
-                        where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
-                          and  pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';
+                          where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
+                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';*/
+
+            /*v_consulta:='select
+                             count( DISTINCT pag.num_tramite)
+                          from  tes.tobligacion_pago pag
+                          inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                          inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                          inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                          inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                          inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
+                          where pm.codigo in ('||COALESCE(v_pre_codigo_proc_macajsutable,'''TEST''') ||')
+                          and pr.id_gestion = '||v_id_gestion::Varchar|| ' and ';*/
+
+                      v_sql_tabla_todo = 'CREATE TEMPORARY TABLE temp_list
+                                            (	id_gestion INTEGER,
+                                                nro_tramite VARCHAR,
+                                                codigo VARCHAR,
+                                                id_moneda INTEGER,
+                                                desc_moneda VARCHAR
+                                            ) ON COMMIT DROP';
+                      EXECUTE(v_sql_tabla_todo);
+
+
+
+                      FOR v_reg_op in ( (select pr.id_gestion,
+                                              pag.num_tramite,
+                                              pm.codigo,
+                                              pag.id_moneda,
+                                              mon.codigo as desc_moneda
+                                    from  tes.tobligacion_pago pag
+                                    inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = pag.id_proceso_wf
+                                    inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                                    inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                                    inner join param.tperiodo pr on pag.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                                    inner join param.tmoneda mon on mon.id_moneda = pag.id_moneda
+                                    where pm.codigo in ('CINTPD','CNAPD','CINTBR','PCE','PCP','PD','PGA','PPM','TES-PD','PU')
+                                    and pr.id_gestion = v_id_gestion
+                                    group by pr.id_gestion,
+                                              pag.num_tramite,
+                                              pm.codigo,
+                                              pag.id_moneda,
+                                              mon.codigo)
+
+                                  union
+
+                                    (select
+                                        pr.id_gestion,
+                                        cdoc.nro_tramite as num_tramite,
+                                        pm.codigo,
+                                        cdoc.id_moneda,
+                                        mon.codigo as desc_moneda
+                                    from  cd.tcuenta_doc cdoc
+                                    inner join wf.tproceso_wf pwf on pwf.id_proceso_wf = cdoc.id_proceso_wf
+                                    inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
+                                    inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
+                                    inner join param.tperiodo pr on cdoc.fecha BETWEEN pr.fecha_ini and pr.fecha_fin
+                                    inner join param.tmoneda mon on mon.id_moneda = cdoc.id_moneda
+                                    where pm.codigo in ('FA')
+                                    and pr.id_gestion = v_id_gestion
+                                    group by pr.id_gestion,
+                                              cdoc.nro_tramite,
+                                              pm.codigo,
+                                              cdoc.id_moneda,
+                                              mon.codigo)
+                                  )LOOP
+
+
+
+                                  insert into temp_list (id_gestion,
+                                                         nro_tramite,
+                                                        codigo,
+                                                        id_moneda,
+                                                        desc_moneda
+
+                                                        ) values (
+
+                                                        v_reg_op.id_gestion,
+                                                        v_reg_op.num_tramite,
+                                                        v_reg_op.codigo,
+                                                        v_reg_op.id_moneda,
+                                                        v_reg_op.desc_moneda
+                                                        );
+
+                      END LOOP;
+
+                         v_consulta:='select count( tlist.nro_tramite)
+                          from  temp_list tlist
+                          where ';
 
 			--Definicion de la respuesta
 			v_consulta:=v_consulta||v_parametros.filtro;
@@ -253,15 +478,15 @@ BEGIN
             begin
             if v_parametros.desde is null then
             	v_desde = 'null::date';
-            else 
+            else
             	v_desde = ''''||v_parametros.desde||'''::date';
             end if;
-            
-            if v_parametros.hasta is null then 
+
+            if v_parametros.hasta is null then
 	            v_hasta = 'null::date';
-            else 
+            else
                 v_hasta = ''''||v_parametros.hasta||'''::date';
-            end if;    
+            end if;
 
             	create temp table cosolidado_partida_ejecucion(
                   moneda 			 varchar,
@@ -275,17 +500,21 @@ BEGIN
                   id_partida		 integer,
                   id_moneda			 integer,
                   comprometido		 numeric,
+                  comprometido_mb	 numeric,
                   ejecutado			 numeric,
+                  ejecutado_mb		 numeric,
                   pagado			 numeric,
+                  pagado_mb			 numeric,
                   saldo              numeric,
+                  saldo_mb            numeric,
                   desde				 date,
                   hasta				 date
-                )on commit drop; 
-                                  
+                )on commit drop;
+
                 v_consul:= 'with recursive detalle (id_int_comprobante, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
-										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado)
-                                                      as 
-                (select 
+										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado, c_mb, e_mb, p_mb)
+                                                      as
+                (select
                   pareje.id_int_comprobante,
                   mon.moneda,
                   pareje.id_moneda,
@@ -299,19 +528,34 @@ BEGIN
                   pareje.nro_tramite,
                   case when pareje.tipo_movimiento = ''comprometido'' then
                           pareje.monto
-                       else 
+                       else
                            0.00
                        end,
                   case when pareje.tipo_movimiento = ''ejecutado'' then
                           pareje.monto
-                      else 
+                      else
                           0.00
                       end,
                   case when pareje.tipo_movimiento = ''pagado'' then
                           pareje.monto
                       else
                           0.00
-                      end      
+                      end,
+                  case when pareje.tipo_movimiento = ''comprometido'' then
+                          pareje.monto_mb
+                       else
+                           0.00
+                       end,
+                  case when pareje.tipo_movimiento = ''ejecutado'' then
+                          pareje.monto_mb
+                      else
+                          0.00
+                      end,
+                  case when pareje.tipo_movimiento = ''pagado'' then
+                          pareje.monto_mb
+                      else
+                          0.00
+                      end                      
                   from pre.tpartida_ejecucion pareje
                   inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
                   INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
@@ -320,7 +564,7 @@ BEGIN
                   inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
                   inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
                   left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
-                  where ' || v_parametros.filtro || '                                                       
+                  where ' || v_parametros.filtro || '
                   )
 	            insert into cosolidado_partida_ejecucion
                 select
@@ -335,13 +579,17 @@ BEGIN
                   de.id_partida,
                   de.id_moneda,
                   sum(de.comprometido) as comprometido,
+                  sum(c_mb) as comprometido_mb,
                   sum(de.ejecutado) as ejecutado,
+                  sum(e_mb) as ejecutado_mb,
                   sum(de.pagado)	as pagado,
+                  sum(p_mb) as pagado_mb,
                   (sum(de.comprometido) - sum(de.ejecutado)) as saldo,
+                  (sum(c_mb) - sum(e_mb)) as saldo_mb,
                   '||v_desde||',
                   '||v_hasta||'
                 from detalle de
-                group by 
+                group by
                     de.nro_tramite,
                     de.moneda,
                     de.descripcion,
@@ -354,15 +602,15 @@ BEGIN
                     de.id_partida,
                     de.id_moneda';
 
-                execute (v_consul); 
-                   
+                execute (v_consul);
+
                 v_consulta:= ' select * from cosolidado_partida_ejecucion ';
 				v_consulta:= v_consulta ||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion;
-                v_consulta:= v_consulta || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;                
-				
+                v_consulta:= v_consulta || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
+
                 --Devuelve la respuesta
                 return v_consulta;
-                
+
         end;
 
 	/*********************************
@@ -373,7 +621,7 @@ BEGIN
 	***********************************/
 
 	elsif(p_transaccion='PRE_DETPAREJE_CONT')then
-    	begin 
+    	begin
 
           	create temp table cosolidado_partida_ejecucion(
                   moneda 			 varchar,
@@ -389,12 +637,12 @@ BEGIN
                   comprometido		 numeric,
                   ejecutado			 numeric,
                   pagado			 numeric,
-                  saldo              numeric  
-                )on commit drop;                    
+                  saldo              numeric
+                )on commit drop;
                 v_consul:= 'with recursive detalle (id_int_comprobante, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
 										              id_partida, codigo, nombre_partida, nro_tramite, comprometido, ejecutado, pagado)
-                                                      as 
-                (select 
+                                                      as
+                (select
                   pareje.id_int_comprobante,
                   mon.moneda,
                   pareje.id_moneda,
@@ -408,19 +656,19 @@ BEGIN
                   pareje.nro_tramite,
                   case when pareje.tipo_movimiento = ''comprometido'' then
                           pareje.monto
-                       else 
+                       else
                            0.00
                        end,
                   case when pareje.tipo_movimiento = ''ejecutado'' then
                           pareje.monto
-                      else 
+                      else
                           0.00
                       end,
                   case when pareje.tipo_movimiento = ''pagado'' then
                           pareje.monto
                       else
                           0.00
-                      end      
+                      end
                   from pre.tpartida_ejecucion pareje
                   inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
                   INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
@@ -429,7 +677,7 @@ BEGIN
                   inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
                   inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
                   left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
-                  where ' || v_parametros.filtro|| '                                                       
+                  where ' || v_parametros.filtro|| '
                   )
 	            insert into cosolidado_partida_ejecucion
                 select
@@ -448,7 +696,7 @@ BEGIN
                   sum(pagado)	as pagado,
                   (sum(comprometido) - sum(ejecutado)) as saldo
                 from detalle
-                group by 
+                group by
                     nro_tramite,
                     moneda,
                     descripcion,
@@ -460,8 +708,8 @@ BEGIN
                     id_presupuesto,
                     id_partida,
                     id_moneda';
-                execute (v_consul);        
-                v_consulta:= ' select count(nro_tramite) from cosolidado_partida_ejecucion ';        
+                execute (v_consul);
+                v_consulta:= ' select count(nro_tramite) from cosolidado_partida_ejecucion ';
                 return v_consulta;
         end;
 
@@ -484,7 +732,7 @@ BEGIN
                                 case when pareje.tipo_movimiento = ''ejecutado'' then
                                       pareje.monto_mb
                                 else 0.00 end,
-                                case when pareje.tipo_movimiento = ''pagado'' then 
+                                case when pareje.tipo_movimiento = ''pagado'' then
                                       pareje.monto_mb
                                 else 0.00 end
                                 from pre.tpartida_ejecucion pareje
@@ -511,7 +759,7 @@ BEGIN
 
   /*********************************
   #TRANSACCION:  'TES_DENTRAM_SEL'
-  #DESCRIPCION:	Listado detalle N° tramite 
+  #DESCRIPCION:	Listado detalle N° tramite
   #AUTOR:	breydi.vasquez
   #FECHA: 10-11-2019
   ***********************************/
@@ -523,17 +771,17 @@ BEGIN
 
             CREATE TEMPORARY TABLE ttemp_eval_det (
               id_partida_ejecucion	integer,
-              id_partida_ejecucion_fk   integer,                                                                                   
+              id_partida_ejecucion_fk   integer,
               moneda					varchar,
               comprometido				numeric,
               ejecutado					numeric,
               pagado					numeric,
               nro_tramite				varchar,
               tipo_movimiento			varchar,
-              nombre_partida			varchar, 
-              codigo					varchar, 
-              codigo_categoria			varchar, 
-              fecha						date, 
+              nombre_partida			varchar,
+              codigo					varchar,
+              codigo_categoria			varchar,
+              fecha						date,
               codigo_cc              	varchar,
               usr_reg					varchar,
               usr_mod 					varchar,
@@ -545,8 +793,8 @@ BEGIN
 		 v_consul:= 'with recursive detalle (id_partida_ejecucion, id_partida_ejecucion_fk, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
 										              id_partida, codigo, nombre_partida, nro_tramite, tipo_movimiento, fecha,
                                                       usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg, comprometido, ejecutado, pagado)
-                                                      as 
-                (select 
+                                                      as
+                (select
 				  pareje.id_partida_ejecucion,
                   pareje.id_partida_ejecucion_fk,
                   mon.moneda,
@@ -565,22 +813,22 @@ BEGIN
                   usu2.cuenta,
                   pareje.fecha_reg,
                   pareje.fecha_mod,
-                  pareje.estado_reg,                  
+                  pareje.estado_reg,
                   case when pareje.tipo_movimiento = ''comprometido'' then
                           pareje.monto
-                       else 
+                       else
                            0.00
                        end,
                   case when pareje.tipo_movimiento = ''ejecutado'' then
                           pareje.monto
-                      else 
+                      else
                           0.00
                       end,
                   case when pareje.tipo_movimiento = ''pagado'' then
                           pareje.monto
                       else
                           0.00
-                      end      
+                      end
                   from pre.tpartida_ejecucion pareje
                   inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
                   INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
@@ -589,11 +837,11 @@ BEGIN
                   inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
                   inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
                   left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
-                  where ' || v_parametros.filtro|| '                                                       
+                  where ' || v_parametros.filtro|| '
                   )
-                  
+
                 insert into ttemp_eval_det
-                
+
                 select
 	              id_partida_ejecucion,
                   id_partida_ejecucion_fk,
@@ -614,17 +862,17 @@ BEGIN
                   fecha_mod,
                   estado_reg
                 from detalle ';
-                
+
             execute(v_consul);
-              
-          v_consulta:='select * from ttemp_eval_det 
+
+          v_consulta:='select * from ttemp_eval_det
           		where tipo_movimiento = '''||v_parametros.estado_func||''' ';
-                
+
 		  v_consulta:=v_consulta||' order by ' ||v_parametros.ordenacion|| ' ' || v_parametros.dir_ordenacion || ' limit ' || v_parametros.cantidad || ' offset ' || v_parametros.puntero;
           --Devuelve la respuesta
           return v_consulta;
       end;
-      
+
 	/*********************************
  	#TRANSACCION:  'TES_DENTRAM_CONT'
  	#DESCRIPCION:	Conteo de registros
@@ -639,17 +887,17 @@ BEGIN
 
             CREATE TEMPORARY TABLE ttemp_eval_det (
               id_partida_ejecucion		integer,
-              id_partida_ejecucion_fk   integer,                                                                                   
+              id_partida_ejecucion_fk   integer,
               moneda					varchar,
               comprometido				numeric,
               ejecutado					numeric,
               pagado					numeric,
               nro_tramite				varchar,
               tipo_movimiento			varchar,
-              nombre_partida			varchar, 
-              codigo					varchar, 
-              codigo_categoria			varchar, 
-              fecha						date, 
+              nombre_partida			varchar,
+              codigo					varchar,
+              codigo_categoria			varchar,
+              fecha						date,
               codigo_cc              	varchar,
               usr_reg					varchar,
               usr_mod 					varchar,
@@ -661,8 +909,8 @@ BEGIN
 		 v_consul:= 'with recursive detalle (id_partida_ejecucion, id_partida_ejecucion_fk, moneda, id_moneda, id_presupuesto, descripcion, codigo_cc, codigo_categoria,
 										              id_partida, codigo, nombre_partida, nro_tramite, tipo_movimiento, fecha,
                                                       usr_reg, usr_mod, fecha_reg, fecha_mod, estado_reg, comprometido, ejecutado, pagado)
-                                                      as 
-                (select 
+                                                      as
+                (select
 				  pareje.id_partida_ejecucion,
                   pareje.id_partida_ejecucion_fk,
                   mon.moneda,
@@ -681,22 +929,22 @@ BEGIN
                   usu2.cuenta,
                   pareje.fecha_reg,
                   pareje.fecha_mod,
-                  pareje.estado_reg,                  
+                  pareje.estado_reg,
                   case when pareje.tipo_movimiento = ''comprometido'' then
                           pareje.monto
-                       else 
+                       else
                            0.00
                        end,
                   case when pareje.tipo_movimiento = ''ejecutado'' then
                           pareje.monto
-                      else 
+                      else
                           0.00
                       end,
                   case when pareje.tipo_movimiento = ''pagado'' then
                           pareje.monto
                       else
                           0.00
-                      end      
+                      end
                   from pre.tpartida_ejecucion pareje
                   inner join pre.tpresupuesto pre on pre.id_presupuesto = pareje.id_presupuesto
                   INNER JOIN pre.vpresupuesto vpre ON vpre.id_presupuesto = pre.id_presupuesto
@@ -705,11 +953,11 @@ BEGIN
                   inner join param.tmoneda mon on mon.id_moneda = pareje.id_moneda
                   inner join segu.tusuario usu1 on usu1.id_usuario = pareje.id_usuario_reg
                   left join segu.tusuario usu2 on usu2.id_usuario = pareje.id_usuario_mod
-                  where ' || v_parametros.filtro|| '                                                       
+                  where ' || v_parametros.filtro|| '
                   )
-                  
+
                 insert into ttemp_eval_det
-                
+
                 select
 	              id_partida_ejecucion,
                   id_partida_ejecucion_fk,
@@ -730,21 +978,21 @@ BEGIN
                   fecha_mod,
                   estado_reg
                 from detalle ';
-                
+
             execute(v_consul);
-              
+
           v_consulta:='select count(id_partida_ejecucion),
           					  sum(comprometido) as total_comprometido,
                               sum(ejecutado) as total_ejecutado,
                               sum(pagado) as total_pagado
-          			 from ttemp_eval_det 
+          			 from ttemp_eval_det
 	           		 where tipo_movimiento = '''||v_parametros.estado_func||''' ';
 
 			--Devuelve la respuesta
 			return v_consulta;
 
 		end;
-      
+
 
 	/*********************************
  	#TRANSACCION:  'TES_GETPRWF_SEL'
@@ -756,10 +1004,10 @@ BEGIN
 	elsif(p_transaccion='TES_GETPRWF_SEL')then
 
 		begin
-        	
+
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select max(id_proceso_wf)
-					    from wf.tproceso_wf 
+					    from wf.tproceso_wf
 					    where nro_tramite = '''||v_parametros.nro_tramite||'''
                          and ';
 
@@ -790,3 +1038,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION pre.ft_partida_ejecucion_sel (p_administrador integer, p_id_usuario integer, p_tabla varchar, p_transaccion varchar)
+  OWNER TO postgres;

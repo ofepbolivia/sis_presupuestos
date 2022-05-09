@@ -183,9 +183,13 @@ class MODPartidaEjecucion extends MODbase{
         $this->captura('id_partida','int4');
         $this->captura('id_moneda','int4');
         $this->captura('comprometido','numeric');
+		$this->captura('comprometido_mb','numeric');
         $this->captura('ejecutado','numeric');
-        $this->captura('pagado','numeric');        
+		$this->captura('ejecutado_mb','numeric');
+        $this->captura('pagado','numeric');      
+		$this->captura('pagado_mb','numeric');  
         $this->captura('saldo','numeric');
+		$this->captura('saldo_mb','numeric');
         $this->captura('desde', 'date');
         $this->captura('hasta', 'date');
         //$this->captura('id_proceso_wf', 'integer');

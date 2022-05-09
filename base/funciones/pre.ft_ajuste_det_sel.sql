@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.ft_ajuste_det_sel (
   p_administrador integer,
   p_id_usuario integer,
@@ -64,13 +62,24 @@ BEGIN
                             usu2.cuenta as usr_mod,
                             pre.codigo_cc as desc_presupuesto,
                             (par.codigo||'' - '' ||par.nombre_partida)::varchar as desc_partida	,
-                            id_ajuste,
-                            ajd.descripcion
+                            ajd.id_ajuste,
+                            ajd.descripcion,
+                            ajd.id_orden_trabajo,
+                            ot.desc_orden,
+                            ajd.id_concepto_ingas,
+                            ci.desc_ingas as nombre_ingas,
+                            ajd.id_sol_origen::varchar,
+                            aj.estado as estado_ajuste
+
 						from pre.tajuste_det ajd
                         inner join pre.vpresupuesto_cc pre on pre.id_presupuesto = ajd.id_presupuesto
                         inner join pre.tpartida par on par.id_partida = ajd.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo = ajd.id_orden_trabajo                        
+				        left join param.tconcepto_ingas ci on ci.id_concepto_ingas = ajd.id_concepto_ingas
+
+                        left join pre.tajuste aj on aj.id_ajuste = ajd.id_ajuste
 				        where  ';
 
 			--Definicion de la respuesta
@@ -94,13 +103,17 @@ BEGIN
 		begin
 			--Sentencia de la consulta de conteo de registros
 			v_consulta:='select
-                            count(id_ajuste_det),
+                            count(ajd.id_ajuste_det),
                             COALESCE(sum(ajd.importe),0)::numeric  as total_importe
 					    from pre.tajuste_det ajd
                         inner join pre.vpresupuesto_cc pre on pre.id_presupuesto = ajd.id_presupuesto
                         inner join pre.tpartida par on par.id_partida = ajd.id_partida
 						inner join segu.tusuario usu1 on usu1.id_usuario = ajd.id_usuario_reg
 						left join segu.tusuario usu2 on usu2.id_usuario = ajd.id_usuario_mod
+                        left join conta.torden_trabajo ot on ot.id_orden_trabajo = ajd.id_orden_trabajo                        
+				        left join param.tconcepto_ingas ci on ci.id_concepto_ingas = ajd.id_concepto_ingas
+
+                        left join pre.tajuste aj on aj.id_ajuste = ajd.id_ajuste
 				        where ';
 
 			--Definicion de la respuesta

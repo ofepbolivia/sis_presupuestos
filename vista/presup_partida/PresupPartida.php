@@ -78,10 +78,10 @@ Phx.vista.PresupPartida=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'importe',
-				fieldLabel: 'Importe',
+				fieldLabel: 'Importe según Memoria',
 				allowBlank: true,
 				anchor: '80%',
-				gwidth: 130,
+				gwidth: 150,
 				maxLength:1179650,
 				renderer:function (value,p,record){
 
@@ -120,7 +120,7 @@ Phx.vista.PresupPartida=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'importe_aprobado',
-				fieldLabel: 'Importe Verificado',
+				fieldLabel: 'Importe Aprobado',
 				selectOnFocus: true,
 				allowNegative: false,
 				allowDecimals: true,

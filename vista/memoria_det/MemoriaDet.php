@@ -171,21 +171,25 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
 				sortable: false,
 				maxLength:1179650,
                 minValue: 0,
+                
+                
 				renderer:function (value,p,record){
-
 					Number.prototype.formatDinero = function(c, d, t){
+                        //alert(this);
 						var n = this,
 							c = isNaN(c = Math.abs(c)) ? 2 : c,
 							d = d == undefined ? "." : d,
 							t = t == undefined ? "," : t,
 							s = n < 0 ? "-" : "",
+
 							i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                            
 							j = (j = i.length) > 3 ? j % 3 : 0;
-						return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+                        
+						return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n-i).toFixed(c).slice(2) : "");
 					};
 
 					if(record.data.tipo_reg != 'summary'){
-
 						return  String.format('<div style="vertical-align:middle;text-align:right;"><span >{0}</span></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
 					}
 					else{
@@ -418,7 +422,8 @@ Phx.vista.MemoriaDet=Ext.extend(Phx.gridInterfaz,{
     iniciarEventos:function(){
     	this.grid.on('afteredit',function(e){
 			 e.record.set( 'cantidad_mem', parseInt(e.record.data.cantidad_mem));
-			 e.record.set( 'importe_unitario', parseInt(e.record.data.importe_unitario));
+			 e.record.set( 'importe_unitario', parseFloat(e.record.data.importe_unitario));
+             //e.record.set( 'importe_unitario', parseInt(e.record.data.importe_unitario));//original
     		 this.calculaTotal(e);
     	}, this);
 

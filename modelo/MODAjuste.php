@@ -226,12 +226,13 @@ class MODAjuste extends MODbase{
         $this->captura('tipo_ajuste', 'varchar');
         $this->captura('tipo_ajuste_det', 'varchar');
         $this->captura('fecha_solicitud', 'date');
-        
+        $this->captura('tipo', 'varchar');
+
         //Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
         $this->ejecutarConsulta();
-
+//var_dump('llegabd ',$this->respuesta );
         //Devuelve la respuesta
         return $this->respuesta;
     }

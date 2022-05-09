@@ -16,6 +16,18 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.initButtons=[this.cmbGestion];
                 //llama al constructor de la clase padre
                 Phx.vista.ClaseGastoCuenta.superclass.constructor.call(this,config);
+
+                this.addButton('clonarCuentas',
+                    {
+                        //grupo: [0],
+                        text: 'Clonar Cuentas',
+                        iconCls: 'blist',
+                        disabled: false,
+                        handler: this.clonarCuenta,
+                        tooltip: '<b>Replicación de Datos</b><br/>Clonar Cuentas.'
+                    }
+                );
+
                 this.init();
                 this.bloquearMenus();
 
@@ -24,6 +36,30 @@ header("content-type: text/javascript; charset=UTF-8");
                         this.capturaFiltros();
                     }
                 },this);
+
+            },
+
+            clonarCuenta: function () {
+                //var rec=this.sm.getSelected();
+                var rec = this.cmbGestion.getValue();
+                var gasto = this.maestro.id_clase_gasto;
+
+                if(this.cmbGestion.getValue()){
+                    Ext.Ajax.request({
+                        url: '../../sis_presupuestos/control/ClaseGastoCuenta/clonarCuenta',
+                        params: {
+                            id_gestion: rec,
+                            id_clase_gasto:gasto
+                        },
+                        success: this.successAnular,
+                        failure: this.conexionFailure,
+                        timeout: this.timeout,
+                        scope: this
+                    });
+                }
+                else{
+                    alert('primero debe selecionar la gestion origen');
+                }
 
             },
 

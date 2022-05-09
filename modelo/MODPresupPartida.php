@@ -7,21 +7,21 @@
 *@description Clase que envia los parametros requeridos a la Base de datos para la ejecucion de las funciones, y que recibe la respuesta del resultado de la ejecucion de las mismas
 */
 class MODPresupPartida extends MODbase{
-	
+
 	function __construct(CTParametro $pParam){
 		parent::__construct($pParam);
 	}
-			
+
 	function listarPresupPartida(){
 		//Definicion de variables para ejecucion del procedimientp
 		$this->procedimiento='pre.ft_presup_partida_sel';
 		$this->transaccion='PRE_PRPA_SEL';
 		$this->tipo_procedimiento='SEL';//tipo de transaccion
-		
+
 		$this->capturaCount('total_importe','numeric');
 		$this->capturaCount('total_importe_aprobado','numeric');
-		
-				
+
+
 		//Definicion de la lista del resultado del query
 		$this->captura('id_presup_partida','int4');
 		$this->captura('tipo','varchar');
@@ -43,12 +43,12 @@ class MODPresupPartida extends MODbase{
 		$this->captura('desc_partida','varchar');
 		$this->captura('desc_gestion','varchar');
 		$this->captura('importe_aprobado','numeric');
-		
-		
+
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -58,15 +58,15 @@ class MODPresupPartida extends MODbase{
 			$this->procedimiento='pre.ft_presup_partida_sel';
 			$this->transaccion='PRE_PRPAEST_SEL';
 			$this->tipo_procedimiento='SEL';//tipo de transaccion
-			
+
 			$this->capturaCount('total_importe','numeric');
 			$this->capturaCount('total_importe_aprobado','numeric');
 			$this->capturaCount('total_importe_formulado','numeric');
 			$this->capturaCount('total_importe_comprometido','numeric');
 			$this->capturaCount('total_importe_ejecutado','numeric');
 			$this->capturaCount('total_importe_pagado','numeric');
-			
-					
+
+
 			//Definicion de la lista del resultado del query
 			$this->captura('id_presup_partida','int4');
 			$this->captura('tipo','varchar');
@@ -77,8 +77,8 @@ class MODPresupPartida extends MODbase{
 			$this->captura('estado_reg','varchar');
 			$this->captura('id_presupuesto','int4');
 			$this->captura('importe','numeric');
-			
-			
+
+
 			$this->captura('desc_partida','varchar');
 			$this->captura('desc_gestion','varchar');
 			$this->captura('importe_aprobado','numeric');
@@ -86,29 +86,29 @@ class MODPresupPartida extends MODbase{
 			$this->captura('comprometido','numeric');
 			$this->captura('ejecutado','numeric');
 			$this->captura('pagado','numeric');
-			
+
 			$this->captura('ajustado','numeric');
 			$this->captura('porc_ejecucion','numeric');
-			
-			
-			
-			
-			
+
+
+
+
+
 			//Ejecuta la instruccion
 			$this->armarConsulta();
 			$this->ejecutarConsulta();
-			
+
 			//Devuelve la respuesta
 			return $this->respuesta;
 	}
-		
-			
+
+
 	function insertarPresupPartida(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='pre.ft_presup_partida_ime';
 		$this->transaccion='PRE_PRPA_INS';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('tipo','tipo','varchar');
 		$this->setParametro('id_moneda','id_moneda','int4');
@@ -126,13 +126,13 @@ class MODPresupPartida extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function modificarPresupPartida(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='pre.ft_presup_partida_ime';
 		$this->transaccion='PRE_PRPA_MOD';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_presup_partida','id_presup_partida','int4');
 		$this->setParametro('importe_aprobado','importe_aprobado','numeric');
@@ -144,13 +144,13 @@ class MODPresupPartida extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-			
+
 	function eliminarPresupPartida(){
 		//Definicion de variables para ejecucion del procedimiento
 		$this->procedimiento='pre.ft_presup_partida_ime';
 		$this->transaccion='PRE_PRPA_ELI';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_presup_partida','id_presup_partida','int4');
        // $this->setParametro('id_partida','id_partida','int4');
@@ -168,12 +168,12 @@ class MODPresupPartida extends MODbase{
 		$this->procedimiento='pre.ft_presup_partida_ime';
 		$this->transaccion='PRE_PREPARVER_IME';
 		$this->tipo_procedimiento='IME';
-				
+
 		//Define los parametros para la funcion
 		$this->setParametro('id_presupuesto','id_presupuesto','int4');
 		$this->setParametro('porcentaje_aprobado','porcentaje_aprobado','int4');
-		
-		
+
+
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();
@@ -182,18 +182,21 @@ class MODPresupPartida extends MODbase{
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
-  
+
   function listarPresupPartidaEstadoXNroTramite(){
 			//Definicion de variables para ejecucion del procedimientp
 			$this->procedimiento='pre.ft_presup_partida_sel';
 			$this->transaccion='PRE_ETPRENRO_SEL';
 			$this->tipo_procedimiento='SEL';//tipo de transaccion
-			
+
 			$this->capturaCount('total_importe_comprometido','numeric');
 			$this->capturaCount('total_importe_ejecutado','numeric');
 			$this->capturaCount('total_importe_pagado','numeric');
-			
-			
+			$this->capturaCount('total_importe_rendido','numeric');
+			$this->capturaCount('total_rendido_impuestos','numeric');
+			$this->capturaCount('total_saldo_rendir','numeric');
+
+
 			$this->captura('id_presup_partida','int4');
             $this->captura('id_partida','int4');
             $this->captura('id_presupuesto','int4');
@@ -208,12 +211,16 @@ class MODPresupPartida extends MODbase{
             $this->captura('comprometido','numeric');
             $this->captura('ejecutado','numeric');
             $this->captura('pagado','numeric');
-			
-			
+
+		   $this->captura('rendido','numeric');
+		   $this->captura('rendido_impuestos','numeric');
+		   $this->captura('saldo_rendir','numeric');
+
+
 			//Ejecuta la instruccion
 			$this->armarConsulta();
 			$this->ejecutarConsulta();
-			
+
 			//Devuelve la respuesta
 			return $this->respuesta;
 	}
@@ -256,14 +263,14 @@ class MODPresupPartida extends MODbase{
 	}
 
     function listarRepEjecucion(){
-		  	
+
 		  //Definicion de variables para ejecucion del procedimientp
 		  $this->procedimiento='pre.f_rep_ejecucion';
 		  $this->transaccion='PRE_EJECUCION_REP';
 		  $this->tipo_procedimiento='SEL';//tipo de transaccion
 		  $this->setCount(false);
-		  $this->setTipoRetorno('record');	
-		
+		  $this->setTipoRetorno('record');
+
           //captura parametros adicionales para el count
           //var_dump($this->objParam->getParametro('id_categoria_programatica'));exit;
 		  $this->setParametro('id_cp_programa','id_cp_programa','int4');
@@ -280,16 +287,16 @@ class MODPresupPartida extends MODbase{
 		  $this->setParametro('nivel','nivel','int4');
 		  $this->setParametro('fecha_ini','fecha_ini','date');
 		  $this->setParametro('fecha_fin','fecha_fin','date');
-		  
-		 
-		
+
+
+
         //Definicion de la lista del resultado del query
         $this->captura('desc_cat','text');
         $this->captura('categoria','varchar');
 		$this->captura('id_partida','int4');
         $this->captura('codigo_partida','varchar');
         $this->captura('nombre_partida','varchar');
-        $this->captura('nivel_partida','int4');        
+        $this->captura('nivel_partida','int4');
         $this->captura('importe','NUMERIC');
         $this->captura('importe_aprobado','NUMERIC');
         $this->captura('formulado','NUMERIC');
@@ -298,30 +305,31 @@ class MODPresupPartida extends MODbase{
         $this->captura('pagado','NUMERIC');
         $this->captura('ajustado','NUMERIC');
         $this->captura('porc_ejecucion','NUMERIC');
-		  
-		              
-		
+				$this->captura('codigo_categoria','varchar');
+				$this->captura('descripcion_cate','varchar');
+
+
 
 		//Ejecuta la instruccion
         $this->armarConsulta();
         //echo($this->consulta);exit;
 		$this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
 
     function listarRepEjecucionPorPartida(){
-		  	
+
 		  //Definicion de variables para ejecucion del procedimientp
 		  $this->procedimiento='pre.f_rep_ejecucion';
 		  $this->transaccion='PRE_EJEXPAR_REP';
 		  $this->tipo_procedimiento='SEL';//tipo de transaccion
 		  $this->setCount(false);
-		  $this->setTipoRetorno('record');	
-		
+		  $this->setTipoRetorno('record');
+
 		  //captura parametros adicionales para el count
-		 
+
 		  $this->setParametro('id_categoria_programatica','id_categoria_programatica','int4');
           $this->setParametro('id_partida','id_partida','int4');
           $this->setParametro('id_presupuesto','id_presupuesto','int4');
@@ -330,13 +338,13 @@ class MODPresupPartida extends MODbase{
           $this->setParametro('id_cp_organismo_fin','id_cp_organismo_fin','int4');
           $this->setParametro('id_cp_fuente_fin','id_cp_fuente_fin','int4');
           $this->setParametro('id_unidad_ejecutora','id_unidad_ejecutora','int4');
-          $this->setParametro('id_cp_programa','id_cp_programa','int4');                    
+          $this->setParametro('id_cp_programa','id_cp_programa','int4');
           $this->setParametro('id_gestion','id_gestion', 'int4');
 		  $this->setParametro('tipo_pres','tipo_pres','VARCHAR');
 		  $this->setParametro('tipo_reporte','tipo_reporte','VARCHAR');
 		  $this->setParametro('fecha_ini','fecha_ini','date');
 		  $this->setParametro('fecha_fin','fecha_fin','date');
-		  
+
           //Definicion de la lista del resultado del query
           $this->captura('cod_cat','varchar');
 		  $this->captura('id_presupuesto','int4');
@@ -348,15 +356,15 @@ class MODPresupPartida extends MODbase{
 	      $this->captura('comprometido','NUMERIC');
 	      $this->captura('ejecutado','NUMERIC');
 	      $this->captura('pagado','NUMERIC');
-        
-		              
-		
+
+
+
 
 		 //Ejecuta la instruccion
          $this->armarConsulta();
          //echo($this->consulta);exit;
 		 $this->ejecutarConsulta();
-		
+
 		//Devuelve la respuesta
 		return $this->respuesta;
 	}
@@ -439,6 +447,6 @@ class MODPresupPartida extends MODbase{
         //Devuelve la respuesta
         return $this->respuesta;
     }
-			
+
 }
 ?>

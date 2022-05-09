@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.f_get_presupuesto_ids (
   p_id_presupuesto integer,
   p_tipo varchar = 'siguiente'::character varying
@@ -19,18 +17,18 @@ DECLARE
 
 BEGIN
 
-   v_nombre_funcion = 'conta.f_get_presupuesto_ids';
-   
-	
+   v_nombre_funcion = 'pre.f_get_presupuesto_ids';
+
+
 	if p_id_presupuesto is null then
     	return null;
     end if;
 	--1.Verificación de existencia de la partida
     if not exists(select 1 from pre.tpresupuesto
     			where id_presupuesto = p_id_presupuesto) then
-    	raise exception 'Partida inexistente';
+    	raise exception 'Presupuesto con id: %, inexistente.',p_id_presupuesto;
     end if;
-    
+
     --Se verifica si se busca la cuenta anterior o la siguiente
     if p_tipo = 'siguiente' then
     	--Obtiene la cuenta de la siguiente gestión
@@ -45,17 +43,17 @@ BEGIN
         from pre.tpresupuesto_ids p
         where p.id_presupuesto_dos = p_id_presupuesto;
     end if;
-    
+
     return v_id_presupuesto;
-    
+
 EXCEPTION
-				
+
 	WHEN OTHERS THEN
 		v_resp='';
 		v_resp = pxp.f_agrega_clave(v_resp,'mensaje',SQLERRM);
 		v_resp = pxp.f_agrega_clave(v_resp,'codigo_error',SQLSTATE);
 		v_resp = pxp.f_agrega_clave(v_resp,'procedimientos',v_nombre_funcion);
-		raise exception '%',v_resp; 
+		raise exception '%',v_resp;
 END;
 $body$
 LANGUAGE 'plpgsql'
@@ -63,3 +61,6 @@ VOLATILE
 CALLED ON NULL INPUT
 SECURITY INVOKER
 COST 100;
+
+ALTER FUNCTION pre.f_get_presupuesto_ids (p_id_presupuesto integer, p_tipo varchar)
+  OWNER TO postgres;

@@ -259,8 +259,8 @@ BEGIN
             ts.estado,
             ts.tipo_ajuste,
             tsd.tipo_ajuste as tipo_ajuste_det,
-            ts.fecha_reg::date as fecha_solicitud
-
+            ts.fecha_reg::date as fecha_solicitud,
+            tpar.tipo
             FROM pre.tajuste ts
             INNER JOIN pre.tajuste_det tsd ON tsd.id_ajuste = ts.id_ajuste
             INNER JOIN pre.tpartida tpar ON tpar.id_partida = tsd.id_partida
@@ -284,8 +284,8 @@ BEGIN
 
 			v_consulta =  v_consulta || ' GROUP BY vcp.id_categoria_programatica, tpar.codigo, ttc.codigo,vcp.codigo_programa,vcp.codigo_proyecto, vcp.codigo_actividad,
             vcp.codigo_fuente_fin, vcp.codigo_origen_fin, vcp.codigo_unidad_ejecutora, tpar.nombre_partida, tmo.codigo, ts.nro_tramite, tet.codigo,
-            tew.fecha_reg, tg.gestion, ts.estado, ts.tipo_ajuste, tsd.tipo_ajuste, ts.fecha_reg::date';
-			v_consulta =  v_consulta || ' ORDER BY tsd.tipo_ajuste asc, tpar.codigo, vcp.id_categoria_programatica, ttc.codigo asc ';
+            tew.fecha_reg, tg.gestion, ts.estado, ts.tipo_ajuste, tsd.tipo_ajuste, ts.fecha_reg::date, tpar.tipo';
+			v_consulta =  v_consulta || ' ORDER BY tpar.tipo asc, tsd.tipo_ajuste asc, tpar.codigo, vcp.id_categoria_programatica, ttc.codigo asc ';
 
             --Devuelve la respuesta
             RAISE NOTICE 'v_consulta %',v_consulta;

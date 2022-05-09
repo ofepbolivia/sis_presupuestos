@@ -109,35 +109,35 @@ BEGIN
                      where p.id_categoria_prog = v_parametros.id_categoria_programatica
                      and p.tipo_pres  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
 
-            --inicio breydi.vasquez 02-01-2020 
+            --inicio breydi.vasquez 02-01-2020
 
-            ELSEIF v_parametros.tipo_reporte = 'unidad_ejecutora' and v_parametros.id_unidad_ejecutora is not null  THEN  
+            ELSEIF v_parametros.tipo_reporte = 'unidad_ejecutora' and v_parametros.id_unidad_ejecutora is not null  THEN
 
-	             if v_parametros.id_unidad_ejecutora != 0 then 
+	             if v_parametros.id_unidad_ejecutora != 0 then
 
                    SELECT
                        pxp.aggarray(p.id_presupuesto)
-                   into       
+                   into
                        va_id_presupuesto
                    FROM pre.tpresupuesto p
-                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog                   
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
                    where cp.id_unidad_ejecutora = v_parametros.id_unidad_ejecutora
                    and cp.id_gestion = v_parametros.id_gestion
-                 and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));                               
-                 
-            	else 
-                
+                 and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
+
+            	else
+
                 	SELECT
                        pxp.aggarray(p.id_presupuesto)
-                   into       
+                   into
                        va_id_presupuesto
                    FROM pre.tpresupuesto p
-                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog                   
+                   inner join pre.tcategoria_programatica cp on cp.id_categoria_programatica = p.id_categoria_prog
                    where cp.id_gestion = v_parametros.id_gestion
-                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));   
-                   
+                   and p.tipo_pres::text  = ANY (string_to_array(v_parametros.tipo_pres::text,','));
+
                 end if;
-			-- fin                      
+			-- fin
 
 
              ELSEIF v_parametros.tipo_reporte = 'presupuesto' and v_parametros.id_presupuesto is not null and v_parametros.id_presupuesto != 0 THEN
@@ -280,7 +280,7 @@ BEGIN
         END IF;
         --listado consolidado segun parametros
 
-        --inicio breydi.vasquez 02-01-2020 
+        --inicio breydi.vasquez 02-01-2020
 	 if v_parametros.id_unidad_ejecutora is not null and  v_parametros.id_unidad_ejecutora = 0 then
 
              FOR v_registros in (
@@ -291,11 +291,11 @@ BEGIN
                                   else
                                   	tep.codigo_partida
                                   end as codigo_partida,
-							      case when tep.nivel_partida = 0 then 
+							      case when tep.nivel_partida = 0 then
                                   	(tep.nombre_partida || ' - UNI. EJEC: '|| unje.nombre)::varchar
                                   else
                                   	tep.nombre_partida
-                                  end as nombre_partida, 
+                                  end as nombre_partida,
                                   tep.nivel_partida,
                                   sum(tep.c1) as c1,
                                   sum(tep.c2) as c2,
@@ -311,7 +311,7 @@ BEGIN
                                   sum(tep.c12) as c12
                           FROM temp_prog tep
                           inner join pre.tcategoria_programatica cat on cat.id_categoria_programatica = tep.id_categoria_programatica
-                          inner join pre.tunidad_ejecutora unje on unje.id_unidad_ejecutora = cat.id_unidad_ejecutora                          
+                          inner join pre.tunidad_ejecutora unje on unje.id_unidad_ejecutora = cat.id_unidad_ejecutora
                           WHERE
 
                               CASE WHEN v_parametros.nivel >= 4  THEN  0=0
@@ -332,8 +332,51 @@ BEGIN
                RETURN NEXT v_registros;
 
        END LOOP;
-    else 
-        -- fin breydi.vasquez 
+       elsif v_parametros.tipo_reporte = 'formulacion_presu_txt' then
+
+           FOR v_registros in (
+               SELECT
+               catud.codigo as codigo_unidad_ejecutora,
+               pro.codigo as codigo_programa,
+               (substr(catac.codigo, char_length(catac.codigo)-1, 2))::varchar as codigo_actividad,
+               catfu.codigo as codigo_fuente_fin,
+               (rtrim(tp.codigo_partida, '0'))::varchar as codigo_partida,
+   /*            tp.codigo_partida,*/
+               case when te.codigo is null then
+       	        	'0'::varchar
+               	else
+   	                te.codigo
+               	end as codigo_ent_trans,
+               round((sum(c1) + sum(c2)+ sum(c3)+ sum(c4)+ sum(c5)+ sum(c6) + sum(c7) + sum(c8) + sum(c9) + sum(c10) + sum(c11) + sum(c12)))::numeric total
+               FROM temp_prog tp
+               inner join pre.tcategoria_programatica cat on cat.id_categoria_programatica = tp.id_categoria_programatica
+               inner join pre.tcp_actividad catac on catac.id_cp_actividad = cat.id_cp_actividad
+               inner join pre.tunidad_ejecutora catud on catud.id_unidad_ejecutora = cat.id_unidad_ejecutora
+               inner join pre.tcp_fuente_fin catfu on catfu.id_cp_fuente_fin = cat.id_cp_fuente_fin
+               inner join pre.tcp_programa pro on pro.id_cp_programa = cat.id_cp_programa
+               left join pre.tpresupuesto_partida_entidad p_p_ent on p_p_ent.id_partida = tp.id_partida
+               left join pre.tentidad_transferencia te on te.id_entidad_transferencia = p_p_ent.id_entidad_transferencia
+               left join pre.tpresupuesto tpre ON tpre.id_presupuesto = p_p_ent.id_presupuesto
+               where tp.sw_transaccional ='movimiento'
+               and tp.codigo_partida not in ('13110',
+               '13120',
+               '13131',
+               '13132',
+               '13200')
+               group by
+               catud.codigo,
+               pro.codigo,
+               catac.codigo,
+               catfu.codigo,
+               te.codigo,
+               tp.codigo_partida
+               order by tp.codigo_partida asc)
+             loop
+                      RETURN NEXT v_registros;
+
+              END LOOP;
+    else
+        -- fin breydi.vasquez
 
        --raise exception 'llega';
         FOR v_registros in (

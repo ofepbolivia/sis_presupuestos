@@ -1,5 +1,3 @@
---------------- SQL ---------------
-
 CREATE OR REPLACE FUNCTION pre.ft_categoria_programatica_ime (
   p_administrador integer,
   p_id_usuario integer,
@@ -482,7 +480,7 @@ BEGIN
 
 
 
-
+			--10-09-2020(maylee.perez) modificacion no mostraba unidad ejecutora de la gestion a clonar id_unidad_ejecutora_dos
             --clonamos presupuestos y centros de costos
             FOR v_registros in select
                                       p.* ,
@@ -491,7 +489,7 @@ BEGIN
                                       act.id_cp_actividad_dos,
                                       fue.id_cp_fuente_fin_dos,
                                       org.id_cp_organismo_fin_dos,
-                                      tue.id_unidad_ejecutora
+    								  tue.id_unidad_ejecutora_dos
 
                                   from pre.tcategoria_programatica p
                                   inner join pre.tcp_programa_ids pro on pro.id_cp_programa_uno = p.id_cp_programa
@@ -499,7 +497,7 @@ BEGIN
                                   inner join pre.tcp_actividad_ids act on act.id_cp_actividad_uno = p.id_cp_actividad
                                   inner join pre.tcp_fuente_fin_ids fue on fue.id_cp_fuente_fin_uno = p.id_cp_fuente_fin
                                   inner join pre.tcp_organismo_fin_ids org on org.id_cp_organismo_fin_uno = p.id_cp_organismo_fin
-                                  left  join pre.tunidad_ejecutora tue on tue.id_unidad_ejecutora = p.id_unidad_ejecutora
+                                  left  join pre.tunidad_ejecutora_ids tue on tue.id_unidad_ejecutora_uno = p.id_unidad_ejecutora
                                   where  p.id_gestion = v_parametros.id_gestion and p.estado_reg = 'activo' LOOP
 
 
@@ -538,7 +536,7 @@ BEGIN
                                           v_registros.id_cp_actividad_dos,
                                           v_registros.id_cp_fuente_fin_dos,
                                           v_registros.id_cp_organismo_fin_dos,
-                                          v_registros.id_unidad_ejecutora
+                                          v_registros.id_unidad_ejecutora_dos
                                         )RETURNING id_categoria_programatica   into v_id_dos;
 
                                   INSERT INTO pre.tcategoria_programatica_ids (id_categoria_programatica_uno, id_categoria_programatica_dos, sw_cambio_gestion )

@@ -100,6 +100,7 @@ header("content-type: text/javascript; charset=UTF-8");
         },
 
         iniciarEventos: function () {
+
             this.Cmp.id_tipo_cc.on('select', function (cmp, rec, ind) {
                 this.Cmp.descripcion.setValue('(' + rec.data.codigo + ') ' + rec.data.descripcion);
                 // this.Cmp.tipo_pres.store.baseParams.mov_pres = rec.data.mov_pres;
@@ -116,6 +117,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 Phx.vista.PresupuestoInicio.superclass.onButtonEdit.call(this);
                 this.Cmp.id_tipo_cc.store.baseParams.gestion = this.cmbGestion.getRawValue();
                 this.Cmp.id_tipo_cc.modificado = true;
+
+                //18-02-2022(may) que filtre categoria programatica segun gestion
+                this.Cmp.id_categoria_prog.store.baseParams.id_gestion = this.Cmp.id_gestion.getValue();
+                this.Cmp.id_categoria_prog.modificado = true
             }
 
         },
@@ -127,6 +132,10 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.Cmp.id_tipo_cc.reset();
                 this.Cmp.id_tipo_cc.store.baseParams.gestion = this.cmbGestion.getRawValue();
                 this.Cmp.id_tipo_cc.modificado = true;
+
+                //18-02-2022(may) que filtre categoria programatica segun gestion
+                this.Cmp.id_categoria_prog.store.baseParams.id_gestion = this.Cmp.id_gestion.getValue();
+                this.Cmp.id_categoria_prog.modificado = true;
 
             }
 

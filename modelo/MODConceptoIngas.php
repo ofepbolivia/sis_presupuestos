@@ -150,6 +150,8 @@ class MODConceptoIngas extends MODbase{
 		$this->captura('contrato','varchar');
 		$this->captura('especial','varchar');
 
+		$this->captura('tipo_contrataciones','varchar');
+
 		//Ejecuta la instruccion
 		$this->armarConsulta();
 		$this->ejecutarConsulta();

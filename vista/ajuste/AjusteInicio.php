@@ -94,20 +94,27 @@ Phx.vista.AjusteInicio = {
           this.getBoton('btnObs').enable();    
           this.getBoton('btnChequeoDocumentosWf').enable(); 
           this.getBoton('diagrama_gantt').enable();
-          
+
           if (data['tipo_ajuste'] == 'incremento' || data['tipo_ajuste'] == 'inc_comprometido'){
           	 this.disableTabDecrementos();
           }
           else {
           	if (data['tipo_ajuste'] == 'decremento' || data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido'){
-          	  this.disableTabIncrementos();
+          	    this.disableTabIncrementos();
             }
-            else{
-            	this.enableAllTab();            	
+          	//16-06-2021 (may)
+            else {
+                if (data['tipo_ajuste'] == 'ajuste_comprometido'){
+                    this.disableTabAjuste();
+                }
+                else{
+                    this.enableAllTab();
+                }
             }
           }
+
           
-          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido'){
+          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'rev_total_comprometido' || data['tipo_ajuste'] == 'ajuste_comprometido'){
           	 this.getBoton('chkpresupuesto').enable();
           } 
           else{
@@ -127,7 +134,7 @@ Phx.vista.AjusteInicio = {
 
            this.Cmp.tipo_ajuste.on('select',function(cmp,rec){        	
            	   
-           	   if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_total_comprometido'){
+           	   if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_total_comprometido'|| this.Cmp.tipo_ajuste.getValue() == 'ajuste_comprometido'){
                    this.Cmp.nro_tramite_aux.reset();
                    this.Cmp.nro_tramite_aux.modificado = true;
            	       this.mostrarComponente(this.Cmp.nro_tramite_aux);
@@ -164,7 +171,7 @@ Phx.vista.AjusteInicio = {
        var rec = this.getSelectedData();
        Phx.vista.AjusteInicio.superclass.onButtonEdit.call(this);
        
-       if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_total_comprometido'){
+       if(this.Cmp.tipo_ajuste.getValue() == 'inc_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'rev_total_comprometido' || this.Cmp.tipo_ajuste.getValue() == 'ajuste_comprometido'){
             this.mostrarComponente(this.Cmp.nro_tramite_aux);
        }
        else{

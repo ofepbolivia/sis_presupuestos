@@ -27,13 +27,16 @@ Phx.vista.PresupuestoFor = {
 	   Phx.vista.PresupuestoFor.superclass.constructor.call(this,config);
 	   
        this.init();
-       this.load({params:{start:0, limit:this.tam_pag, tipo_interfaz: me.nombreVista }}) 
+       this.load({params:{start:0, limit:this.tam_pag, tipo_interfaz: me.nombreVista }})
+        this.getBoton('ant_estado').disable();
+        this.getBoton('fin_registro').disable();
+
    },
    
    preparaMenu:function(n){
           var data = this.getSelectedData();
           var tb =this.tbar;
-          
+
           Phx.vista.PresupuestoFor.superclass.preparaMenu.call(this,n);
           
            if(data['sw_consolidado'] == 'si'){
@@ -43,7 +46,9 @@ Phx.vista.PresupuestoFor = {
           	  this.TabPanelEast.get(1).disable();
           	  this.TabPanelEast.setActiveTab(0)
           }
-          
+
+       this.getBoton('ant_estado').disable();
+       this.getBoton('fin_registro').disable();
            
     },
     
@@ -51,6 +56,9 @@ Phx.vista.PresupuestoFor = {
         var tb = Phx.vista.PresupuestoFor.superclass.liberaMenu.call(this);
         
         return tb
+
+        this.getBoton('fin_registro').disable();
+        this.getBoton('ant_estado').disable();
     },
    
    
