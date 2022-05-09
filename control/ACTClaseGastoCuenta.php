@@ -49,6 +49,13 @@ class ACTClaseGastoCuenta extends ACTbase{
         $this->res=$this->objFunc->eliminarClaseGastoCuenta($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+    /**{developer:franklin.espinoza, date:22/12/2020, description: Clonar Cuentas Contables}**/
+    function clonarCuenta(){
+        $this->objFunc=$this->create('MODClaseGastoCuenta');
+        $this->res=$this->objFunc->clonarCuenta($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+    /**{developer:franklin.espinoza, date:22/12/2020, description: Clonar Cuentas Contables}**/
 
 }
 

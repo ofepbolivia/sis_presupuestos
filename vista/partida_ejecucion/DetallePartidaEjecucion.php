@@ -107,7 +107,7 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
                         j = (j = i.length) > 3 ? j % 3 : 0;
                     return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
                 };
-                    return  String.format('<div style="vertical-align:middle;text-align:right;"><span >{0}</span></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
                 }
 			},
 			type:'NumberField',
@@ -135,7 +135,7 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
                         j = (j = i.length) > 3 ? j % 3 : 0;
                     return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
                 };
-                    return  String.format('<div style="vertical-align:middle;text-align:right;"><span >{0}</span></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
                 }
 			},
 			type:'NumberField',
@@ -163,7 +163,7 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
                             j = (j = i.length) > 3 ? j % 3 : 0;
                     return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
                 };
-                    return  String.format('<div style="vertical-align:middle;text-align:right;"><span >{0}</span></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
                 }                
 			},
 			type:'NumberField',
@@ -191,7 +191,7 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
                             j = (j = i.length) > 3 ? j % 3 : 0;
                     return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
                 };
-                    return  String.format('<div style="vertical-align:middle;text-align:right;"><span >{0}</span></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
                 } 				
 			},
 			type:'NumberField',
@@ -214,6 +214,118 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 			grid:true,
 			form:true
 		},
+		{
+			config:{
+				name: 'comprometido_mb',
+				fieldLabel: 'Comprometido Bs',
+				allowBlank: false,
+				allowNegative: false,
+				anchor: '80%',
+				gwidth: 100,                
+				renderer:function (value,p,record){
+                Number.prototype.formatDinero = function(c, d, t){
+                    var n = this,
+                        c = isNaN(c = Math.abs(c)) ? 2 : c,
+                        d = d == undefined ? "." : d,
+                        t = t == undefined ? "," : t,
+                        s = n < 0 ? "-" : "",
+                        i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                        j = (j = i.length) > 3 ? j % 3 : 0;
+                    return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+                };
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                }
+			},
+			type:'NumberField',
+			filters:{pfiltro:'comprometido_mb',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:false
+        },
+		{
+			config:{
+				name: 'ejecutado_mb',
+				fieldLabel: 'Ejecutado Bs',
+				allowBlank: false,
+				allowNegative: false,
+				anchor: '80%',
+				gwidth: 100,
+				renderer:function (value,p,record){
+                Number.prototype.formatDinero = function(c, d, t){
+                    var n = this,
+                        c = isNaN(c = Math.abs(c)) ? 2 : c,
+                        d = d == undefined ? "." : d,
+                        t = t == undefined ? "," : t,
+                        s = n < 0 ? "-" : "",
+                        i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                        j = (j = i.length) > 3 ? j % 3 : 0;
+                    return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+                };
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                }
+			},
+			type:'NumberField',
+			filters:{pfiltro:'ejecutado_mb',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:false
+        },
+		{
+			config:{
+				name: 'pagado_mb',
+				fieldLabel: 'Pagado Bs',
+				allowBlank: false,
+				allowNegative: false,
+				anchor: '80%',
+				gwidth: 100,
+				renderer:function (value,p,record){
+                    Number.prototype.formatDinero = function(c, d, t){
+                        var n = this,
+                            c = isNaN(c = Math.abs(c)) ? 2 : c,
+                            d = d == undefined ? "." : d,
+                            t = t == undefined ? "," : t,
+                            s = n < 0 ? "-" : "",
+                            i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                            j = (j = i.length) > 3 ? j % 3 : 0;
+                    return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+                };
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                }                
+			},
+			type:'NumberField',
+			filters:{pfiltro:'pagado_mb',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:false
+        },                
+		{
+			config:{
+				name: 'saldo_mb',
+				fieldLabel: 'Saldo Devengar Bs',
+				allowBlank: false,
+				allowNegative: false,
+				anchor: '80%',
+				gwidth: 120,
+				renderer:function (value,p,record){
+                    Number.prototype.formatDinero = function(c, d, t){
+                        var n = this,
+                            c = isNaN(c = Math.abs(c)) ? 2 : c,
+                            d = d == undefined ? "." : d,
+                            t = t == undefined ? "," : t,
+                            s = n < 0 ? "-" : "",
+                            i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                            j = (j = i.length) > 3 ? j % 3 : 0;
+                    return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+                };
+                    return  String.format('<div style="vertical-align:middle;text-align:right;"><b >{0}</b></div>',(parseFloat(value)).formatDinero(2, ',', '.'));
+                } 				
+			},
+			type:'NumberField',
+			filters:{pfiltro:'saldo_mb',type:'numeric'},
+			id_grupo:1,
+			grid:true,
+			form:false
+        },		
 		{
 			//configuracion del componente
 			config:{
@@ -319,8 +431,7 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
         {name:'comprometido', type: 'numeric'},
         {name:'ejecutado', type: 'numeric'},
         {name:'pagado', type: 'numeric'},
-        {name:'saldo', type: 'numeric'},				
-		{name:'monto_mb', type: 'numeric'},
+        {name:'saldo', type: 'numeric'},						
 		{name:'monto', type: 'numeric'},		
 		{name:'id_usuario_reg', type: 'numeric'},		
 		{name:'usuario_ai', type: 'string'},
@@ -332,7 +443,8 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
         {name:'desde', type: 'date', dateFormat: 'Y-m-d'},
         {name:'hasta', type: 'date', dateFormat: 'Y-m-d'},
         //{name:'id_proceso_wf', type:'numeric'},
-        'moneda','desc_pres','codigo_cc','codigo_categoria','codigo','nombre_partida',        
+        'moneda','desc_pres','codigo_cc','codigo_categoria','codigo','nombre_partida',
+		'comprometido_mb','ejecutado_mb','pagado_mb','saldo','saldo_mb'        
 		
 	],
 	bdel:  false,
@@ -345,7 +457,7 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 		field: 'id_partida'		
 	},    
 	arrayDefaultColumHidden:['id_partida_ejecucion','columna_origen','valor_id_origen',
-		,'monto_mb','fecha_mod', 'id_usuario_ai','usr_mod','estado_reg'],
+		,'comprometido_mb','ejecutado_mb','pagado_mb', 'saldo_mb','fecha_mod', 'id_usuario_ai','usr_mod','estado_reg'],
 
 	loadValoresIniciales:function(){                
 		Phx.vista.DetallePartidaEjecucion.superclass.loadValoresIniciales.call(this);		

@@ -47,7 +47,7 @@ BEGIN
 	if(p_transaccion='PRE_OBJ_INS')then
 
         begin
-        	raise exception 'id_parametros: %',v_parametros;
+        	--raise exception 'id_parametros: %',v_parametros;
 
            IF v_parametros.id_objetivo_fk != 'id' and v_parametros.id_objetivo_fk != '' THEN
                    v_id_objetivo_fk  = v_parametros.id_objetivo_fk::integer;

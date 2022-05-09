@@ -10,9 +10,9 @@ header("content-type: text/javascript; charset=UTF-8");
 ?>
 <script>
 Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
-		
+
 		Atributos : [
-		
+
 		{
 			//configuracion del componente
 			config:{
@@ -21,9 +21,9 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 					name: 'concepto'
 			},
 			type:'Field',
-			form:true 
+			form:true
 		},
-		
+
 		{
             config:{
                 name:'id_gestion',
@@ -53,7 +53,7 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
                 triggerAction: 'all',
                 lazyRender:true,
                 mode:'remote',
-                pageSize:10,
+                pageSize:5,
                 queryDelay:1000,
                 listWidth:250,
                 resizable:true,
@@ -62,14 +62,14 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
             },
             type:'ComboBox',
             id_grupo:0,
-            filters:{   
+            filters:{
                         pfiltro:'gestion',
                         type:'string'
                     },
             grid:true,
             form:true
         },
-        
+
         {
             config:{
             	name: 'tipo_pres',
@@ -105,14 +105,14 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 			},
             type:'AwesomeCombo',
             id_grupo:0,
-            filters:{   
+            filters:{
                         pfiltro:'gestion',
                         type:'string'
                     },
             form:true
         },
-		
-		
+
+
 		{
 			config:{
 				name:'tipo_reporte',
@@ -127,15 +127,16 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 	        	fields: ['ID', 'valor'],
 	        	data :	[
 		        	        ['programa','Programa'],
-		        	        ['categoria','Categoría Programática'],	
+		        	        ['categoria','Categoría Programática'],
 							['presupuesto','Presupuesto'],
                             ['unidad_ejecutora', 'Unidad Ejecutora'],
-						]	        				
+														['formulacion_presu_txt', 'Formulación Presupuestaria por archivo plano']
+						]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
-				width:250,			
-				
+				width:250,
+
 			},
 			type:'ComboBox',
 			id_grupo:1,
@@ -195,9 +196,9 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
             id_grupo: 0,
             form: true
         },
-		
+
 		{
-			
+
 			config: {
 				name: 'id_cp_programa',
 				fieldLabel: 'Programa',
@@ -249,7 +250,7 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
                     },
                     totalProperty: 'total',
                     fields: ['id_unidad_ejecutora', 'nombre', 'codigo'],
-                    remoteSort: true,                    
+                    remoteSort: true,
                     baseParams: {par_filtro: 'codigo#nombre', _adicionar:'si'}
                 }),
                 valueField: 'id_unidad_ejecutora',
@@ -275,7 +276,7 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
             grid: true,
             form: true
         },
-	   	
+
 		{
 			config:{
 				name:'formato_reporte',
@@ -288,20 +289,20 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 				mode:'local',
 				store:new Ext.data.ArrayStore({
 	        	fields: ['ID', 'valor'],
-	        	data :[ ['pdf','PDF'],	
-						['csv','CSV']]	        				
+	        	data :[ ['pdf','PDF'],
+						['csv','CSV']]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
-				width:250,			
-				
+				width:250,
+
 			},
 			type:'ComboBox',
 			id_grupo:1,
 			form:true
 		},
-		
-		
+
+
 		{
 			config:{
 				name:'nivel',
@@ -320,120 +321,138 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 		        			['1','Hasta el Nivel 1'],
 		        			['2','Hasta el Nivel 2'],
 							['3','Hasta el Nivel 3']
-						]	        				
+						]
 	    		}),
 				valueField:'ID',
 				displayField:'valor',
-				width:250,			
-				
+				width:250,
+
 			},
 			type:'ComboBox',
 			id_grupo:1,
 			form:true
 		}],
-		
-		
-		title : 'Reporte Libro Compras Ventas IVA',		
+
+
+		title : 'Reporte Libro Compras Ventas IVA',
 		ActSave : '../../sis_presupuestos/control/MemoriaCalculo/reporteMemoriaCalculo',
-		
+
 		topBar : true,
 		botones : false,
 		labelSubmit : 'Generar',
 		tooltipSubmit : '<b>Reporte Proyecto Presupeustario</b>',
-		
+
 		constructor : function(config) {
 			Phx.vista.FormRepProgramacion.superclass.constructor.call(this, config);
 			this.init();
-			
+
 			this.ocultarComponente(this.Cmp.id_categoria_programatica);
 			this.ocultarComponente(this.Cmp.id_presupuesto);
 			this.ocultarComponente(this.Cmp.id_cp_programa);
             this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
-						
+
 			this.iniciarEventos();
 		},
-		
-		iniciarEventos:function(){        
-			
+
+		iniciarEventos:function(){
+
 			this.Cmp.id_gestion.on('select',function(c,r,n){
-				
+
 					this.Cmp.id_categoria_programatica.reset();
-					this.Cmp.id_categoria_programatica.store.baseParams.id_gestion =c.value;				
+					this.Cmp.id_categoria_programatica.store.baseParams.id_gestion =c.value;
 					this.Cmp.id_categoria_programatica.modificado=true;
-					
+
 					this.Cmp.id_presupuesto.reset();
-					this.Cmp.id_presupuesto.store.baseParams.id_gestion = c.value;				
+					this.Cmp.id_presupuesto.store.baseParams.id_gestion = c.value;
 					this.Cmp.id_presupuesto.modificado=true;
-					
+
 					this.Cmp.id_cp_programa.reset();
-					this.Cmp.id_cp_programa.store.baseParams.id_gestion = c.value;				
+					this.Cmp.id_cp_programa.store.baseParams.id_gestion = c.value;
 					this.Cmp.id_cp_programa.modificado=true;
 
                     this.Cmp.id_unidad_ejecutora.reset();
-					this.Cmp.id_unidad_ejecutora.store.baseParams.id_gestion = c.value;				
-					this.Cmp.id_unidad_ejecutora.modificado=true;                    					
-				
-				
+					this.Cmp.id_unidad_ejecutora.store.baseParams.id_gestion = c.value;
+					this.Cmp.id_unidad_ejecutora.modificado=true;
+
+
 			},this);
-			
-			
+
+
 			this.Cmp.tipo_reporte.on('select',function(combo, record, index){
 				console.log(record, index)
-				
+
 				this.Cmp.id_categoria_programatica.reset();
 				this.Cmp.id_presupuesto.reset();
 				this.Cmp.id_cp_programa.reset();
                 this.Cmp.id_unidad_ejecutora.reset();
-				
+								this.Cmp.formato_reporte.reset();
+								this.Cmp.nivel.reset();
+
 				console.log('--->',record.data.ID)
 				if(record.data.ID == 'programa'){
 					this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
 					this.mostrarComponente(this.Cmp.id_cp_programa);
                     this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
-					
+										this.mostrarComponente(this.Cmp.nivel);
+										this.mostrarComponente(this.Cmp.formato_reporte);
+
 				}
-				
-				if(record.data.ID == 'categoria'){
+
+				else if(record.data.ID == 'categoria'){
 					this.mostrarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
 					this.ocultarComponente(this.Cmp.id_cp_programa);
                     this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
-					
+										this.mostrarComponente(this.Cmp.nivel);
+										this.mostrarComponente(this.Cmp.formato_reporte);
+
 				}
-				
-				if(record.data.ID == 'presupuesto'){
+
+				else if(record.data.ID == 'presupuesto'){
 					this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.mostrarComponente(this.Cmp.id_presupuesto);
 					this.ocultarComponente(this.Cmp.id_cp_programa);
                     this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
-					
+										this.mostrarComponente(this.Cmp.nivel);
+										this.mostrarComponente(this.Cmp.formato_reporte);
+
 				}
-				if(record.data.ID == 'unidad_ejecutora'){
+				else if(record.data.ID == 'unidad_ejecutora'){
                     this.ocultarComponente(this.Cmp.id_categoria_programatica);
 					this.ocultarComponente(this.Cmp.id_presupuesto);
 					this.ocultarComponente(this.Cmp.id_cp_programa);
                     this.mostrarComponente(this.Cmp.id_unidad_ejecutora);
+										this.mostrarComponente(this.Cmp.nivel);
+										this.mostrarComponente(this.Cmp.formato_reporte);
                 }
-				
+				else if (record.data.ID == 'formulacion_presu_txt'){
+					this.ocultarComponente(this.Cmp.id_categoria_programatica);
+					this.ocultarComponente(this.Cmp.id_presupuesto);
+					this.ocultarComponente(this.Cmp.id_cp_programa);
+					this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+					this.ocultarComponente(this.Cmp.nivel);
+					this.ocultarComponente(this.Cmp.formato_reporte);
+				}
+
 			}, this);
-			
+
 			this.Cmp.tipo_pres.on('change',function(){
-				 
+
 				  this.Cmp.id_presupuesto.reset();
-				  this.Cmp.id_presupuesto.store.baseParams.codigos_tipo_pres = this.Cmp.tipo_pres.getValue();				
-				  this.Cmp.id_presupuesto.modificado = true; 
-				   
+				  this.Cmp.id_presupuesto.store.baseParams.codigos_tipo_pres = this.Cmp.tipo_pres.getValue();
+				  this.Cmp.id_presupuesto.modificado = true;
+
 			}, this);
-			
-		
+
+
 		},
-		
-		
-		
+
+
+
 		tipo : 'reporte',
 		clsSubmit : 'bprint',
-		
+
 		Grupos : [{
 			layout : 'column',
 			items : [{
@@ -448,11 +467,11 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
 				collapsible : true
 			}]
 		}],
-		
+
 	ActSave:'../../sis_presupuestos/control/MemoriaCalculo/reporteProgramacion',
-	
+
 	onSubmit: function(o, x, force){
-		
+
 		if(this.Cmp.tipo_reporte.getValue()=='categoria'){
 			this.Cmp.concepto.setValue(this.Cmp.id_categoria_programatica.getRawValue());
 		}
@@ -465,30 +484,49 @@ Phx.vista.FormRepProgramacion = Ext.extend(Phx.frmInterfaz, {
         if(this.Cmp.tipo_reporte.getValue()=='unidad_ejecutora'){
 			this.Cmp.concepto.setValue(this.Cmp.id_unidad_ejecutora.getRawValue());
 		}
-		
+
 		Phx.vista.FormRepProgramacion.superclass.onSubmit.call(this,o, x, force);
 	},
-	
+
 	successSave :function(resp){
        Phx.CP.loadingHide();
        var reg = Ext.util.JSON.decode(Ext.util.Format.trim(resp.responseText));
         if (reg.ROOT.error) {
             alert('error al procesar');
             return
-       } 
-       
+       }
+
        var nomRep = reg.ROOT.detalle.archivo_generado;
-        if(Phx.CP.config_ini.x==1){  			
+        if(Phx.CP.config_ini.x==1){
         	nomRep = Phx.CP.CRIPT.Encriptar(nomRep);
         }
-       
+
         if(this.Cmp.formato_reporte.getValue()=='pdf'){
         	window.open('../../../lib/lib_control/Intermediario.php?r='+nomRep+'&t='+new Date().toLocaleTimeString())
-        }
+        }else if(this.Cmp.formato_reporte.getValue()=='csv'){
+					window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
+				}
         else{
-        	window.open('../../../reportes_generados/'+nomRep+'?t='+new Date().toLocaleTimeString())
+					var id_g = this.Cmp.id_gestion.getValue()
+					var type = this.Cmp.tipo_pres.getValue()
+					var gestion = ''
+					this.Cmp.id_gestion.store.data.items.forEach(function(e) {
+							if(e.data.id_gestion == id_g) {
+									gestion = e.data.gestion
+							}
+					})
+					var tip_p = ''
+					if(type == '1'){ tip_p = 'Recursos' }else{tip_p = 'Gasto'};
+
+
+					nomRep.forEach((item, i) => {
+						var data = "&extension=txt";
+							  data += "&name_file=FormulacionPresupuestaria"+tip_p+gestion;
+								data += "&url=../../../reportes_generados/"+item;
+								window.open('../../../lib/lib_control/CTOpenFile.php?' + data);
+					});
         }
-       
+
 	}
 })
 </script>

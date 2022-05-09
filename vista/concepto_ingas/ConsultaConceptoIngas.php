@@ -312,6 +312,23 @@ header("content-type: text/javascript; charset=UTF-8");
             },
             {
                 config:{
+                    name: 'tipo_contrataciones',
+                    fieldLabel: 'Tipo Contratación (Matriz)',
+                    allowBlank: true,
+                    anchor: '80%',
+                    gwidth: 400,
+                    maxLength:500
+                },
+                type:'TextField',
+                filters: {pfiltro:'tipo_contrataciones', type:'string'},
+
+                id_grupo:0,
+                form:false,
+                grid:true,
+                bottom_filter : false
+            },
+            {
+                config:{
                     name: 'activo_fijo',
                     fieldLabel: 'Activo Fijo?',
                     allowBlank: true,
@@ -428,7 +445,9 @@ header("content-type: text/javascript; charset=UTF-8");
             'pago_unico',
             'contrato',
             'especial',
-            'activo_fijo'
+            'activo_fijo',
+
+            'tipo_contrataciones'
 
         ],
         sortInfo:{

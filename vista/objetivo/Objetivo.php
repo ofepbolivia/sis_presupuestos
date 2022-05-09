@@ -12,6 +12,9 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 
+    fwidth: '55%',
+    fheight: '65%',
+
 	constructor:function(config){
 		this.maestro=config.maestro;
 		this.initButtons=[this.cmbGestion];

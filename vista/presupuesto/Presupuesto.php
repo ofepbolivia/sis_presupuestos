@@ -19,16 +19,20 @@ header("content-type: text/javascript; charset=UTF-8");
             Phx.vista.Presupuesto.superclass.constructor.call(this,config);
 
             this.addButton('ant_estado',{
+                //(may) 05-01-2021 modificacion temporal
+                //grupo:[4]
+                //(may) 06-01-2021 se quita la modificacion temporal
+                //grupo:[0, 1,2,4],
                 grupo:[4],
                 argument: {estado: 'anterior'},
                 text: 'Retroceder',
                 iconCls: 'batras',
-                disabled: true,
+                disabled: false,
                 handler: this.antEstado,
                 tooltip: '<b>Pasar al Anterior Estado</b>'
             });
 
-            this.addButton('fin_registro', { grupo:[0, 1], text:'Siguiente', iconCls: 'badelante', disabled:true,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
+            this.addButton('fin_registro', { grupo:[0, 1], text:'Siguiente', iconCls: 'badelante', disabled:false,handler:this.fin_registro,tooltip: '<b>Siguiente</b><p>Pasa al siguiente estado, si esta en borrador comprometera presupuesto</p>'});
             this.addButton('btnMemoria',{ grupo:[0,1,2], text :'Memoria', iconCls:'bdocuments', disabled: true, handler : this.onButtonMemoria,tooltip : '<b>Memoria de Calculo</b><br/><b>Planificación de gastos o recursos</b>'});
             this.addButton('btnChequeoDocumentosWf',
                 {
@@ -110,7 +114,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     allowBlank:false,
                     gdisplayField:'nombre_uo',//mapea al store del grid
                     gwidth:200,
-                    width:250,
+                    width:350,
                     baseParams:{presupuesta:'si'},
                     renderer:function (value, p, record){return String.format('{0} {1}' , record.data['codigo_uo'], record.data['nombre_uo']);}
                 },
@@ -120,14 +124,30 @@ header("content-type: text/javascript; charset=UTF-8");
                 grid:true,
                 form:true
             },
+            {
+                config: {
+                    name: 'estado_reg_uo',
+                    fieldLabel: 'Estado Unidad',
+                    allowBlank: true,
+                    anchor: '30%',
+                    gwidth: 80,
+                    //gdisplayField: 'estado_reg_uo',//mapea al store del grid
+                    maxLength: 100
 
+                },
+                type: 'TextField',
+                filters: {pfiltro: 'estado_reg_uo', type: 'string'},
+                id_grupo: 1,
+                grid: true,
+                form: false
+            },
 
             {
                 config:{
                     name: 'descripcion',
                     fieldLabel: 'Descripcion',
                     allowBlank: true,
-                    anchor: '80%',
+                    width:350,
                     gwidth: 200,
                     maxLength:200
                 },
@@ -185,7 +205,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     queryDelay:1000,
                     width: 150,
                     listWidth: 280,
-                    gwidth: 150,
+                    width:350,
                     minChars:2,
                     renderer:function(value, p, record){return String.format('{0}', record.data['desc_tipo_presupuesto']);}
                 },
@@ -212,7 +232,7 @@ header("content-type: text/javascript; charset=UTF-8");
                             direction: 'ASC'
                         },
                         totalProperty: 'total',
-                        fields: ['codigo_categoria','id_categoria_programatica','descripcion'],
+                        fields: ['codigo_categoria','id_categoria_programatica','descripcion', 'gestion'],
                         remoteSort: true,
                         baseParams:{par_filtro:'descripcion#codigo_categoria'}
                     }),
@@ -227,16 +247,16 @@ header("content-type: text/javascript; charset=UTF-8");
                     mode:'remote',
                     pageSize:10,
                     queryDelay:1000,
-                    width: 150,
+                    width:350,
                     listWidth: 280,
                     gwidth: 150,
                     minChars:2,
-                    tpl:'<tpl for="."><div class="x-combo-list-item"><p>{codigo_categoria}</p><p>{descripcion}</p> </div></tpl>',
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{codigo_categoria}</b></p><p>{descripcion}</p> <p>Gestión: {gestion}</p> </div></tpl>',
                     renderer:function(value, p, record){return String.format('{0}', record.data['codigo_categoria']);}
                 },
                 type:'ComboBox',
                 bottom_filter: true,
-                filters:{pfiltro:'codigo_categoria',type:'string'},
+                filters:{pfiltro:'cp.codigo_categoria',type:'string'},
                 id_grupo:1,
                 grid:true,
                 form:true
@@ -266,6 +286,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     allowBlank:false,
                     typeAhead: true,
                     triggerAction: 'all',
+                    width:350,
                     lazyRender:true,
                     mode: 'local',
                     store: ['si','no']
@@ -287,7 +308,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_inicio_pres',
                     fieldLabel: 'Fecha Inicio Presupuesto',
                     allowBlank: false,
-                    anchor: '42.3%',
+                    width:350,
                     gwidth: 100,
 
 
@@ -308,7 +329,7 @@ header("content-type: text/javascript; charset=UTF-8");
                     name: 'fecha_fin_pres',
                     fieldLabel: 'Fecha Fin Presupuesto',
                     allowBlank: false,
-                    anchor: '42.3%',
+                    width:350,
                     gwidth: 100,
 
 
@@ -458,7 +479,8 @@ header("content-type: text/javascript; charset=UTF-8");
             'desc_tipo_presupuesto','descripcion','movimiento_tipo_pres',
             'id_gestion','obs_wf','sw_consolidado','codigo_categoria','id_categoria_prog','mov_pres','momento_pres','id_uo','codigo_uo','nombre_uo','id_tipo_cc','desc_tcc',
             { name:'fecha_inicio_pres', type: 'date', dateFormat: 'Y-m-d'},
-            { name:'fecha_fin_pres', type: 'date', dateFormat: 'Y-m-d'}
+            { name:'fecha_fin_pres', type: 'date', dateFormat: 'Y-m-d'},
+            {name: 'estado_reg_uo', type: 'string'}
 
         ],
 
@@ -575,10 +597,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('fin_registro').disable();
             }
 
-
+            //(may) 05-01-2021 modificacion temporal -- descomentar
+            //(may) 06-01-2021 se quita la modificacion temporal
             if (data['estado']!= 'borrador' && data['estado']!= 'aprobado'){
                 this.getBoton('ant_estado').enable();
             }
+
+
+
 
             this.getBoton('btnMemoria').enable();
             this.getBoton('btnObs').enable();

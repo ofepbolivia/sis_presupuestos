@@ -80,15 +80,21 @@ Phx.vista.AjusteConsulta = {
           	this.disableTabDecrementos();
           }
           else {
-          	if (data['tipo_ajuste'] == 'decremento' || data['tipo_ajuste'] == 'rev_comprometido'){ 
+          	if (data['tipo_ajuste'] == 'decremento' || data['tipo_ajuste'] == 'rev_comprometido' ){
           	  this.disableTabIncrementos();
             }
-            else{
+            //16-06-2021 (may)
+            else {
+                if (data['tipo_ajuste'] == 'ajuste_comprometido'){
+                    this.disableTabAjuste();
+                }
+                else{
             	this.enableAllTab();
+                }
             }
           }
           
-          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido'){
+          if (data['tipo_ajuste'] == 'rev_comprometido' || data['tipo_ajuste'] == 'inc_comprometido' || data['tipo_ajuste'] == 'ajuste_comprometido'){
           	 this.getBoton('chkpresupuesto').enable();
           } 
           else{
@@ -109,7 +115,14 @@ Phx.vista.AjusteConsulta = {
     		  title:'Incrementos (+)', 
     		  width:'60%',
     		  cls:'AjusteDetIncConsulta'
-		  }]
+		  },
+           {
+               url:'../../../sis_presupuestos/vista/ajuste_det/AjusteDetAjuConsullta.php',
+               title:'Ajuste (+/-)',
+               width:'60%',
+               cls:'AjusteDetAjuConsullta'
+           }
+		  ]
     
 };
 </script>

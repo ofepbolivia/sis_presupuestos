@@ -66,6 +66,21 @@ DECLARE
     v_tipo_ajuste					varchar;
     v_importe_total					numeric;
     v_tipo_proceso					varchar;
+
+    --16-06-2021 (may)
+    v_total_ajuste					numeric;
+
+    sw_incremento				boolean;
+    sw_decremento				boolean;
+    v_sw_error 					boolean;
+    sw_revertir 				boolean;
+    sw_comprometer				boolean;
+    sw_ajuste 					boolean;
+    v_registros_det				record;
+    v_resultado_ges				numeric[];
+    v_id_moneda_base			integer;
+    v_columna_origen			varchar;
+
 BEGIN
 
     v_nombre_funcion = 'pre.ft_ajuste_ime';
@@ -124,7 +139,7 @@ BEGIN
          END IF;
 
          --recuperamos la moenda del tramite en partida ejecucion
-         IF  v_parametros.tipo_ajuste in ('inc_comprometido','rev_comprometido', 'rev_total_comprometido') and  v_parametros.nro_tramite_aux is not null and v_parametros.nro_tramite_aux != ''THEN
+         IF  v_parametros.tipo_ajuste in ('inc_comprometido','rev_comprometido', 'rev_total_comprometido', 'ajuste_comprometido') and  v_parametros.nro_tramite_aux is not null and v_parametros.nro_tramite_aux != ''THEN
             select
                pe.id_moneda
             into
@@ -141,7 +156,8 @@ BEGIN
          from pre.tajuste taj
          where taj.nro_tramite = v_parametros.nro_tramite_aux;
 
-          v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento' else 'decremento' end;
+          v_tipo_ajuste = case when v_parametros.tipo_ajuste = 'inc_comprometido' then 'incremento'
+          						when v_parametros.tipo_ajuste = 'ajuste_comprometido' then 'ajuste'  else 'decremento' end;
 
 
 
@@ -184,7 +200,9 @@ BEGIN
         from wf.tproceso_wf pwf
         inner join wf.ttipo_proceso tp on tp.id_tipo_proceso = pwf.id_tipo_proceso
         inner join wf.tproceso_macro pm on pm.id_proceso_macro = tp.id_proceso_macro
-        where pwf.nro_tramite = v_parametros.nro_tramite_aux limit 1;
+        where pwf.nro_tramite = v_parametros.nro_tramite_aux
+        order by pwf.id_proceso_wf asc
+        limit 1;
 
         if v_tipo_proceso in ('CINTPD','CNAPD','CINTBR','GM-RM','GA-RM','GO-RM','GC-RM') then
           insert into pre.tajuste_det(
@@ -200,7 +218,11 @@ BEGIN
                 fecha_mod,
                 id_usuario_mod,
                 id_ajuste,
-                descripcion
+                descripcion,
+                id_orden_trabajo,
+                id_sol_origen,
+                tabla_origen
+
             ) select
                 tsd.id_centro_costo,
                 case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -tsd.precio_total end,
@@ -214,11 +236,60 @@ BEGIN
                 null,
                 null,
                 v_id_ajuste,
-                tsd.descripcion
+                tsd.descripcion,
+                tsd.id_orden_trabajo,
+                tsd.id_solicitud_det,
+                'adq.tsolicitud'
+
             from adq.tsolicitud_det tsd
             inner join adq.tsolicitud ts on ts.id_solicitud = tsd.id_solicitud
             where ts.num_tramite = v_parametros.nro_tramite_aux and tsd.estado_reg = 'activo';
-    	else
+
+        --17-12-2021(may)aumentando para FA
+        else if v_tipo_proceso in ('FA') then
+       		insert into pre.tajuste_det(
+                id_presupuesto,
+                importe,
+                id_partida,
+                estado_reg,
+                tipo_ajuste,
+                id_usuario_ai,
+                fecha_reg,
+                usuario_ai,
+                id_usuario_reg,
+                fecha_mod,
+                id_usuario_mod,
+                id_ajuste,
+                descripcion,
+                id_orden_trabajo,
+                id_sol_origen,
+                tabla_origen
+
+            )
+            select
+                cdet.id_cc as id_centro_costo,
+                case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -cdet.importe end,
+                cdet.id_partida ,
+                'activo',
+                v_tipo_ajuste,
+                v_parametros._id_usuario_ai,
+                now(),
+                v_parametros._nombre_usuario_ai,
+                p_id_usuario,
+                null,
+                null,
+                v_id_ajuste,
+                cdet.detalle, --descripcion,
+                null,
+                cdet.id_cuenta_doc_det,
+                'cd.tcuenta_doc'
+
+            from cd.tcuenta_doc_det cdet
+            inner join cd.tcuenta_doc cdoc on cdoc.id_cuenta_doc = cdet.id_cuenta_doc
+            where cdoc.nro_tramite = v_parametros.nro_tramite_aux and cdet.estado_reg = 'activo';
+          --
+        else
+
         	insert into pre.tajuste_det(
                 id_presupuesto,
                 importe,
@@ -232,7 +303,11 @@ BEGIN
                 fecha_mod,
                 id_usuario_mod,
                 id_ajuste,
-                descripcion
+                descripcion,
+                id_orden_trabajo,
+                id_sol_origen,
+                tabla_origen,
+                id_concepto_ingas
             ) select
                 tsd.id_centro_costo,
                 case when v_parametros.tipo_ajuste != 'rev_total_comprometido' then 0 else -tsd.monto_pago_mo end,
@@ -246,11 +321,17 @@ BEGIN
                 null,
                 null,
                 v_id_ajuste,
-                tsd.descripcion
+                tsd.descripcion,
+                tsd.id_orden_trabajo,
+                tsd.id_obligacion_det,
+                'tes.tobligacion_pago',
+                tsd.id_concepto_ingas
+
             from tes.tobligacion_det tsd
             inner join tes.tobligacion_pago ts on ts.id_obligacion_pago = tsd.id_obligacion_pago
             where ts.num_tramite = v_parametros.nro_tramite_aux and tsd.estado_reg = 'activo';
         end if;
+       end if;
 
        SELECT tf.id_funcionario
        INTO v_id_funcionario
@@ -535,7 +616,7 @@ BEGIN
                      where ad.id_ajuste = v_parametros.id_ajuste;
 
                      IF   array_length(va_id_partida,1 ) > 1 THEN
-                         raise exception 'en traspasos la partida en cada detalle tiene que ser la misma';
+                         --raise exception 'en traspasos la partida en cada detalle tiene que ser la misma';
                      END IF;
 
 
@@ -602,6 +683,33 @@ BEGIN
 
                      IF v_total_decrementos != 0 THEN
                         raise exception 'elimine los decrementos registrados';
+                     END IF;
+
+                  ELSEIF v_registros_proc.tipo_ajuste = 'ajuste_comprometido'   THEN --16-06-2021(may)
+                     -- si es Ajuste
+                     --suma
+                     select
+                        sum(a.importe)
+                     into
+                        v_total_ajuste
+                     from pre.tajuste_det a
+                     where a.id_ajuste = v_registros_proc.id_ajuste
+                           and a.tipo_ajuste = 'ajuste'
+                           and a.estado_reg = 'activo';
+
+
+                     v_total_ajuste  =  COALESCE(v_total_ajuste ,0);
+
+                     IF v_total_ajuste != 0 THEN
+                     	raise exception 'No debe existir diferencia de importes entre la suma de los Incrementos y las Disminuciones, existe una diferencia de importes: %.', v_total_ajuste;
+                     END IF;
+
+                 ELSEIF  v_registros_proc.tipo_ajuste = 'ajuste_mod_presupuestaria'   THEN
+                  -- si es Ajuste Modificación Presupuestaria igual que insertar presupuestos
+
+                     -- validar que el monto de incremento iguala al monto del decremento
+                     IF (v_total_decrementos*-1) !=  v_total_incrementos THEN
+                        raise exception 'Los incrementos deben ser proporcionales a los decrementos';
                      END IF;
 
                  ELSE
@@ -700,15 +808,35 @@ BEGIN
           --------------------------------------------------
           --  ACTUALIZA EL NUEVO ESTADO DE AJUSTES
           ----------------------------------------------------
+          --obtenermos datos basicos
+          select a.tipo_ajuste
+          into v_registros_proc
+          from pre.tajuste a
+          where a.id_ajuste = v_parametros.id_ajuste;
+
+          IF (v_registros_proc.tipo_ajuste = 'ajuste_mod_presupuestaria' and v_codigo_estado_siguiente = 'aprobado') THEN
+
+          		IF  pre.f_fun_inicio_presupuesto_ajuste_wf(p_id_usuario,
+                                                          v_parametros._id_usuario_ai,
+                                                          v_parametros._nombre_usuario_ai,
+                                                          v_id_estado_actual,
+                                                          v_id_proceso_wf,
+                                                          v_codigo_estado_siguiente) THEN
 
 
-          IF  pre.f_fun_inicio_ajuste_wf(p_id_usuario,
-           									v_parametros._id_usuario_ai,
-                                            v_parametros._nombre_usuario_ai,
-                                            v_id_estado_actual,
-                                            v_id_proceso_wf,
-                                            v_codigo_estado_siguiente) THEN
+          		END IF;
 
+          ELSE
+
+              IF  pre.f_fun_inicio_ajuste_wf(p_id_usuario,
+                                              v_parametros._id_usuario_ai,
+                                              v_parametros._nombre_usuario_ai,
+                                              v_id_estado_actual,
+                                              v_id_proceso_wf,
+                                              v_codigo_estado_siguiente) THEN
+
+
+              END IF;
 
           END IF;
 

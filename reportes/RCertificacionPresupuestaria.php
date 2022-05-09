@@ -43,13 +43,23 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $firma_aprobado = '';
         $fecha_presupuesto = '';
 
+
+    $date = date("Y");
+    if ($this->datos[0]['gestion'] <= $date ){
+
         if(count($firmas)>1) {
 
             foreach ($firmas as $fir) {
                 if (strpos($fir, 'vbrpc') !== false) {
                     $firma_fecha = explode(',', $fir);
                     //var_dump($firma_fecha);
+                }elseif (strpos($fir, 'vbrpa') !== false){
+                    $firma_fecha = explode(',', $fir);
                 }
+                elseif (strpos($fir, 'vbpresupuestos') !== false){
+                    $firma_fecha = explode(',', $fir);
+                }
+
             }
             // foreach ($firmas as $fir) {
             //     if (strpos($fir, 'vbpresupuestos') !== false) {
@@ -76,8 +86,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         //var_dump($firma_fecha);
 
-        if($firma_fecha[0]=='vbrpc') {
+        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
           $fecha = date_create($firma_fecha[1]);
+
         }
         $fecha_sol = date_format(date_create($this->datos[0]['fecha_soli']),'d/m/Y');
 
@@ -91,11 +102,11 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
       if(($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018'))||($this->datos[0]['funcionario_solicitante']=='PASTOR JAIME LAZARTE VILLAGRA'&&$this->datos[0]['codigo_moneda']!='Bs')/*||$fecha_sol<= date_create('31-10-2018')*/){
             if ($this->datos[0]['tipo'] == 'Boa' && $fecha >=  date_create('27-4-2018')){
-              if($firma_fecha[0]=='vbrpc') {
+              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
                 $fecha  = $fecha_sol;
               }
             }else{
-              if($firma_fecha[0]=='vbrpc') {
+              if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
                 $fecha = date_format($fecha, 'd/m/Y');
               }
             }
@@ -104,10 +115,21 @@ class RCertificacionPresupuestaria extends  ReportePDF{
             /*if($fecha_sol<= date_create('31-10-2018')){
                 $fecha  = $fecha_sol;
             }else {*/
-            if($firma_fecha[0]=='vbrpc') {
+            if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
             $fecha = date_format($fecha, 'd/m/Y');
            }
             //}
+        }
+
+
+        //10-12-2020 (may) para verificar las fechas... de una gestion del proceso..con la fecha de la solicitud si hay diferencia...
+        //este es un proceso de una gestion adelantada el cual se parametriza una fecha establecida
+        $anio = date_format(date_create($this->datos[0]['fecha_solicitud'] ),'Y');
+
+        if($this->datos[0]['gestion'] == $anio ){
+            $fecha_certificacion = $fecha;
+        }else{
+            $fecha_certificacion = $this->datos[0]['fecha_certificacion_por_generar'];
         }
 
         /*$tbl = '<table border="0" style="font-size: 7pt;">
@@ -121,9 +143,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
 
         $tbl = '<table border="0" style="font-size: 7pt;"> 
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
-                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha.'</td></tr>
+                <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA: </b></td><td>'.$fecha_certificacion.'</td></tr>
                 <tr><td><b>CON IMPUTACIÓN PRESUPUESTARIA: </b></td><td>Compromiso: <img width="13" height="13" src="'.dirname(__FILE__).'/../../sis_presupuestos/reportes/media/tiqueado.png"></td><td><b>UNIDAD SOLICITANTE: </b></td><td>'.$this->datos[0]['unidad_solicitante'].' </td></tr>
-                <tr><td><b>CATEGORIA:</b></td><td>'.$this->datos[0]['codigo_proceso'].'</td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
+                <tr><td><b>CATEGORIA:</b></td><td>'.$this->datos[0]['nombre_categoria'].'</td><td><b>FUNCIONARIO SOLICITANTE: </b></td><td>'.$this->datos[0]['funcionario_solicitante'].'</td></tr>
                 ';
 
         $this->Ln(5);
@@ -271,7 +293,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         if($this->GetY() == 220)
             $this->SetY(250);
 
-        if($firma_fecha[0]=='vbrpc') {
+
+
+        if($firma_fecha[0]=='vbrpc' || $firma_fecha[0]=='vbrpa' || $firma_fecha[0]=='vbpresupuestos') {
             $tbl = '<table>
                     <tr>
                     <td style="width: 15%"></td>
@@ -337,9 +361,9 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         }
 
         if($this->datos[0]['codigo_poa']!=''){
-            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.$fecha/*date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y')*/.'</b>
-            acerca de: <b>'.$this->datos[0]['justificacion'].'</b>, certificar que el mismo se encuentra contemplado en el Plan Operativo gestion <b>'.$this->datos[0]['gestion'].'</b>,
-            en la operacion <b>'.$this->datos[0]['codigo_descripcion'].'.</b>';
+            $tex ='Mediante la presente, en referencia a solicitud <b>'.$this->datos[0]['num_tramite'].'</b> de fecha <b>'.$fecha_certificacion/*date_format(date_create($this->datos[0]['fecha_soli']), 'd/m/Y')*/.'</b>
+            acerca de: <b>'.$this->datos[0]['justificacion'].'</b>, certificar que el mismo se encuentra contemplado en el Plan Operativo gestión <b>'.$this->datos[0]['gestion'].'</b>,
+            en la operación <b>'.$this->datos[0]['codigo_descripcion'].'.</b>';
 
             $this->SetFont('','B',12);
             $this->Cell(0,5,"CERTIFICACIÓN POA",0,1,'C');
@@ -396,7 +420,23 @@ class RCertificacionPresupuestaria extends  ReportePDF{
                     ';
                 $this->writeHTML($tbl, true, false, false, false, '');
             }
+
+
         }
+
+
+    }else{
+        $fecha_certificacion_por_generar = $this->datos[0]['fecha_certificacion_por_generar'];
+
+        $tbl = '<table border="0" style="font-size: 7pt;"> 
+                <tr width="28%" align="center"><b>AUN NO SE ENCUENTRA LA CERTIFICACION PRESUPUESTARIA PARA EL PROCESO '.$this->datos[0]['num_tramite'].', SE GENERARÁ AUTOMÁTICAMENTE EN LA FECHA '.$fecha_certificacion_por_generar.'.</b></tr>
+                </table>
+                ';
+        $this->Ln(5);
+        $this->writeHTML($tbl, true, false, false, false, '');
+    }
+
+
     }
 
     function basico($numero) {

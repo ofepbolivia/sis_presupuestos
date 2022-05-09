@@ -85,7 +85,7 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
 			type:'Field',
 			form:true 
 		},
-        {
+        /*{
             config: {
                 name: 'id_gestion',
                 fieldLabel: 'Gestion',
@@ -129,6 +129,28 @@ Phx.vista.UnidadEjecutora=Ext.extend(Phx.gridInterfaz,{
             filters: {pfiltro: 'tg.gestion',type: 'string'},
             grid: true,
             form: true
+        },*/
+        {
+            config:{
+                name : 'id_gestion',
+                origen : 'GESTION',
+                fieldLabel : 'Gestión',
+                allowBlank : false,
+                resizable:true,
+                gdisplayField : 'gestion',//mapea al store del grid
+                width: 177,
+                gwidth : 100,
+                renderer : function (value, p, record){return String.format('{0}', record.data['gestion']);}
+            },
+            type : 'ComboRec',
+            id_grupo : 2,
+            filters : {
+                pfiltro : 'ges.gestion',
+                type : 'numeric'
+            },
+
+            grid : false,
+            form : true
         },
 		{
 			config:{

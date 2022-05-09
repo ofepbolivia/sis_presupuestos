@@ -33,7 +33,7 @@ DECLARE
   v_verif_pres      varchar[];
   v_disponible		numeric;
   v_gestion			integer;
-  
+  v_moneda			varchar;
 BEGIN
 
 v_nombre_funcion = 'pre.f_verificar_presupuesto_partida';
@@ -85,9 +85,10 @@ v_nombre_funcion = 'pre.f_verificar_presupuesto_partida';
            IF  v_id_moneda_base != p_id_moneda THEN
                   -- tenemos tipo de cambio
                   -- si el tipo de cambio es null utilza el cambio oficial para la fecha
+                  -- modificado breydi vasquez 06/03/2020 correccion cambio moneda.
                   v_monto_mb  =   param.f_convertir_moneda (
-                             v_id_moneda_base, 
-                             p_id_moneda,   
+                             p_id_moneda,
+                             v_id_moneda_base,
                              p_monto_total, 
                              now()::date,
                              'CUS',50, 
@@ -97,7 +98,13 @@ v_nombre_funcion = 'pre.f_verificar_presupuesto_partida';
               v_monto_mb = p_monto_total;
            END IF;
       
-      
+           if v_monto_mb is null then
+                    select m.moneda
+                      into v_moneda
+                      from param.tmoneda m
+                      where id_moneda = p_id_moneda;
+	        	raise exception 'No existe tipo de cambio para la fecha: % y la moneda: % ', to_char(now()::date,'DD/MM/YYYY'),v_moneda;
+           end if;
          
     
             v_verif_pres  =  pre.f_verificar_presupuesto_individual(
