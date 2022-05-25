@@ -64,12 +64,7 @@ Phx.vista.PresupuestoFor = {
    
    tabeast:[
 
-		   /*{
-			   url:'../../../sis_presupuestos/vista/presupuesto_objetivo/PresupuestoObjetivoForm.php',
-			   title:'Objetivos',
-			   width:'50%',
-			   cls:'PresupuestoObjetivoForm'
-		   },*/
+
 	       {
     		  url:'../../../sis_presupuestos/vista/presup_partida/PresupPartidaForm.php',
     		  title:'Partidas', 

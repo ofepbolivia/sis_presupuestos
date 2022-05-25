@@ -372,12 +372,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 width: '50%',
                 cls: 'RelPreInicio'
             },
-            {
-                url: '../../../sis_presupuestos/vista/presupuesto_objetivo/PresupuestoObjetivo.php',
-                title: 'Objetivos',
-                width: '50%',
-                cls: 'PresupuestoObjetivo'
-            },
+
             {
                 url: '../../../sis_presupuestos/vista/techo_presupuestos/TechoPresupuestos.php',
                 title: 'Techo presupuestario',
