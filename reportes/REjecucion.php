@@ -285,7 +285,8 @@ class REjecucion extends  ReportePDF {
             $this->tablealigns=array('R','C','R','R','R','R','R','R','R','R','R','R','C');
             $this->tablenumbers=array(0,0,2,2,2,2,2,2,2,2,2,2,0);
     
-            $this-> MultiRow($RowArray,$fill,1);
+            //$this-> MultiRow($RowArray,$fill,1);
+            $this-> MultiRow($RowArray,false,1); //ANPM 27092022 Se ajusta para la visualizacion de los totales fianles
 
 
         }else{            
