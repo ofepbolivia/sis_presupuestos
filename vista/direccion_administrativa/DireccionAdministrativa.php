@@ -35,10 +35,9 @@ Phx.vista.DireccionAdministrativa=Ext.extend(Phx.gridInterfaz,{
         {
             config: {
                 name: 'id_gestion',
-                fieldLabel: 'Gestion',
+                fieldLabel: 'Gestión',
                 allowBlank: false,
-                emptyText:'Gestion...',
-                blankText: 'Año',
+                emptyText:'Gestión...',
                 store:new Ext.data.JsonStore(
                     {
                         url: '../../sis_parametros/control/Gestion/listarGestion',
@@ -63,7 +62,7 @@ Phx.vista.DireccionAdministrativa=Ext.extend(Phx.gridInterfaz,{
                 queryDelay:500,
                 listWidth:'280',
                 hidden:false,
-                width:80,
+                width:100,
                 minChars: 2,
                 editable: false,
                 renderer : function(value, p, record) {
@@ -81,7 +80,7 @@ Phx.vista.DireccionAdministrativa=Ext.extend(Phx.gridInterfaz,{
 		{
 			config:{
 				name: 'codigo',
-				fieldLabel: 'Codigo',
+				fieldLabel: 'Código',
 				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
@@ -219,7 +218,7 @@ Phx.vista.DireccionAdministrativa=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	tam_pag:50,	
-	title:'DireccionAdmin',
+	title:'Dirección Administrativa',
 	ActSave:'../../sis_presupuestos/control/DireccionAdministrativa/insertarDireccionAdministrativa',
 	ActDel:'../../sis_presupuestos/control/DireccionAdministrativa/eliminarDireccionAdministrativa',
 	ActList:'../../sis_presupuestos/control/DireccionAdministrativa/listarDireccionAdministrativa',
@@ -252,9 +251,10 @@ Phx.vista.DireccionAdministrativa=Ext.extend(Phx.gridInterfaz,{
             url:'../../sis_reclamo/control/Reclamo/getDatosOficina',
             params:{id_usuario:0},
             success:function(resp){
-                var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
+                //fRnk: comentado para que no tenga valor por defecto, genera error cuando está asignado el valor por defecto
+                /*var reg =  Ext.decode(Ext.util.Format.trim(resp.responseText));
                 this.Cmp.id_gestion.setValue(reg.ROOT.datos.id_gestion);
-                this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);
+                this.Cmp.id_gestion.setRawValue(reg.ROOT.datos.gestion);*/
                 //this.store.baseParams.id_gestion=this.cmbGestion.getValue();
             },
             failure: this.conexionFailure,

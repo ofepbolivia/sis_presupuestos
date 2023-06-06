@@ -203,7 +203,7 @@ Phx.vista.CpProyecto=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	tam_pag:50,	
-	title:'CP Poryecto',
+	title:'CP Proyecto', //fRnk: modificado título Poryecto
 	ActSave:'../../sis_presupuestos/control/CpProyecto/insertarCpProyecto',
 	ActDel:'../../sis_presupuestos/control/CpProyecto/eliminarCpProyecto',
 	ActList:'../../sis_presupuestos/control/CpProyecto/listarCpProyecto',
