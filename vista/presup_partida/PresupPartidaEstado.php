@@ -373,7 +373,7 @@ Phx.vista.PresupPartidaEstado=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	tam_pag:50,	
-	title:'PREPAR',
+	title:'PRESUPUESTO APROBADO',
 	ActList:'../../sis_presupuestos/control/PresupPartida/listarPresupPartidaEstado',
 	id_store:'id_presup_partida',
 	fields: [

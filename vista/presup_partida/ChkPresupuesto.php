@@ -208,7 +208,7 @@ Phx.vista.ChkPresupuesto=Ext.extend(Phx.gridInterfaz,{
 		
 	],
 	tam_pag:50,	
-	title:'PREPAR',
+	title:'Anteproyecto',
 	ActList:'../../sis_presupuestos/control/PresupPartida/listarPresupPartidaEstadoXNroTramite',
 	id_store:'id_presup_partida',
 	fields: [

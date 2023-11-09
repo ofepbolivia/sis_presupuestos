@@ -77,6 +77,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                 <tr><td width="28%"><b>ENTIDAD: </b></td><td width="23%"> '.$this->datos[0]['nombre_entidad'].'</td><td width="23%"><b>NRO. PROCESO: </b></td><td width="28%">'.$this->datos[0]['num_tramite'].'</td></tr>
                 <tr><td><b>DIRECCIÓN ADMINISTRATIVA: </b></td><td> '.$this->datos[0]['direccion_admin'].'</td><td><b>FECHA SOLICITUD: </b></td><td>'.date_format(date_create($this->datos[0]['fecha_solicitud']),'d/m/Y').'</td></tr>
                 <tr><td><b>UNIDAD EJECUTORA: </b></td><td> '.$this->datos[0]['unidad_ejecutora'].'</td><td><b>FECHA VALIDACIÓN: </b></td><td>'.$fecha.' </td></tr>
+                <tr><td><b>ESTADO: </b></td><td> '.$this->datos[0]['estado'].'</td><td><b></b></td><td></td></tr>
                 ';
 
         $this->Ln(5);
@@ -133,7 +134,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                                <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
                            </tr>';
                     $tbl.='<tr>
-                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Bolivianos.').'</b></td>
     
                    </tr>';
 
@@ -188,7 +189,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                             <td width="8%" align="center" valign="center"><br><b>PARTIDA</b></td>
                             <td width="36%" align="center"><br><b>DESCRIPCIÓN</b></td>
                             <td width="7%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
-                            <td width="12%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$us.').'</b></td>
+                            <td width="12%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$Bs.').'</b></td>
                         </tr>';
 
                     $codigo_cg = $record["codigo_cg"];
@@ -238,7 +239,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                                <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
                            </tr>';
                     $tbl.='<tr>
-                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Bolivianos.').'</b></td>
     
                    </tr>';
 
@@ -280,7 +281,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                                <td align="right" ><b>'.number_format($total_general,2, ',', '.').'</b></td>
                            </tr>';
                     $tbl.='<tr>
-                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Dolares.').'</b></td>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$this->convertir((integer)$total_general>0?(integer)$total_general:(integer)$total_general*(-1)).' '.($centimos[1]==''?'00':$centimos[1]).'/100 ........................................................'.($cod_moneda=='Bs'?'Bolivianos.':'Bolivianos.').'</b></td>
     
                    </tr>';
 
@@ -327,7 +328,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                             <td width="11%" align="center" valign="center"><br><b>RUBRO</b></td>
                             <td width="10%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
                             <td width="38%" align="center"><br><b>DESCRIPCIÓN</b></td>
-                            <td width="15%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$us.').'</b></td>
+                            <td width="15%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$Bs.').'</b></td>
                         </tr>';
 
                     $codigo_cg = $record["codigo_cg"];
@@ -376,7 +377,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                                <td align="right" ><b>' . number_format($total_general, 2, ',', '.') . '</b></td>
                            </tr>';
             $tbl .= '<tr>
-                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this->convertir((integer)$total_general > 0 ? (integer)$total_general : (integer)$total_general * (-1)) . ' ' . ($centimos[1] == '' ? '00' : $centimos[1]) . '/100 ........................................................' . ($cod_moneda == 'Bs' ? 'Bolivianos.' : 'Dolares.') . '</b></td>
+                       <td colspan="11" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this->convertir((integer)$total_general > 0 ? (integer)$total_general : (integer)$total_general * (-1)) . ' ' . ($centimos[1] == '' ? '00' : $centimos[1]) . '/100 ........................................................' . ($cod_moneda == 'Bs' ? 'Bolivianos.' : 'Bolivianos.') . '</b></td>
     
                    </tr>';
         }else{
@@ -385,7 +386,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                                <td align="right" ><b>' . number_format($total_general, 2, ',', '.') . '</b></td>
                            </tr>';
             $tbl .= '<tr>
-                       <td colspan="7" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this->convertir((integer)$total_general > 0 ? (integer)$total_general : (integer)$total_general * (-1)) . ' ' . ($centimos[1] == '' ? '00' : $centimos[1]) . '/100 ........................................................' . ($cod_moneda == 'Bs' ? 'Bolivianos.' : 'Dolares.') . '</b></td>
+                       <td colspan="7" align="left">&nbsp;&nbsp;&nbsp;&nbsp;Son: <b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . $this->convertir((integer)$total_general > 0 ? (integer)$total_general : (integer)$total_general * (-1)) . ' ' . ($centimos[1] == '' ? '00' : $centimos[1]) . '/100 ........................................................' . ($cod_moneda == 'Bs' ? 'Bolivianos.' : 'Bolivianos.') . '</b></td>
     
                    </tr>';
         }
