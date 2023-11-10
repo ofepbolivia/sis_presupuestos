@@ -27,9 +27,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 argument: {estado: 'anterior'},
                 text: 'Retroceder',
                 iconCls: 'batras',
-                /////////////////////NGLL
-                disabled: true,
-                /////////////////////NGLL
+                disabled: false,
                 handler: this.antEstado,
                 tooltip: '<b>Pasar al Anterior Estado</b>'
             });
@@ -486,7 +484,7 @@ header("content-type: text/javascript; charset=UTF-8");
 
         ],
 
-        
+
         sortInfo:{
             field: 'id_presupuesto',
             direction: 'ASC'
@@ -727,26 +725,6 @@ header("content-type: text/javascript; charset=UTF-8");
             });
 
         },
-        /////////////////////////NGLL
-        preparaMenu:function(){
-		var rec = this.sm.getSelected();
-		var tb = this.tbar;
-		if (rec.data.tipo_reg == 'summary'){
-			if( this.getBoton('edit') ){
-				this.getBoton('edit').disable();
-			}
-			if( this.getBoton('del') ){
-				this.getBoton('del').disable();
-			}
-			//if( this.getBoton('new') ){
-				//this.getBoton('new').disable();
-			//}
-		}
-		else{
-		   Phx.vista.PresupPartida.superclass.preparaMenu.call(this);
-		}
-   },
-        //////////////////////////////NGLL
 
         successEstadoSinc:function(resp){
             Phx.CP.loadingHide();
@@ -755,5 +733,4 @@ header("content-type: text/javascript; charset=UTF-8");
         }
 
     })
-    
 </script>

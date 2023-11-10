@@ -18,7 +18,6 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 		this.iniciarEventos();
 		
 	},
-    
 			//ll
 	Atributos:[
 		{
@@ -203,7 +202,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 width: 350,
                 gwidth: 200,
-                maxLength:400,
+                maxLength:10,
                 readOnly: false
             },
             type:'TextArea',
@@ -220,7 +219,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
                 fieldLabel: 'ID. Origen',
                 allowBlank: true,
                 gwidth: 70,
-                maxLength:400
+                maxLength:10
             },
             type:'TextField',
             filters:{pfiltro:'ajd.id_sol_origen',type:'string'},
@@ -308,23 +307,6 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				grid:true,
 				form:false
 		},
-        
-       // {
-		//	config:{
-//				name: 'estado_ajuste',
-//				fieldLabel: 'Estado.',
-//				allowBlank: true,
-//				anchor: '80%',
-//				gwidth: 100,
-//				maxLength:10
-//			},
-//				type:'TextField',
-//				filters:{pfiltro:'ajd.estado_ajuste',type:'string'},
-//				id_grupo:1,
-//				grid:true,
-//				form:false
-//		},
-        
 		{
 			config:{
 				name: 'fecha_reg',
@@ -403,8 +385,6 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				form:false
 		}
 	],
-
-    
 	tam_pag:50,	
 	title:'Detalle del Ajuste',
 	ActSave:'../../sis_presupuestos/control/AjusteDet/insertarAjusteDet',
@@ -431,8 +411,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
         {name:'nombre_ingas', type: 'string'},
         'id_orden_trabajo','desc_orden',
         {name:'id_sol_origen', type: 'string'},
-        {name:'estado_ajuste', type: 'string'}
-        //'estado_ajuste'
+        'estado_ajuste'
 	],
 	sortInfo:{
 		field: 'id_ajuste_det',
@@ -442,9 +421,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 	preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
-        
-        
-        
+
 
 		if (rec.data.tipo_reg == 'summary'){
 			if( this.getBoton('edit') ){
@@ -457,13 +434,13 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				this.getBoton('new').disable();
 			}
 		     
+
 		}
 		else{
 		   Phx.vista.AjusteDet.superclass.preparaMenu.call(this);
 		}
-    
-        //cambio del estado de los botones
 
+        //04-01-2022 para que botones no esten activos cuando se apruebe el ajuste
         if (rec.data.estado_ajuste == 'aprobado'){
             this.getBoton('edit').disable();
             this.getBoton('del').disable();
