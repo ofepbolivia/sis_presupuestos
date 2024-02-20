@@ -1,4 +1,10 @@
 <?php
+//dirname(__FILE__).'/../../lib/lib_modelo/conexion.php';
+
+//$conexion = pg_connect("host=localhost dbname=kerp user=admin password=admin");
+
+//$nombres = pg_query($conexion, "SELECT nombre FROM usuarios WHERE edad < 30");
+
 class RPartidaEjecutadoXls
 {
     private $docexcel;
@@ -6,7 +12,7 @@ class RPartidaEjecutadoXls
     private $equivalencias=array();
     private $objParam;
     private $columna;
-    private  $cat ;
+    private $cat ;
     private $codigo= array();
     private $titulo= array();
     private $sumaTotal = array();
@@ -62,19 +68,24 @@ class RPartidaEjecutadoXls
 
         );
 
-
     }
-    function datosHeader ( $detalle,$totales,$total,$institucional) {
-        //var_dump($total);exit;
+    function datosHeader ($detalle,$totales,$total,$institucional,$data_empresa) {
         $this->datos_detalle = $detalle;
         $this->datos_titulo = $totales;
-       $this->datos_total = $total;
+        $this->datos_total = $total;
         $this->datos_institucional = $institucional;
+        $this->datos_entidad = $dataEmpresa;
     }
+
     function imprimeCabecera($shit,$tipo) {
         $this->docexcel->createSheet($shit);
         $this->docexcel->setActiveSheetIndex($shit);
-        $this->docexcel->getActiveSheet()->setTitle($tipo|'');
+        //quitamos los - 
+        $tipop = str_replace("-", "", $this->cat);
+        if($shit==1){
+            $tipop='Admón. productiva';
+        }
+        $this->docexcel->getActiveSheet()->setTitle(substr($tipop, 0, 20));
 
         $styleTitulos1 = array(
             'font'  => array(
@@ -114,9 +125,6 @@ class RPartidaEjecutadoXls
                     ),
                 )
         );
-
-
-
 
                 $styleEjecutado = array(
                     'font' => array(
@@ -1331,27 +1339,26 @@ class RPartidaEjecutadoXls
                 $this->docexcel->getActiveSheet()->getColumnDimension('DS')->setVisible(0);
                 $this->docexcel->getActiveSheet()->getColumnDimension('DT')->setVisible(0);
                 $this->docexcel->getActiveSheet()->getColumnDimension('DU')->setVisible(0);
-
-
             }
-
         }
-
         //titulos
 
         if ($this->objParam->getParametro('tipo_reporte')=='presupuesto') {
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2,'"BOLIVIANA DE AVIACIÓN" - BoA');
+
+            //$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $this->cat = $value['cod_prg']);
+            //$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $this->objParam->getParametro('nom_empresa'));
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $this->objParam->getParametro('nombre'));
             $this->docexcel->getActiveSheet()->getStyle('A2:BJ2')->applyFromArray($styleTitulos1);
             $this->docexcel->getActiveSheet()->mergeCells('A2:BJ2');
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, $this->objParam->getParametro('concepto') );
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, $this->objParam->getParametro('concepto'));
             $this->docexcel->getActiveSheet()->getStyle('A3:BJ3')->applyFromArray($styleTitulos1);
             $this->docexcel->getActiveSheet()->mergeCells('A3:BJ3');
         }else
         {
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, '"BOLIVIANA DE AVIACIÓN" - BoA');
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $this->objParam->getParametro('nombre'));
             $this->docexcel->getActiveSheet()->getStyle('A2:BJ2')->applyFromArray($styleTitulos1);
             $this->docexcel->getActiveSheet()->mergeCells('A2:BJ2');
-            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, $this->cat . ' - ' . $this->objParam->getParametro('concepto'));
+            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, $this->cat . ' - ' .$this->objParam->getParametro('concepto'));
             $this->docexcel->getActiveSheet()->getStyle('A3:BJ3')->applyFromArray($styleTitulos1);
             $this->docexcel->getActiveSheet()->mergeCells('A3:BJ3');
 
@@ -1738,7 +1745,6 @@ class RPartidaEjecutadoXls
 
 
         $colum = 0;
-        //var_dump($this->cabecera); exit;
        foreach ($this->cabecera as  $value)
        {
            $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow($colum, 6, $value);
@@ -1794,9 +1800,7 @@ class RPartidaEjecutadoXls
                     'style' => PHPExcel_Style_Border::BORDER_THICK,
                 )
             )
-
         );
-
 
         if(($this->objParam->getParametro('tipo_movimiento')=='comprometido')or ($this->objParam->getParametro('tipo_movimiento')=='ejecutado')) {
             $fila = 7;
@@ -1806,7 +1810,6 @@ class RPartidaEjecutadoXls
             $sheet = 0;
             $this->codigo =['10000','20000','30000','40000','50000','60000','80000','90000'];
             $this->imprimeCabecera($sheet,$this->cat);
-
             foreach ($datos as $value) {
                 if ($value['cod_prg'] != $this->cat) {
                     $this->cat = $value['cod_prg'];
@@ -2201,12 +2204,12 @@ class RPartidaEjecutadoXls
 
             $fila = 7;
             $dato2 = $this->datos_total;
+
             $this->cat = $dato2[0]['cod_prg'];
             $this->titulo= [0,1,2];
             $sheet = 0;
             $this->codigo =['10000','20000','30000','40000','50000','60000','80000','90000'];
             $this->imprimeCabecera($sheet,$this->cat);
-
             foreach ($dato2 as $value) {
                 if ($value['cod_prg'] != $this->cat) {
                     $this->cat = $value['cod_prg'];
@@ -2587,20 +2590,17 @@ class RPartidaEjecutadoXls
         if($categoria =='0' or $presupuesto =='0' or $programa == '0'){
         $this->institucional($sheet);
        }
-
     }
-    function institucional ($sheet){
+    function institucional($sheet){
         $this->docexcel->createSheet($sheet );
         $this->docexcel->setActiveSheetIndex($sheet);
         $this->imprimeCabecera($sheet,'INSTITUCIONAL');
 
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, $this->objParam->getParametro('concepto'));
-
         $dato2 = $this->datos_institucional;
         $fila = 7;
         $this->titulo= [0,1,2];
         $this->codigo =['10000','20000','30000','40000','50000','60000','80000','90000'];
-
 
         foreach ($dato2 as $value) {
 

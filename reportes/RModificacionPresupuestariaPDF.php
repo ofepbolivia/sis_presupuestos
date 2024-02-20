@@ -189,7 +189,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                             <td width="8%" align="center" valign="center"><br><b>PARTIDA</b></td>
                             <td width="36%" align="center"><br><b>DESCRIPCIÓN</b></td>
                             <td width="7%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
-                            <td width="12%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$Bs.').'</b></td>
+                            <td width="12%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'Bs.').'</b></td>
                         </tr>';
 
                     $codigo_cg = $record["codigo_cg"];
@@ -328,7 +328,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                             <td width="11%" align="center" valign="center"><br><b>RUBRO</b></td>
                             <td width="10%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
                             <td width="38%" align="center"><br><b>DESCRIPCIÓN</b></td>
-                            <td width="15%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$Bs.').'</b></td>
+                            <td width="15%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'Bs.').'</b></td>
                         </tr>';
 
                     $codigo_cg = $record["codigo_cg"];

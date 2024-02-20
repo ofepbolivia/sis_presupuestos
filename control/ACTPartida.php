@@ -78,7 +78,7 @@ class ACTPartida extends ACTbase{
 		   $this->objParam->getParametro('id_presupuesto_ajuste')!=''
 		   ){
 
-	    	  $this->objParam->addFiltro("id_partida in (select x.id_partida from pre.vpe_check_partida x where x.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto_ajuste')." and x.id_gestion =  ".$this->objParam->getParametro('id_gestion')." and  x.nro_tramite = ''".$this->objParam->getParametro('nro_tramite')."'')");
+	    	$this->objParam->addFiltro("id_partida in (select x.id_partida from pre.vpe_check_partida x where x.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto_ajuste')." and x.id_gestion =  ".$this->objParam->getParametro('id_gestion')." and  x.nro_tramite = ''".$this->objParam->getParametro('nro_tramite')."'')");
 	     }
 
 		/////////////////////
@@ -267,25 +267,36 @@ class ACTPartida extends ACTbase{
             $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
             exit;
         }
+    }
+
+	function listarDatosEmpresa(){
+        $this->objFunc = $this->create('MODPartida');
+        $cbteHeader = $this->objFunc->listarDatosEmpresa($this->objParam);
+        if($cbteHeader->getTipo() == 'EXITO'){
+            return $cbteHeader;
+        }
+        else{
+            $cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+            exit;
+        }
 
     }
-    function listarPartidaEjecutado (){
+    function listarPartidaEjecutado(){
 		$dataSource = $this->listarPartidaEjecutados();
-
         $dataSourceTotal = $this->listarPartidaEjecutadoTotal();
         $dateSourseInstitucional = $this->listarPartidaInstitucional();
+		$dataSourceEmpresa = $this->listarDatosEmpresa();
 
 		$nombreArchivo = uniqid(md5(session_id()).'Partidas').'.xls';
 		$this->objParam->addParametro('nombre_archivo',$nombreArchivo);
 		$reporte = new RPartidaEjecutadoXls($this->objParam);
-		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData,$dataSourceTotal->getDatos(),$dateSourseInstitucional->getDatos());
+		$reporte->datosHeader($dataSource->getDatos(),$dataSource->extraData,$dataSourceTotal->getDatos(),$dateSourseInstitucional->getDatos(),
+		$dataSourceEmpresa->getDatos());
 		$reporte->generarReporte();
 		$this->mensajeExito=new Mensaje();
 		$this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
 		$this->mensajeExito->setArchivoGenerado($nombreArchivo);
 		$this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
-
-
 
 
     }

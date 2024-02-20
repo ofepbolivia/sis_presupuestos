@@ -202,7 +202,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
                 allowBlank: true,
                 width: 350,
                 gwidth: 200,
-                maxLength:10,
+                maxLength:400,
                 readOnly: false
             },
             type:'TextArea',
@@ -434,7 +434,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				this.getBoton('new').disable();
 			}
 		     
-
+             
 		}
 		else{
 		   Phx.vista.AjusteDet.superclass.preparaMenu.call(this);

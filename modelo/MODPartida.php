@@ -201,13 +201,14 @@ class MODPartida extends MODbase{
         $this->setParametro('fecha_ini','fecha_ini','date');
         $this->setParametro('fecha_fin','fecha_fin','date');
         $this->setParametro('tipo_movimiento','tipo_movimiento','varchar');
+       // $this->setParametro('nom_empresa','nom_empresa','varchar');
 
         $this->captura('id_partida','int4');
         $this->captura('codigo_partida','varchar');
         $this->captura('nombre_partida','varchar');
         $this->captura('nivel_partida','int4');
         $this->captura('cod_prg','varchar');
-
+        //$this->captura('nom_empresa','varchar');
 
         $this->captura('c1','NUMERIC');
         $this->captura('c2','NUMERIC');
@@ -261,12 +262,10 @@ class MODPartida extends MODbase{
         $this->captura('acumulado11', 'NUMERIC');
         $this->captura('acumulado12', 'NUMERIC');
 
-
         $this->captura('total_programado', 'NUMERIC');
         $this->captura('importe_aprobado', 'NUMERIC');
         $this->captura('modificaciones', 'NUMERIC');
         $this->captura('total_comp_ejec', 'NUMERIC');
-
 
 
         $this->armarConsulta();
@@ -524,6 +523,8 @@ class MODPartida extends MODbase{
         $this->captura('modificaciones', 'NUMERIC');
         $this->captura('total_comprometido', 'NUMERIC');
         $this->captura('total_ejecutado', 'NUMERIC');
+        //$this->captura('nombre_empresa', 'varchar');
+        
 
 
         $this->armarConsulta();
@@ -646,5 +647,25 @@ class MODPartida extends MODbase{
         return $this->respuesta;
     }
 
+    function listarDatosEmpresa(){
+        //Definicion de variables para ejecucion del procedimientp
+        $this->procedimiento='pre.ft_partida_sel';
+        $this->transaccion='PRE_DAT_EMP_SEL';
+        $this->tipo_procedimiento='SEL';//tipo de transaccion
+
+        //$this->setParametro('filtro_ges','filtro_ges','varchar');
+        $this->setParametro('id_empresa','id_empresa','int4');
+        $this->setParametro('nombre','nombre','varchar');
+        //$this->setParametro('nombre','nombre','varchar');
+        //Definicion de la lista del resultado del query
+       
+        $this->captura('nombre','varchar');
+       
+        //Ejecuta la instruccion
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        //Devuelve la respuesta
+        return $this->respuesta;
+    }
 }
 ?>

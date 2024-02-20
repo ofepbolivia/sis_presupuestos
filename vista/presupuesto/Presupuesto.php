@@ -599,11 +599,34 @@ header("content-type: text/javascript; charset=UTF-8");
 
             //(may) 05-01-2021 modificacion temporal -- descomentar
             //(may) 06-01-2021 se quita la modificacion temporal
+            
+
             if (data['estado']!= 'borrador' && data['estado']!= 'aprobado'){
                 this.getBoton('ant_estado').enable();
             }
+            //ngll
+            //formulacion del Presupuesto docs-PRE.FOR_01
+            //estado del presupuesto   docs-PRE.REP_03
+          
+            if(this.idContenedor=='docs-PRE.FOR_01'){
+            if (data['estado']== 'aprobado'){
+                this.getBoton('edit').disable();
+            }}
+           
+            if(this.idContenedor=='docs-PRE.REP_03'){
 
-
+                if (data['estado']== 'aprobado'){
+                    this.getBoton('fin_registro').disable();
+                    this.getBoton('ant_estado').disable();
+                    this.getBoton('edit').disable();
+                    this.getBoton('del').disable();
+                }
+                if (data['estado']!= 'aprobado'){
+                    this.getBoton('fin_registro').disable();
+                    this.getBoton('ant_estado').disable();
+                    this.getBoton('edit').disable();
+                    this.getBoton('del').disable();
+                }}
 
 
             this.getBoton('btnMemoria').enable();
@@ -611,7 +634,6 @@ header("content-type: text/javascript; charset=UTF-8");
             this.getBoton('btnChequeoDocumentosWf').enable();
             this.getBoton('diagrama_gantt').enable();
         },
-
 
         liberaMenu:function(){
             var tb = Phx.vista.Presupuesto.superclass.liberaMenu.call(this);

@@ -599,10 +599,13 @@ Phx.vista.FormRepEjecucionPorPartida = Ext.extend(Phx.frmInterfaz, {
                 this.clean(this.Cmp.id_unidad_ejecutora, c);
                 this.clean(this.Cmp.id_partida, c);
 
+                //fRnk: se añadió validación para el rago de fechas HR00174-2024
+                this.Cmp.fecha_ini.setMinValue('01/01/'+r.data.gestion);
+                this.Cmp.fecha_ini.setMaxValue('31/12/'+r.data.gestion);
+                this.Cmp.fecha_fin.setMinValue('01/01/'+r.data.gestion);
+                this.Cmp.fecha_fin.setMaxValue('31/12/'+r.data.gestion);
                 this.Cmp.fecha_ini.setValue('01/01/'+r.data.gestion);
                 this.Cmp.fecha_fin.setValue('31/12/'+r.data.gestion);
-
-
 
 			},this);
 

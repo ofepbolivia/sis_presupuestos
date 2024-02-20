@@ -340,8 +340,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.TabPanelEast.get(2).disable();
                 this.TabPanelEast.setActiveTab(0)
             }
-
-
         },
 
         liberaMenu: function () {
@@ -351,10 +349,9 @@ header("content-type: text/javascript; charset=UTF-8");
                 this.getBoton('btnRepRelCon').disable();
             }
         },
-
-
+        
         tabeast: [
-            {
+            {   
                 url: '../../../sis_presupuestos/vista/presup_partida/PresupPartidaInicio.php',
                 title: 'Partidas',
                 width: '50%',
@@ -372,7 +369,6 @@ header("content-type: text/javascript; charset=UTF-8");
                 width: '50%',
                 cls: 'RelPreInicio'
             },
-
             {
                 url: '../../../sis_presupuestos/vista/techo_presupuestos/TechoPresupuestos.php',
                 title: 'Techo presupuestario',
@@ -380,7 +376,5 @@ header("content-type: text/javascript; charset=UTF-8");
                 cls: 'TechoPresupuestos'
             }
         ]
-
-
     };
 </script>

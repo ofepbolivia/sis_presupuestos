@@ -14,6 +14,9 @@ require_once(dirname(__FILE__).'/../reportes/REjecucionPorPartidaXls.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionGestionAnterior.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionCategoria.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionCategoriaXls.php');
+require_once(dirname(__FILE__).'/../reportes/RPresupPartidaPdf.php');
+require_once(dirname(__FILE__).'/../reportes/RPresupPartidaEstadoPdf.php');
+
 
 class ACTPresupPartida extends ACTbase{
 
@@ -25,8 +28,7 @@ class ACTPresupPartida extends ACTbase{
 		if($this->objParam->getParametro('id_presupuesto')!=''){
             $this->objParam->addFiltro("prpa.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
         }
-
-
+		
 		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 			$this->objReporte = new Reporte($this->objParam,$this);
 			$this->res = $this->objReporte->generarReporteListado('MODPresupPartida','listarPresupPartida');
@@ -41,16 +43,52 @@ class ACTPresupPartida extends ACTbase{
 		$temp['importe_aprobado'] = $this->res->extraData['total_importe_aprobado'];
 		$temp['tipo_reg'] = 'summary';
 		$temp['id_presup_partida'] = 0;
-
-
-
-
 		$this->res->total++;
-
 		$this->res->addLastRecDatos($temp);
-
-
 		$this->res->imprimirRespuesta($this->res->generarJson());
+	}
+
+	function listarPresupPartidaPdf(){
+		//echo($this->objParam->getParametro('id_presupuesto')); exit();
+		$this->objParam->defecto('ordenacion','id_presup_partida');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+
+		if($this->objParam->getParametro('id_presupuesto')!=''){
+            $this->objParam->addFiltro("prpa.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
+        }
+		///////////////////////
+        $this->objFunc=$this->create('MODPresupPartida');
+        $dataSource=$this->objFunc->listarPresupPartidaPdf($this->objParam);
+		//probar si llegan los datos
+		//var_dump($dataSource->getDatos());exit();
+        $nombreArchivo = uniqid(md5(session_id()).'Reporte Presupuesto Partida').'.pdf';
+
+            $orientacion = 'P';
+            $tamano = 'LETTER';
+            $titulo = 'Consolidado';
+            $this->objParam->addParametro('orientacion', $orientacion);
+            $this->objParam->addParametro('tamano', $tamano);
+            $this->objParam->addParametro('titulo_archivo', $titulo);
+            $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+          $reporte =new RPresupPartidaPdf($this->objParam);
+          $reporte->datosHeader($dataSource->getDatos(), $dataSource->extraData, '', '');
+          $reporte->generarReporte();
+          $reporte->output($reporte->url_archivo, 'F');
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+		/////////////////////////
+		$temp = Array();
+		$temp['importe'] = $this->res->extraData['total_importe'];
+		$temp['importe_aprobado'] = $this->res->extraData['total_importe_aprobado'];
+		$temp['tipo_reg'] = 'summary';
+		$temp['id_presup_partida'] = 0;
+		//$this->res->total++;
+		//$this->res->addLastRecDatos($temp);
+		//$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
     function listarPresupPartidaEstado(){
@@ -61,7 +99,6 @@ class ACTPresupPartida extends ACTbase{
 			if($this->objParam->getParametro('id_presupuesto')!=''){
 	            $this->objParam->addFiltro("prpa.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
 	        }
-
 
 			if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
 				$this->objReporte = new Reporte($this->objParam,$this);
@@ -82,15 +119,59 @@ class ACTPresupPartida extends ACTbase{
 			$temp['tipo_reg'] = 'summary';
 			$temp['id_presup_partida'] = 0;
 
-
 			$this->res->total++;
-
 			$this->res->addLastRecDatos($temp);
-
-
-		$this->res->imprimirRespuesta($this->res->generarJson());
+ 			$this->res->imprimirRespuesta($this->res->generarJson());
 	}
 
+	function listarPresupPartidaEstadoPdf(){
+		//echo $this->objParam->getParametro('id_presupuesto');exit();
+		$this->objParam->defecto('ordenacion','id_presup_partida');
+
+		$this->objParam->defecto('dir_ordenacion','asc');
+
+		if($this->objParam->getParametro('id_presupuesto')!=''){
+			$this->objParam->addFiltro("prpa.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
+		}
+		/////////////////////////////////////////
+		$this->objFunc=$this->create('MODPresupPartida');
+        $dataSource=$this->objFunc->listarPresupPartidaEstadoPdf($this->objParam);
+
+		//var_dump($dataSource->getDatos());exit;
+
+          $nombreArchivo = uniqid(md5(session_id()).'Reporte Presupuesto Partida').'.pdf';
+            $orientacion = 'L';
+            $tamano = 'LETTER';
+            $titulo = 'Consolidado';
+            $this->objParam->addParametro('orientacion', $orientacion);
+            $this->objParam->addParametro('tamano', $tamano);
+            $this->objParam->addParametro('titulo_archivo', $titulo);
+            $this->objParam->addParametro('nombre_archivo',$nombreArchivo);
+          $reporte =new RPresupPartidaEstadoPdf($this->objParam);
+          $reporte->datosHeader($dataSource->getDatos(), $dataSource->extraData, '', '');
+          $reporte->generarReporte();
+          $reporte->output($reporte->url_archivo, 'F');
+
+        $this->mensajeExito=new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO','Reporte.php','Reporte generado','Se generó con éxito el reporte: '.$nombreArchivo,'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+
+		////////////////////////////////////////
+		$temp = Array();
+		$temp['importe'] = $this->res->extraData['total_importe'];
+		$temp['importe_aprobado'] = $this->res->extraData['total_importe_aprobado'];
+		$temp['formulado'] = $this->res->extraData['total_importe_formulado'];
+		$temp['comprometido'] = $this->res->extraData['total_importe_comprometido'];
+		$temp['ejecutado'] = $this->res->extraData['total_importe_ejecutado'];
+		$temp['pagado'] = $this->res->extraData['total_importe_pagado'];
+		$temp['tipo_reg'] = 'summary';
+		$temp['id_presup_partida'] = 0;
+
+		//$this->res->total++;
+		//$this->res->addLastRecDatos($temp);
+		// $this->res->imprimirRespuesta($this->res->generarJson());
+}
 
 	function insertarPresupPartida(){
 		$this->objFunc=$this->create('MODPresupPartida');

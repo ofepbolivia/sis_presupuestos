@@ -21,6 +21,45 @@ class MODPresupPartida extends MODbase{
 		$this->capturaCount('total_importe','numeric');
 		$this->capturaCount('total_importe_aprobado','numeric');
 
+		//Definicion de la lista del resultado del query
+		$this->captura('id_presup_partida','int4');
+		$this->captura('tipo','varchar');
+		$this->captura('id_moneda','int4');
+		$this->captura('id_partida','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('fecha_hora','timestamp');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_presupuesto','int4');
+		$this->captura('importe','numeric');
+		$this->captura('id_usuario_ai','int4');
+		$this->captura('usuario_ai','varchar');
+		$this->captura('fecha_reg','timestamp');
+		$this->captura('id_usuario_reg','int4');
+		$this->captura('id_usuario_mod','int4');
+		$this->captura('fecha_mod','timestamp');
+		$this->captura('usr_reg','varchar');
+		$this->captura('usr_mod','varchar');
+		$this->captura('desc_partida','varchar');
+		$this->captura('desc_gestion','varchar');
+		$this->captura('importe_aprobado','numeric');
+
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+	}
+
+	function listarPresupPartidaPdf(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='pre.ft_presup_partida_sel';
+		$this->transaccion='PRE_PRPA_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		$this->capturaCount('total_importe','numeric');
+		$this->capturaCount('total_importe_aprobado','numeric');
 
 		//Definicion de la lista del resultado del query
 		$this->captura('id_presup_partida','int4');
@@ -90,10 +129,6 @@ class MODPresupPartida extends MODbase{
 			$this->captura('ajustado','numeric');
 			$this->captura('porc_ejecucion','numeric');
 
-
-
-
-
 			//Ejecuta la instruccion
 			$this->armarConsulta();
 			$this->ejecutarConsulta();
@@ -102,6 +137,49 @@ class MODPresupPartida extends MODbase{
 			return $this->respuesta;
 	}
 
+	function listarPresupPartidaEstadoPdf(){
+		//Definicion de variables para ejecucion del procedimientp
+		$this->procedimiento='pre.ft_presup_partida_sel';
+		$this->transaccion='PRE_PRPAEST_SEL';
+		$this->tipo_procedimiento='SEL';//tipo de transaccion
+
+		$this->capturaCount('total_importe','numeric');
+		$this->capturaCount('total_importe_aprobado','numeric');
+		$this->capturaCount('total_importe_formulado','numeric');
+		$this->capturaCount('total_importe_comprometido','numeric');
+		$this->capturaCount('total_importe_ejecutado','numeric');
+		$this->capturaCount('total_importe_pagado','numeric');
+
+
+		//Definicion de la lista del resultado del query
+		$this->captura('id_presup_partida','int4');
+		$this->captura('tipo','varchar');
+		$this->captura('id_moneda','int4');
+		$this->captura('id_partida','int4');
+		$this->captura('id_centro_costo','int4');
+		$this->captura('fecha_hora','timestamp');
+		$this->captura('estado_reg','varchar');
+		$this->captura('id_presupuesto','int4');
+		$this->captura('importe','numeric');
+
+		$this->captura('desc_partida','varchar');
+		$this->captura('desc_gestion','varchar');
+		$this->captura('importe_aprobado','numeric');
+		$this->captura('formulado','numeric');
+		$this->captura('comprometido','numeric');
+		$this->captura('ejecutado','numeric');
+		$this->captura('pagado','numeric');
+
+		$this->captura('ajustado','numeric');
+		$this->captura('porc_ejecucion','numeric');
+
+		//Ejecuta la instruccion
+		$this->armarConsulta();
+		$this->ejecutarConsulta();
+
+		//Devuelve la respuesta
+		return $this->respuesta;
+}
 
 	function insertarPresupPartida(){
 		//Definicion de variables para ejecucion del procedimiento

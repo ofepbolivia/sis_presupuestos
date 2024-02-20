@@ -12,7 +12,53 @@ header("content-type: text/javascript; charset=UTF-8");
 <script>
 Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
     Atributos : [
-
+        {
+                config:{
+                    name: 'nombre',
+                    fieldLabel: 'Nombre',
+                    allowBlank: true,
+                    //emptyText:'Nombre...',
+                    //msgTarget: 'side',
+                    editable: false,
+                    store:new Ext.data.JsonStore(
+                        {
+                            url:'../../sis_parametros/control/Empresa/listarNombreEmpresa',
+                            id: 'id_empresa',
+                            root: 'datos',
+                            sortInfo:{
+                                field: 'nombre',
+                                direction: 'DESC'
+                            },
+                            totalProperty: 'total',
+                            fields: ['id_empresa','nombre'],
+                            //turn on remote sorting
+                            remoteSort: true,
+                            baseParams: { par_filtro:'id_empresa#nombre' }
+                        }),
+                    valueField: 'id_empresa',
+                    //displayField: 'nombre',
+                    //gdisplayField:'nombre',
+                    hiddenName: 'id_empresa',
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:50,
+                    queryDelay:500,
+                    //anchor:"90%",
+                    width: 280,
+                    listWidth:280,
+                    gwidth:250,
+                    minChars:0,
+                    visibility: false,
+                   // renderer:function (value, p, record){return String.format('{0}', record.data['nombre']);}
+                },
+                type:'TextField',
+                //filters:{pfiltro:'EMP.nombre',type:'string'},
+                id_grupo:0,
+                egrid:true,
+                form:true,
+                grid:true
+            },
         {
             config:{
                 labelSeparator:'',
@@ -57,7 +103,6 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 listWidth:250,
                 resizable:true,
                 width: 250
-
             },
             type:'ComboBox',
             id_grupo:0,
@@ -110,9 +155,34 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
             },
             form:true
         },
+  
+     //   {
 
+     //           config: {
+     //               name: 'nombre_empresa',
+     //               fieldLabel: 'Empresa',
+     //               typeAhead: true,
+     //               allowBlank: true,
 
-        {
+     //               triggerAction: 'all',
+     //               emptyText: 'Tipo...',
+     //               selectOnFocus: false,
+     //               mode: 'local',
+     //               store: new Ext.data.ArrayStore({
+     //                   fields: ['ID', 'valor'],              
+     //                   data: [['Gestora Pública de la Seguridad Social de Largo Plazo', 'Gestora Pública de la Seguridad Social de Largo Plazo']]
+     //               }),
+     //               valueField: 'ID',
+     //               displayField: 'valor',
+     //               width: 250,
+     //           },
+     //           type: 'ComboBox',
+     //           id_grupo: 1,
+     //           form: true
+
+     //       },
+     {
+
             config:{
                 name:'tipo_reporte',
                 fieldLabel:'Filtrar por',
@@ -177,6 +247,7 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
             id_grupo:1,
             form:true
         },
+
         {
             config:{
                 sysorigen: 'sis_presupuestos',
@@ -202,6 +273,7 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
                 allowBlank: true,
                 emptyText: 'Elija una opción...',
                 store: new Ext.data.JsonStore({
+                    
                     url: '../../sis_presupuestos/control/CpPrograma/listarCpPrograma',
                     id: 'id_cp_programa',
                     root: 'datos',
@@ -229,7 +301,6 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
             type: 'ComboBox',
             form: true
         },
-
 
        /*{
             config:{
@@ -371,6 +442,7 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
         this.ocultarComponente(this.Cmp.id_categoria_programatica);
         this.ocultarComponente(this.Cmp.id_presupuesto);
         this.ocultarComponente(this.Cmp.id_cp_programa);
+        this.ocultarComponente(this.Cmp.nombre);
         //this.ocultarComponente(this.Cmp.fecha_ini);
         //this.ocultarComponente(this.Cmp.id_partida);
         this.iniciarEventos();
@@ -378,6 +450,15 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
     },
 
     iniciarEventos:function(){
+
+        this.Cmp.nombre.store.load({params:{start:0, limit:1}, scope:this, callback: function (param,op,suc) {
+        this.Cmp.nombre.setValue(param[0].data.nombre);
+        this.Cmp.nombre.collapse();
+         }});
+
+        this.Cmp.nombre.on('select', function(combo,record,index){
+        this.Cmp.nombre.setValue(record.data.nombre);
+        },this)
 
         this.Cmp.id_gestion.on('select',function(c,r,n){
 
@@ -478,8 +559,6 @@ Phx.vista.FormPartidaEjecutado = Ext.extend(Phx.frmInterfaz,{
         Phx.vista.FormPartidaEjecutado.superclass.onSubmit.call(this,o, x, force);
     }
 
-
-
-
+   
 })
 </script>
