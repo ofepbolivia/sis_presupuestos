@@ -43,7 +43,7 @@ class REjecucionCategoria extends  ReportePDF{
         $this->Ln(3);
         //cabecera del reporte
 
-        $this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 10,5,35,20);
+        $this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], 10,5,35,20);
         $this->SetFont('','B',11);
         ($this->objParam->getParametro('tipo_reporte') == 'resumen_categoria')?$title = 'RESUMEN CATEGORIA PROGRAMÁTICA':$title = 'UNIDAD EJECUTORA';
         $this->Cell(0,5, mb_strtoupper("EJECUCIÓN PRESUPUESTARIA ".$title,'UTF-8'),0,1,'C');

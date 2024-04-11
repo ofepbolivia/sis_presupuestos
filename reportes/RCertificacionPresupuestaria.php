@@ -13,7 +13,7 @@ class RCertificacionPresupuestaria extends  ReportePDF{
         $this->Ln(3);
 
         //cabecera del reporte
-        $this->Image(dirname(__FILE__).'/../../lib/imagenes/logos/logo.jpg', 16,5,40,20);
+        $this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], 16,5,40,20);
         $this->ln(5);
 
 
