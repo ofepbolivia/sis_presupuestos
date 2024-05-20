@@ -145,7 +145,17 @@ class ACTObjetivo extends ACTbase{
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
-			
+
+    function listarActividadesPorPartida(){ //fRnk: HR00488
+        $this->objParam->defecto('ordenacion','codigo');
+        $this->objParam->defecto('dir_ordenacion','asc');
+        if($this->objParam->getParametro('id_partida')!='') {
+            $this->objParam->addFiltro("id_objetivo in(select id_objetivo from pre.tobjetivo_partida where id_partida=".$this->objParam->getParametro('id_partida').")");
+        }
+        $this->objFunc=$this->create('MODObjetivo');
+        $this->res=$this->objFunc->listarActividadesPorPartida($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
 }
 
 ?>

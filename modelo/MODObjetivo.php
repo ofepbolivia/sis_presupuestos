@@ -240,6 +240,20 @@ class MODObjetivo extends MODbase{
         //var_dump( $this->respuesta);exit;
         return $this->respuesta;
     }
-			
+
+    function listarActividadesPorPartida(){ //fRnk: HR00488
+        $this->procedimiento='pre.ft_objetivo_sel';
+        $this->transaccion='PRE_ACPOA_SEL';
+        $this->tipo_procedimiento='SEL';
+        $this->setCount(false);
+        $this->setParametro('id_gestion','id_gestion','int4');
+        $this->setParametro('id_partida','id_partida','int4');
+        $this->captura('id_objetivo','int4');
+        $this->captura('codigo','varchar');
+        $this->captura('descripcion','varchar');
+        $this->armarConsulta();
+        $this->ejecutarConsulta();
+        return $this->respuesta;
+    }
 }
 ?>

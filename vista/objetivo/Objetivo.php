@@ -100,7 +100,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 			config:{
 				name: 'codigo',
 				fieldLabel: 'Codigo',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 100,
 				maxLength:30
@@ -116,7 +116,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 			config:{
 				name: 'tipo_objetivo',
 				fieldLabel: 'Tipo',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 140,
 				mode: 'local',
@@ -138,7 +138,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 			config:{
 				name: 'descripcion',
 				fieldLabel: 'Descripcion',
-				allowBlank: true,
+				allowBlank: false,
 				anchor: '80%',
 				gwidth: 400,
 				maxLength:1000
@@ -332,7 +332,7 @@ Phx.vista.Objetivo=Ext.extend(Phx.arbGridInterfaz,{
 			config:{
 				name: 'sw_transaccional',
 				fieldLabel: 'Transaccional',
-				allowBlank: true,
+				allowBlank: false, //fRnk
 				anchor: '80%',
 				gwidth: 140,
 				mode: 'local',
