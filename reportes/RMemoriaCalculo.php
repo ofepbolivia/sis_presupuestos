@@ -50,7 +50,7 @@ class RMemoriaCalculo extends  ReportePDF {
 	    $this->SetFont('','B',11);
 		$this->Cell(0,5,"MEMORIA DE CÁLCULO Y CRONOGRAMA DE REQUERIMIENTOS",0,1,'C');
 		$this->Cell(0,5,mb_strtoupper($this->datos_entidad['nombre'],'UTF-8'),0,1,'C');
-		$this->Cell(0,5,"ANTEPROYECTO PRESUPUESTO GESTION ".$this->datos_gestion['anho'],0,1,'C');
+		$this->Cell(0,5,"PRESUPUESTO GESTION ".$this->datos_gestion['anho'],0,1,'C'); //fRnk: se quitó ANTEPROYECTO HR00569
 		//$this->Ln();
 		$this->SetFont('','B',7);
 		$this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');

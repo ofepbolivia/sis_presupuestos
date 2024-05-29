@@ -458,7 +458,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 	iniciarEventos : function() {
 
         this.Cmp.id_presupuesto.on('select', function (c, r, i) {
-             this.Cmp.id_partida.reset();
+            this.Cmp.id_partida.reset();
             if(this.maestro.tipo_ajuste == 'inc_comprometido' || this.maestro.tipo_ajuste == ''){
 			    
 			    this.Cmp.id_partida.store.baseParams.id_presupuesto_ajuste = this.Cmp.id_presupuesto.getValue();
@@ -469,6 +469,10 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 				this.Cmp.id_partida.store.baseParams.id_presupuesto = this.Cmp.id_presupuesto.getValue();
 				delete this.Cmp.id_partida.store.baseParams.id_presupuesto_ajuste;
 			}
+            //fRnk: HR00569 a.
+            if(this.maestro.tipo_ajuste == 'incremento' || this.maestro.tipo_ajuste == 'reformulacion' || this.maestro.tipo_ajuste == 'traspaso'){
+                delete this.Cmp.id_partida.store.baseParams.id_presupuesto;
+            }
 			this.Cmp.id_partida.modificado = true;
 
 			//17-06-2021 (may) filtros

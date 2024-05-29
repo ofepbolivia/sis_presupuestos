@@ -24,13 +24,14 @@ class RPresupPartidaEstadoPdf extends  ReportePDF{
       //$this->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
 
       $this->SetXY(5,5);
-
+      //fRnk: HR00569 b.
+      $texto_anteproyecto = $this->objParam->getParametro('estado')=='aprobado'? '' : 'ANTEPROYECTO DE';
 
       $cabecera = '<table Cellpadding="2">
       <thead>
           <tr>
               <th border="1" rowspan="2" style="width: 100px; height: 42px;"><img  style="width: 80px;" align="middle" src="../../../lib/imagenes/logos/logo.jpg" alt="Logo"></th>
-              <th border="1" colspan="2" style="border-bottom: none; width: 830px; text-align: center; vertical-align: middle; height: 42px;"><strong>ANTEPROYECTO DE PRESUPUESTO - ESTADO: '.strtoupper($this->objParam->getParametro('estado')).'</strong></th>
+              <th border="1" colspan="2" style="border-bottom: none; width: 830px; text-align: center; vertical-align: middle; height: 42px;"><strong>'.$texto_anteproyecto.' PRESUPUESTO - ESTADO: '.strtoupper($this->objParam->getParametro('estado')).'</strong></th>
           </tr>
           <tr>
               <th border="1"><span style="font-size:8px; text-align:left;"><strong>Tipo de Centro: </strong>'.strtoupper($this->objParam->getParametro('codigo_cc')).'</span></th>
