@@ -88,7 +88,7 @@ header("content-type: text/javascript; charset=UTF-8");
                 iconCls: 'bfolder',
                 disabled: true,
                 handler: this.onClonar,
-                tooltip: '<b>Clonar Formulacion</b>'
+                tooltip: '<b>Clonar Formulación</b>'
             });
 
             this.init();
