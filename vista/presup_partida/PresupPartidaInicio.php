@@ -28,6 +28,10 @@ header("content-type: text/javascript; charset=UTF-8");
    preparaMenu:function(){
 		var rec = this.sm.getSelected();
 		var tb = this.tbar;
+        if(this.store.baseParams.estado=='aprobado'){ //fRnk: HR00690 a.
+            this.bdel = false;
+            this.getBoton('del').disable();
+        }
 		Phx.vista.PresupPartidaInicio.superclass.preparaMenu.call(this);
 	},
 	
@@ -52,7 +56,10 @@ header("content-type: text/javascript; charset=UTF-8");
 		id_usuario_mod: this.maestro.id_usuario_mod
 		};
         this.load({ params: { start: 0, limit: 50 }});
-        
+        if(this.maestro.estado=='aprobado'){ //fRnk: HR00690 a.
+            this.bnew = false;
+            this.getBoton('new').disable();
+        }
     },
 	reportePdf: function () {
             Phx.CP.loadingShow();
