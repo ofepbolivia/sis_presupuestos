@@ -293,7 +293,7 @@ class RMemCalMensualPDF extends  ReportePDF {
 
         $this->SetFillColor(224, 235, 255);
         $this->SetTextColor(0);
-        $this->SetFont('','',8);
+        $this->SetFont('','',7);
 
         $conf_par_tablewidths=array(10,35,45,70,15,20,10,15,15,15,15,15,15,15,15,15,15,15,15,25);
         $conf_par_tablealigns=array('C','L','L','L','R','R','C','R','R','R','R','R','R','R','R','R','R','R','R','R');

@@ -250,7 +250,7 @@ class RMemoriaCalculo extends  ReportePDF {
 
 		$this->SetFillColor(224, 235, 255);
         $this->SetTextColor(0);
-        $this->SetFont('','',8);
+        $this->SetFont('','',7);
 
 		$conf_par_tablewidths=array(10,50,50,80,15,20,15,25);
         $conf_par_tablealigns=array('C','L','L','L','R','R','R','R');
