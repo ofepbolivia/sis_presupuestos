@@ -194,7 +194,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
 				                              	'rev_comprometido':'Disminución Comprometido',
                                                 'rev_total_comprometido':'Reversión Comprometido',
                                                 'ajuste_comprometido':'Ajuste Comprometido',
-                                                'ajuste_mod_presupuestaria':'Ajuste Formulación Presupuestaria (+/-)'
+                                                'ajuste_mod_presupuestaria':'Ajuste Formulación Presupuestaria (+/-)',
+                                                'mod_ingas':'Entre Conceptos INGAS'
 				                              };
 
 	                           return String.format('<b><font color="green">{0}</font></b>', ajustes[value]);
@@ -211,7 +212,8 @@ Phx.vista.Ajuste=Ext.extend(Phx.gridInterfaz,{
                                       ['rev_comprometido','Disminución Comprometido -> [ADQ, TES]'],
                                       ['rev_total_comprometido','Reversión Comprometido -> [ADQ, TES]'],
                                       ['ajuste_comprometido','Ajuste Comprometido -> [ADQ, TES, FA]'],
-                                      ['ajuste_mod_presupuestaria','Ajuste Formulación Presupuestaria (+/-)']
+                                      ['ajuste_mod_presupuestaria','Ajuste Formulación Presupuestaria (+/-)'],
+                                      ['mod_ingas','Entre Conceptos INGAS'] //fRnk: HR00856
                             ]}),
             },
             type:'ComboBox',

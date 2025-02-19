@@ -10,7 +10,9 @@ require_once(dirname(__FILE__).'/../../pxp/pxpReport/DataSource.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucion.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionXls.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionPorPartida.php');
+require_once(dirname(__FILE__).'/../reportes/REjecucionPorPartidaIngas.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionPorPartidaXls.php');
+require_once(dirname(__FILE__).'/../reportes/REjecucionPorPartidaXlsIngas.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionGestionAnterior.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionCategoria.php');
 require_once(dirname(__FILE__).'/../reportes/REjecucionCategoriaXls.php');
@@ -303,6 +305,11 @@ class ACTPresupPartida extends ACTbase{
     }
 
     function reporteEjecucion(){
+		if($this->objParam->getParametro('tipo_reporte')=='ingas'){ //fRnk: adicionado HR00856
+			$this->objParam->addParametro('id_partida', 'null');
+			$this->reporteEjecucionPorPartida();
+			exit();
+		}
 
 			    if($this->objParam->getParametro('formato_reporte')=='pdf'){
 					$nombreArchivo = 'Ejecucion'.uniqid(md5(session_id())).'.pdf';
@@ -371,6 +378,18 @@ class ACTPresupPartida extends ACTbase{
 
     }
 
+	function recuperarEjecucionPorPartidaIngas(){ //fRnk: adicionado HR00856-2024
+		$this->objFunc = $this->create('MODPresupPartida');
+		$cbteHeader = $this->objFunc->listarRepEjecucionPorPartidaIngas($this->objParam);
+		if($cbteHeader->getTipo() == 'EXITO'){
+			return $cbteHeader;
+		}
+		else{
+			$cbteHeader->imprimirRespuesta($cbteHeader->generarJson());
+			exit;
+		}
+	}
+
    function reporteEjecucionPorPartida(){
 
 			    if($this->objParam->getParametro('formato_reporte')=='pdf'){
@@ -379,8 +398,11 @@ class ACTPresupPartida extends ACTbase{
 				else{
 					$nombreArchivo = 'EjecucionPorPartida'.uniqid(md5(session_id())).'.xls';
 				}
-
-				$dataSource = $this->recuperarEjecucionPorPartida();
+				if($this->objParam->getParametro('tipo_reporte')=='ingas') {
+					$dataSource = $this->recuperarEjecucionPorPartidaIngas();
+				}else{
+					$dataSource = $this->recuperarEjecucionPorPartida();
+				}
 				$dataGestion = $this->recuperarDatosGestion();
 				$dataEmpresa = $this->recuperarDatosEmpresa();
 
@@ -398,13 +420,21 @@ class ACTPresupPartida extends ACTbase{
 
 				//Instancia la clase de pdf
 				if($this->objParam->getParametro('formato_reporte')=='pdf'){
-				    $reporte = new REjecucionPorPartida($this->objParam);
+					if($this->objParam->getParametro('tipo_reporte')=='ingas') {
+						$reporte = new REjecucionPorPartidaIngas($this->objParam);
+					}else {
+						$reporte = new REjecucionPorPartida($this->objParam);
+					}
 					$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData,$dataGestion->getDatos(),$dataEmpresa->getDatos(),$this->objParam->getParametro('fecha_ini'),$this->objParam->getParametro('fecha_fin'));
 				    $reporte->generarReporte();
 				    $reporte->output($reporte->url_archivo,'F');
 				}
 				else{
-					$reporte = new REjecucionPorPartidaXls($this->objParam);
+					if($this->objParam->getParametro('tipo_reporte')=='ingas') {
+						$reporte = new REjecucionPorPartidaXlsIngas($this->objParam);
+					}else {
+						$reporte = new REjecucionPorPartidaXls($this->objParam);
+					}
 					$reporte->datosHeader($dataSource->getDatos(),  $dataSource->extraData,$dataGestion->getDatos(),$dataEmpresa->getDatos());
 				    $reporte->imprimeCabecera();
 				    $reporte->generarReporte();

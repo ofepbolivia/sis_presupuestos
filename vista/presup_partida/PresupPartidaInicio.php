@@ -60,6 +60,8 @@ header("content-type: text/javascript; charset=UTF-8");
             this.bnew = false;
             this.getBoton('new').disable();
         }
+        this.bnew = false; //fRnk: HR00856-2024, debe ser creado desde memoria de cálculo para que tenga relación con concepto INGAS
+        this.getBoton('new').disable();
     },
 	reportePdf: function () {
             Phx.CP.loadingShow();

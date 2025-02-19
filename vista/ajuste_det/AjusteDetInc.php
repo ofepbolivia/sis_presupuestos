@@ -63,9 +63,20 @@ Phx.vista.AjusteDetInc = {
         this.Cmp.id_partida.store.baseParams.partida_rubro = this.maestro.movimiento;
         this.Cmp.id_presupuesto.modificado = true;
         this.Cmp.id_partida.modificado = true;
-        
-        
-         this.load({params:{start:0, limit:50}});
+
+       //fRnk: HR00856
+       if(this.maestro.tipo_ajuste == 'mod_ingas') {
+           this.mostrarComponente(this.Cmp.id_concepto_ingas);
+           this.Cmp.id_partida.on('select', function (cmb, rec, ind) {
+               this.Cmp.id_concepto_ingas.reset();
+               this.Cmp.id_concepto_ingas.store.baseParams.id_partida = cmb.getValue();
+               this.Cmp.id_concepto_ingas.store.baseParams.id_presupuesto = this.Cmp.id_presupuesto.getValue();
+               this.Cmp.id_concepto_ingas.store.baseParams.memoria_calculo = true;
+               this.Cmp.id_concepto_ingas.modificado = true;
+           }, this);
+       }
+
+       this.load({params:{start:0, limit:50}});
    },
    
    loadValoresIniciales:function(){

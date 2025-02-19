@@ -100,6 +100,8 @@ class MODAjusteDet extends MODbase{
 		$this->setParametro('estado_reg','estado_reg','varchar');
 		$this->setParametro('tipo_ajuste','tipo_ajuste','varchar');
 		$this->setParametro('id_ajuste','id_ajuste','int4');
+        $this->setParametro('id_concepto_ingas','id_concepto_ingas','int4'); //fRnk:HR00856-2024
+        $this->setParametro('descripcion','descripcion','varchar');
 
 		//Ejecuta la instruccion
 		$this->armarConsulta();

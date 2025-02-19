@@ -176,7 +176,7 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                     if($cont_parcial!=0) {
                         $total_general+=$cont_total;
                     }
-
+                    //fRnk: adicionado Concepto INGAS, HR00856-2024
                     $tbl.='
                          <tr>
                             <td width="7%" align="center"><b>CENTRO DE COSTO</b></td>
@@ -187,7 +187,8 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                             <td width="5%" align="center" ><b>ORG. FINAN</b></td>
                             <td width="5%" align="center" ><b>U. E.</b></td>
                             <td width="8%" align="center" valign="center"><br><b>PARTIDA</b></td>
-                            <td width="36%" align="center"><br><b>DESCRIPCIÓN</b></td>
+                            <td width="21%" align="center"><br><b>DESCRIPCIÓN PARTIDA</b></td>
+                            <td width="15%" align="center"><br><b>CONCEPTO DE GASTO/INGRESO</b></td>
                             <td width="7%" align="center"><b>ENT.</b> <br><b>TRANSF</b></td>
                             <td width="12%" align="right"><br><b>IMPORTE '.($cod_moneda=='Bs'?'Bs.':'$Bs.').'</b></td>
                         </tr>';
@@ -217,7 +218,8 @@ class RModificacionPresupuestariaPDF extends  ReportePDF{
                                 <td width="5%" align="center" >'.$record["codigo_origen_fin"].'</td>
                                 <td width="5%" align="center" >'.$record["codigo_unidad_ejecutora"].'</td>
                                 <td width="8%" align="center" valign="center">'.$record["codigo_partida"].'</td>
-                                <td width="36%" align="left">'.$record["nombre_partidad"].'</td>
+                                <td width="21%" align="left">'.$record["nombre_partidad"].'</td>
+                                <td width="15%" align="left">'.$record["desc_ingas"].'</td>
                                 <td width="7%" align="center">'.$record["codigo_transf"].'</td>
                                 <td width="12%" align="right">'.number_format($record["precio_total"],2, ',', '.').'</td>
                             </tr>';

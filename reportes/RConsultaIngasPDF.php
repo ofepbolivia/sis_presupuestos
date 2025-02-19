@@ -9,6 +9,8 @@ class RConsultaIngasPDF extends  ReportePDF{
     var $cantidad_columnas_estaticas;
 
     function Header() {
+        ini_set("memory_limit",-1);
+        set_time_limit(1200);
         $white = array('LTRB' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 255, 255)));
         $black = array('T' =>array('width' => 0.3, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)));
         

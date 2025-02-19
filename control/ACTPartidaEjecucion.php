@@ -91,8 +91,12 @@ class ACTPartidaEjecucion extends ACTbase{
         
         $this->objParam->getParametro('id_centro_costo') !='' && $this->objParam->addFiltro("pareje.id_presupuesto = ".$this->objParam->getParametro('id_centro_costo'));        
 
-        $this->objParam->getParametro('id_presupuesto') !='' && $this->objParam->addFiltro("pareje.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));        
-        
+        //fRnk: modificado, b) HR01765-2024
+        //$this->objParam->getParametro('id_presupuesto') !='' && $this->objParam->addFiltro("pareje.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
+        if($this->objParam->getParametro('id_presupuesto') !='' && $this->objParam->getParametro('id_presupuesto') !='0') {
+            $this->objParam->addFiltro("pareje.id_presupuesto = ".$this->objParam->getParametro('id_presupuesto'));
+        }
+
         $this->objParam->getParametro('id_categoria_programatica') !='' && $this->objParam->addFiltro("cat.id_categoria_programatica = ".$this->objParam->getParametro('id_categoria_programatica'));        
         
         $this->objParam->getParametro('nro_tramite') !='' && $this->objParam->addFiltro("pareje.nro_tramite ilike ''%".$this->objParam->getParametro('nro_tramite')."%''");        

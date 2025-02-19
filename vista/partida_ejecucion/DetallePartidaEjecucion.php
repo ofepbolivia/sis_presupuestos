@@ -418,7 +418,8 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 		}
 	],
 	tam_pag: 50,	
-	title:'Detalle Partida Ejecucion',		
+	title:'Detalle de Ejecución por Partida', //fRnk: b) HR01765-2024
+    title2:'',
 	ActList:'../../sis_presupuestos/control/PartidaEjecucion/listarDetallePartidaEjecucion',
 	id_store:'id_partida_ejecucion',
 	fields: [

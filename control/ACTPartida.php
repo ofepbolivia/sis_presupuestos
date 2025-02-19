@@ -69,7 +69,11 @@ class ACTPartida extends ACTbase{
 		}
 
 		if($this->objParam->getParametro('id_presupuesto')!=''){
-	    	$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_presupuesto') . ") ");
+			if($this->objParam->getParametro('memoria_calculo')){ //fRnk: HR00856-2024,
+				$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tmemoria_calculo where estado_reg=''activo'' and id_presupuesto = " . $this->objParam->getParametro('id_presupuesto') . ") ");
+			}else{
+				$this->objParam->addFiltro("par.id_partida in (select id_partida from pre.tpresup_partida where id_presupuesto = " . $this->objParam->getParametro('id_presupuesto') . ") ");
+			}
 		}
 
 		if($this->objParam->getParametro('tipo_ajuste')!='' &&

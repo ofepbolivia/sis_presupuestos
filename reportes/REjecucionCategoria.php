@@ -45,9 +45,9 @@ class REjecucionCategoria extends  ReportePDF{
 
         $this->Image(dirname(__FILE__).'/../../lib'.$_SESSION['_DIR_LOGO'], 10,5,35,20);
         $this->SetFont('','B',11);
-        ($this->objParam->getParametro('tipo_reporte') == 'resumen_categoria')?$title = 'RESUMEN CATEGORIA PROGRAMÁTICA':$title = 'UNIDAD EJECUTORA';
-        $this->Cell(0,5, mb_strtoupper("EJECUCIÓN PRESUPUESTARIA ".$title,'UTF-8'),0,1,'C');
-        $this->Cell(0,5,mb_strtoupper('BOLIVIANA DE AVIACIÓN - BOA','UTF-8'),0,1,'C');
+        ($this->objParam->getParametro('tipo_reporte') == 'resumen_categoria')?$title = 'POR CATEGORIA PROGRAMÁTICA':$title = 'POR UNIDAD EJECUTORA';
+        $this->Cell(0,5, mb_strtoupper("EJECUCIÓN PRESUPUESTARIA RESUMEN ".$title,'UTF-8'),0,1,'C');
+        // $this->Cell(0,5,mb_strtoupper('BOLIVIANA DE AVIACIÓN - BOA','UTF-8'),0,1,'C');
         $this->Cell(0,5, "GESTIÓN ".$this->datos_gestion['anho'],0,1,'C');
         $this->SetFont('','B',7);
         $this->Cell(0,5,"(Expresado en Bolivianos)",0,1,'C');
@@ -152,7 +152,7 @@ class REjecucionCategoria extends  ReportePDF{
 
         $RowArray = array(
          's0'  => 'TOTAL',
-         's1'  => '578 BOLIVIANA DE AVIACIÓN',
+         's1'  => '',
          's2'  => number_format($this->totales_importe, 2, ',', '.'),
          's3'  => number_format($this->totales_importe_aprobado, 2, ',', '.'),
          's4'  => number_format($this->totales_ajustado, 2, ',', '.'),

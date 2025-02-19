@@ -118,11 +118,11 @@ class REjecucionCategoriaXls
         );
 
         //titulos
-        ($this->objParam->getParametro('tipo_reporte') == 'resumen_categoria')?$title = 'RESUMEN CATEGORIA PROGRAMÁTICA':$title = 'UNIDAD EJECUTORA';
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, "EJECUCIÓN PRESUPUESTARIA ".$title);
+		($this->objParam->getParametro('tipo_reporte') == 'resumen_categoria')?$title = 'POR CATEGORIA PROGRAMÁTICA':$title = 'POR UNIDAD EJECUTORA';
+		$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, "EJECUCIÓN PRESUPUESTARIA RESUMEN ".$title);
         $this->docexcel->getActiveSheet()->getStyle('A2:M2')->applyFromArray($styleTitulos1);
         $this->docexcel->getActiveSheet()->mergeCells('A2:M2');
-        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, 'BOLIVIANA DE AVIACIÓN - BOA');
+        //$this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, 'BOLIVIANA DE AVIACIÓN - BOA');
         $this->docexcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitulos1);
         $this->docexcel->getActiveSheet()->mergeCells('A3:M3');
         $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 4, "GESTIÓN ".$this->datos_gestion['anho']);

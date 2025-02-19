@@ -227,6 +227,7 @@ class MODAjuste extends MODbase{
         $this->captura('tipo_ajuste_det', 'varchar');
         $this->captura('fecha_solicitud', 'date');
         $this->captura('tipo', 'varchar');
+        $this->captura('desc_ingas', 'varchar'); //fRnk: HR00856-2024
 
         //Ejecuta la instruccion
         $this->armarConsulta();

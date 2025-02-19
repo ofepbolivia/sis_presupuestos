@@ -71,7 +71,29 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             bottom_filter: true,
             form:true
         },
-
+	   	{
+   			config:{
+   				sysorigen:'sis_presupuestos',
+       		    name:'id_partida',
+   				origen:'PARTIDA',
+   				allowBlank:false,
+   				fieldLabel:'Partida',
+   				gdisplayField:'desc_partida',//mapea al store del grid
+   				baseParams: {sw_transaccional: 'movimiento', sw_oficial: 'si'},
+   				gwidth:200,
+   				width: 350,
+   				listWidth: 350
+       	     },
+   			type:'ComboRec',
+   			id_grupo:0,
+   			filters:{	
+		        pfiltro: 'par.codigo#par.nombre_partida',
+				type: 'string'
+			},   		   
+   			grid:true,   			
+   			form:true,
+            bottom_filter: true
+	   	},
         {
             config:{
                 name:'id_concepto_ingas',
@@ -126,30 +148,6 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             grid:false,
             form:true
         },
-
-	   	{
-   			config:{
-   				sysorigen:'sis_presupuestos',
-       		    name:'id_partida',
-   				origen:'PARTIDA',
-   				allowBlank:false,
-   				fieldLabel:'Partida',
-   				gdisplayField:'desc_partida',//mapea al store del grid
-   				baseParams: {sw_transaccional: 'movimiento', sw_oficial: 'si'},
-   				gwidth:200,
-   				width: 350,
-   				listWidth: 350
-       	     },
-   			type:'ComboRec',
-   			id_grupo:0,
-   			filters:{	
-		        pfiltro: 'par.codigo#par.nombre_partida',
-				type: 'string'
-			},   		   
-   			grid:true,   			
-   			form:true,
-            bottom_filter: true
-	   	},
         {
             config:{
                 name:'id_orden_trabajo',
@@ -475,6 +473,13 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             }
 			this.Cmp.id_partida.modificado = true;
 
+            if(this.maestro.tipo_ajuste == 'mod_ingas'){ //fRnk: HR00856-2024
+                this.Cmp.id_partida.store.baseParams.memoria_calculo = true;
+            }else{
+                this.Cmp.id_partida.store.baseParams.memoria_calculo = false;
+            }
+            this.Cmp.id_concepto_ingas.store.baseParams.movimiento = r.data.movimiento_tipo_pres;
+
 			//17-06-2021 (may) filtros
 
             if(this.maestro.tipo_ajuste == 'ajuste_comprometido'){
@@ -508,10 +513,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
 
 
             }
-
         }, this);
-
-
 
     },
     onButtonEdit : function () {
@@ -534,7 +536,7 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
             this.ocultarComponente(this.Cmp.id_concepto_ingas);
             this.ocultarComponente(this.Cmp.id_orden_trabajo);
         }
-       
+        this.mostrarComponente(this.Cmp.id_concepto_ingas);
     },
      onButtonNew : function () {
        
@@ -555,7 +557,9 @@ Phx.vista.AjusteDet=Ext.extend(Phx.gridInterfaz,{
              this.ocultarComponente(this.Cmp.id_orden_trabajo);
              this.mostrarComponente(this.Cmp.id_partida);
          }
-       
+         //if(this.maestro.tipo_ajuste == 'mod_ingas') {//fRnk: HR00856
+             this.mostrarComponente(this.Cmp.id_concepto_ingas);
+         //}
     },
 	
 	

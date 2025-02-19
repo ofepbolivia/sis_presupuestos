@@ -141,11 +141,12 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
                             ['orga_financ', 'Organismo Financiador'],
                             ['fuente_financ', 'Fuente Financiamiento'],
                             ['unidad_ejecutora', 'Unidad Ejecutora'],
-														['resumen_unidad_ejecutora', 'Resumen Unidad Ejecutora'],
+							['resumen_unidad_ejecutora', 'Resumen Unidad Ejecutora'],
 		        	        ['categoria', 'Categoría Programática'],
-											['resumen_categoria', 'Resumen Categoría Programática'],
+							['resumen_categoria', 'Resumen Categoría Programática'],
 							['presupuesto', 'Presupuesto'],
                             ['centro_costo', 'Centro de Costo'],
+                            ['ingas', 'Concepto INGAS'], //fRnk: HR00856-2024
 						]
 	    		}),
 				valueField:'ID',
@@ -474,32 +475,76 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 			},
 			type: 'ComboBox',
 			form: true
-		},
+		}, { //fRnk: adicionado HR00856-2024
+                config:{
+                    name:'id_concepto_ingas',
+                    fieldLabel:'Concepto INGAS',
+                    allowBlank:false,
+                    emptyText:'Concepto Ingreso Gasto...',
+                    store: new Ext.data.JsonStore({
+                        url: '../../sis_parametros/control/ConceptoIngas/listarConceptoIngas',
+                        id: 'id_concepto_ingas',
+                        root: 'datos',
+                        sortInfo:{
+                            field: 'desc_ingas',
+                            direction: 'ASC'
+                        },
+                        totalProperty: 'total',
+                        fields: ['id_concepto_ingas','tipo','desc_ingas','movimiento','desc_partida','id_grupo_ots','filtro_ot','requiere_ot'],
+                        remoteSort: true,
+                        baseParams:{par_filtro:'desc_ingas',movimiento:'gasto' ,autorizacion_nulos: 'no',_adicionar:'si'}
+                    }),
+                    valueField: 'id_concepto_ingas',
+                    displayField: 'desc_ingas',
+                    gdisplayField:'nombre_ingas',
+                    tpl:'<tpl for="."><div class="x-combo-list-item"><p><b>{desc_ingas}</b></p><p>TIPO:{tipo}</p><p>MOVIMIENTO:{movimiento}</p></div></tpl>',
+                    hiddenName: 'id_concepto_ingas',
+                    forceSelection:true,
+                    typeAhead: false,
+                    triggerAction: 'all',
+                    lazyRender:true,
+                    mode:'remote',
+                    pageSize:10,
+                    queryDelay:1000,
+                    listWidth:250,
+                    resizable:true,
+                    width: 250,
+                    gwidth: 200,
+                    renderer:function(value, p, record){return String.format('{0}', record.data['nombre_ingas']);}
+                },
+                type:'ComboBox',
+                id_grupo:0,
+                filters:{
+                    pfiltro:'cig.movimiento#cig.desc_ingas',
+                    type:'string'
+                },
+                grid:false,
+                form:true
+            },
+            {
+                config:{
+                    name:'formato_reporte',
+                    fieldLabel:'Formato del Reporte',
+                    typeAhead: true,
+                    allowBlank:false,
+                    triggerAction: 'all',
+                    emptyText:'Formato...',
+                    selectOnFocus:true,
+                    mode:'local',
+                    store:new Ext.data.ArrayStore({
+                        fields: ['ID', 'valor'],
+                        data :[ ['pdf','PDF'],
+                            ['csv','CSV']]
+                    }),
+                    valueField:'ID',
+                    displayField:'valor',
+                    width:250,
 
-		{
-			config:{
-				name:'formato_reporte',
-				fieldLabel:'Formato del Reporte',
-				typeAhead: true,
-				allowBlank:false,
-	    		triggerAction: 'all',
-	    		emptyText:'Formato...',
-	    		selectOnFocus:true,
-				mode:'local',
-				store:new Ext.data.ArrayStore({
-	        	fields: ['ID', 'valor'],
-	        	data :[ ['pdf','PDF'],
-						['csv','CSV']]
-	    		}),
-				valueField:'ID',
-				displayField:'valor',
-				width:250,
-
-			},
-			type:'ComboBox',
-			id_grupo:1,
-			form:true
-		},
+                },
+                type:'ComboBox',
+                id_grupo:1,
+                form:true
+            },
 		{
 				config:{
 					name: 'fecha_ini',
@@ -575,6 +620,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
             this.ocultarComponente(this.Cmp.id_cp_proyecto);
 			this.ocultarComponente(this.Cmp.id_presupuesto);
 			this.ocultarComponente(this.Cmp.id_cp_programa);
+			this.ocultarComponente(this.Cmp.id_concepto_ingas);
             this.ocultarComponente(this.Cmp.id_cp_actividad);
             this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
             this.ocultarComponente(this.Cmp.id_cp_fuente_fin);
@@ -594,6 +640,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				this.clean(this.Cmp.id_categoria_programatica, c);
                 this.clean(this.Cmp.id_presupuesto, c);
                 this.clean(this.Cmp.id_cp_programa, c);
+                this.clean(this.Cmp.id_concepto_ingas, c);
                 this.clean(this.Cmp.id_cp_proyecto, c);
                 this.clean(this.Cmp.id_cp_actividad, c);
                 this.clean(this.Cmp.id_cp_organismo_fin, c);
@@ -618,6 +665,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 				this.Cmp.id_categoria_programatica.reset();
 				this.Cmp.id_presupuesto.reset();
 				this.Cmp.id_cp_programa.reset();
+				this.Cmp.id_concepto_ingas.reset();
                 this.Cmp.id_cp_proyecto.reset();
                 this.Cmp.id_cp_actividad.reset();
                 this.Cmp.id_cp_organismo_fin.reset();
@@ -626,6 +674,7 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
                 this.Cmp.nivel.reset();
 
 				console.log('--->',record.data.ID)
+                this.ocultarComponente(this.Cmp.id_concepto_ingas);
                 switch (record.data.ID) {
                     case 'programa':
                         this.ocultarComponente(this.Cmp.id_categoria_programatica);
@@ -756,6 +805,17 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
 												this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
 												this.ocultarComponente(this.Cmp.nivel);
 												break;
+                    case 'ingas':
+                        this.ocultarComponente(this.Cmp.id_categoria_programatica);
+                        this.ocultarComponente(this.Cmp.id_presupuesto);
+                        this.ocultarComponente(this.Cmp.id_cp_programa);
+                        this.ocultarComponente(this.Cmp.id_cp_proyecto);
+                        this.ocultarComponente(this.Cmp.id_cp_organismo_fin);
+                        this.ocultarComponente(this.Cmp.id_unidad_ejecutora);
+                        this.ocultarComponente(this.Cmp.id_cp_actividad);
+                        this.mostrarComponente(this.Cmp.id_concepto_ingas);
+                        this.ocultarComponente(this.Cmp.nivel);
+                        break;
                 }
 			}, this);
 
@@ -841,6 +901,9 @@ Phx.vista.FormRepEjecucion = Ext.extend(Phx.frmInterfaz, {
                         e.data.id_unidad_ejecutora == id && this.Cmp.subtitulo.setValue(`${e.data.codigo} - ${e.data.nombre}`);
                     });
                 this.Cmp.concepto.setValue(this.Cmp.id_unidad_ejecutora.getRawValue());
+                break;
+            case 'ingas':
+                this.Cmp.concepto.setValue(this.Cmp.id_concepto_ingas.getRawValue());
                 break;
         }
 

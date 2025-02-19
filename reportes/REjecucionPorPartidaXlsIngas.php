@@ -1,0 +1,346 @@
+<?php
+
+//fRnk: nuevo reporte HR00856-2024
+class REjecucionPorPartidaXlsIngas
+{
+    private $docexcel;
+    private $objWriter;
+    private $equivalencias = array();
+    private $objParam;
+    public $url_archivo;
+    private $datos_titulo;
+    private $datos_detalle;
+    private $datos_entidad;
+    private $totales_segun_memoria = 0;
+    private $totales_aprobado = 0;
+    private $totales_ajustado = 0;
+    private $totales_vigente = 0;
+    private $totales_comprometido = 0;
+    private $totales_ejecutado = 0;
+    private $totales_pagado = 0;
+    private $totales_saldoXcomprometer = 0;
+    private $totales_saldoXdevengar = 0;
+    private $totales_saldoXpagar = 0;
+    private $totales_porcentaje_ejecucion = 0;
+
+    function __construct(CTParametro $objParam)
+    {
+        $this->objParam = $objParam;
+        $this->url_archivo = "../../../reportes_generados/" . $this->objParam->getParametro('nombre_archivo');
+        set_time_limit(4000);
+        $cacheMethod = PHPExcel_CachedObjectStorageFactory:: cache_to_phpTemp;
+        $cacheSettings = array('memoryCacheSize' => '10MB');
+        PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+
+        $this->docexcel = new PHPExcel();
+        $this->docexcel->getProperties()->setCreator("PXP")
+            ->setLastModifiedBy("PXP")
+            ->setTitle($this->objParam->getParametro('titulo_archivo'))
+            ->setSubject($this->objParam->getParametro('titulo_archivo'))
+            ->setDescription('Reporte "' . $this->objParam->getParametro('titulo_archivo') . '", generado por el framework PXP')
+            ->setKeywords("office 2007 openxml php")
+            ->setCategory("Report File");
+
+        $this->docexcel->setActiveSheetIndex(0);
+        $this->docexcel->getActiveSheet()->setTitle($this->objParam->getParametro('titulo_archivo'));
+
+        $this->equivalencias = array(0 => 'A', 1 => 'B', 2 => 'C', 3 => 'D', 4 => 'E', 5 => 'F', 6 => 'G', 7 => 'H', 8 => 'I',
+            9 => 'J', 10 => 'K', 11 => 'L', 12 => 'M', 13 => 'N', 14 => 'O', 15 => 'P', 16 => 'Q', 17 => 'R',
+            18 => 'S', 19 => 'T', 20 => 'U', 21 => 'V', 22 => 'W', 23 => 'X', 24 => 'Y', 25 => 'Z',
+            26 => 'AA', 27 => 'AB', 28 => 'AC', 29 => 'AD', 30 => 'AE', 31 => 'AF', 32 => 'AG', 33 => 'AH',
+            34 => 'AI', 35 => 'AJ', 36 => 'AK', 37 => 'AL', 38 => 'AM', 39 => 'AN', 40 => 'AO', 41 => 'AP',
+            42 => 'AQ', 43 => 'AR', 44 => 'AS', 45 => 'AT', 46 => 'AU', 47 => 'AV', 48 => 'AW', 49 => 'AX',
+            50 => 'AY', 51 => 'AZ',
+            52 => 'BA', 53 => 'BB', 54 => 'BC', 55 => 'BD', 56 => 'BE', 57 => 'BF', 58 => 'BG', 59 => 'BH',
+            60 => 'BI', 61 => 'BJ', 62 => 'BK', 63 => 'BL', 64 => 'BM', 65 => 'BN', 66 => 'BO', 67 => 'BP',
+            68 => 'BQ', 69 => 'BR', 70 => 'BS', 71 => 'BT', 72 => 'BU', 73 => 'BV', 74 => 'BW', 75 => 'BX',
+            76 => 'BY', 77 => 'BZ');
+
+    }
+
+    function datosHeader($detalle, $totales, $gestion, $dataEmpresa)
+    {
+        $this->datos_detalle = $detalle;
+        $this->datos_titulo = $totales;
+        $this->datos_entidad = $dataEmpresa;
+        $this->datos_gestion = $gestion;
+    }
+
+    function imprimeCabecera()
+    {
+        $styleTitulos1 = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 12,
+                'name' => 'Arial'
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+        );
+
+        $styleTitulos3 = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 11,
+                'name' => 'Arial'
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+        );
+
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, 'EJECUCIÓN PRESUPUESTARIA POR CONCEPTO DE INGRESO/GASTO');
+        $this->docexcel->getActiveSheet()->getStyle('A2:M2')->applyFromArray($styleTitulos1);
+        $this->docexcel->getActiveSheet()->mergeCells('A2:M2');
+        $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(0, 3, 'Del: ' . $this->objParam->getParametro('fecha_ini') . '   Al: ' . $this->objParam->getParametro('fecha_fin'));
+        $this->docexcel->getActiveSheet()->getStyle('A3:M3')->applyFromArray($styleTitulos3);
+        $this->docexcel->getActiveSheet()->mergeCells('A3:M3');
+
+    }
+
+    function imprimeDatos()
+    {
+        $datos = $this->datos_detalle;
+        $styleTitulos = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 8,
+                'name' => 'Arial'
+            ),
+            'alignment' => array(
+                'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => 'c5d9f1')
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            ));
+        $styleSubtitulo = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 12),
+            'fill' => array(
+                'color' => array('rgb' => '#00008B')
+            )
+        );
+        $styleError = array(
+            'font' => array('size' => 8, 'color' => array('rgb' => 'FF0000'))
+        );
+
+        $concepto = $this->objParam->getParametro('concepto');
+
+        $this->docexcel->getActiveSheet()->getStyle('B5:I5')->applyFromArray($styleSubtitulo);
+        $this->docexcel->getActiveSheet()->mergeCells('B5:D5');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1, 5, "CONCEPTO INGAS: " . $concepto);
+        $this->docexcel->getActiveSheet()->getStyle('B6:I6')->applyFromArray($styleSubtitulo);
+        $this->docexcel->getActiveSheet()->mergeCells('B6:I6');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[0])->setWidth(10);
+
+        $fi = 8;
+        $this->docexcel->getActiveSheet()->getStyle('B8:O8')->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[1])->setWidth(50);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1, $fi, 'CENTRO DE COSTO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[2])->setWidth(50);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2, $fi, 'PARTIDA');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[3])->setWidth(50);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3, $fi, 'CONCEPTO DE GASTO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[4])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4, $fi, 'SEGÚN MEMORIA');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[5])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5, $fi, 'APROBADO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[6])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6, $fi, 'MODIFICADO');//Ajustado
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[7])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7, $fi, 'VIGENTE');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[8])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8, $fi, 'COMPROMETIDO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[9])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9, $fi, 'EJECUTADO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[10])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10, $fi, 'PAGADO');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[11])->setWidth(22);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11, $fi, 'SALDO POR COMPROMETER');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[12])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12, $fi, 'SALDO POR EJECUTAR');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[13])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(13, $fi, 'SALDO POR PAGAR');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[14])->setWidth(20);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(14, $fi, '% EJECUCIÓN');
+        $this->docexcel->getActiveSheet()->getColumnDimension($this->equivalencias[15])->setWidth(20);
+
+        $count = 0;
+        $primero = true;
+        $fila = 9;
+        if (count($datos) > 0) {
+            $presupuesto_actual = $datos[0]['id_presupuesto'];
+            $row = $datos[0]['id_presupuesto'] . $datos[0]['codigo'] . $datos[0]['nombre_partida'] . $datos[0]['desc_ingas'];
+        }
+        foreach ($datos as $value) {
+            if ($value['id_presupuesto'] == $presupuesto_actual && ($value['id_presupuesto'] . $value['codigo'] . $value['nombre_partida'] . $value['desc_ingas'] == $row) && !$primero) {
+                $count++;
+            } else {
+                $count = 0;
+            }
+            $ingas = $value['desc_ingas'];
+            $id_concepto_ingas = $this->objParam->getParametro('id_concepto_ingas');
+            $ingas_arr = explode('|', $ingas);
+            $id_ingas = 0;
+            $desc_ingas = '';
+            if (count($ingas_arr) > 0) {
+                $id_ingas = $ingas_arr[0];
+                $desc_ingas = $ingas_arr[1] . ' - ' . $ingas_arr[2];
+            }
+            if (empty($id_concepto_ingas) || $id_concepto_ingas == $id_ingas) {
+                if ($value['importe_aprobado'] != 0) {
+                    $por_eje = ($value['ejecutado'] / $value['importe_aprobado']) * 100;
+                } else {
+                    $por_eje = 0;
+                }
+                $por_eje = number_format((float)$por_eje, 2, '.', '');
+
+                $ajustado = $value['formulado'] - $value['importe_aprobado'];
+                $sal_comprometido = $value['formulado'] - $value['comprometido'];
+                $sal_ejecutado = $value['comprometido'] - $value['ejecutado'];
+                $sal_pagado = $value['ejecutado'] - $value['pagado'];
+
+                $styleTitulos = array(
+                    'font' => array(
+                        'bold' => true,
+                        'size' => 8,
+                        'name' => 'Arial'
+                    ),
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    ));
+
+                if ($value['id_presupuesto'] == 0) {
+                    $styleCat = array(
+                        'font' => array(
+                            'bold' => true,
+                            'size' => 8,
+                            'name' => 'Arial'
+                        ),
+                        'alignment' => array(
+                            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+                            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+                        ),
+                        'fill' => array(
+                            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                            'color' => array('rgb' => 'c5d9f1')
+                        ),
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_THIN
+                            )
+                        ));
+                    $this->docexcel->getActiveSheet()->getStyle('B' . $fila . ':' . 'O' . $fila)->applyFromArray($styleCat);
+                } else {
+                    $this->docexcel->getActiveSheet()->getStyle('B' . $fila . ':' . 'O' . $fila)->applyFromArray($styleTitulos);
+                }
+                $this->docexcel->getActiveSheet()->getStyle('C:O')->getNumberFormat()->setFormatCode('#,##0.00');
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1, $fila, $value['codigo_cc']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2, $fila, $value['codigo'] . ' - ' . $value['nombre_partida']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3, $fila, $desc_ingas);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4, $fila, $value['importe']);
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5, $fila, $value['importe_aprobado']);//D
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6, $fila, $ajustado);//"=F".$fila."-D".$fila
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7, $fila, $value['formulado']);//F
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8, $fila, $value['comprometido']);//G
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9, $fila, $value['ejecutado']);//H
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10, $fila, $value['pagado']);//I
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11, $fila, $sal_comprometido);//"=F".$fila."-G".$fila
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12, $fila, $sal_ejecutado);//"=G".$fila."-H".$fila
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(13, $fila, $sal_pagado);//"=H".$fila."-I".$fila
+                $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(14, $fila, $por_eje);
+
+                if ($count > 0) {
+                    $styleDuplicados = array(
+                        'fill' => array(
+                            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                            'color' => array('rgb' => 'fff2cc')
+                        ),
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_THIN
+                            )
+                        ));
+                    $this->docexcel->getActiveSheet()->getStyle('B' . $fila . ':' . 'O' . $fila)->applyFromArray($styleDuplicados);
+                    $this->docexcel->getActiveSheet()->setCellValueByColumnAndRow(1, 4, '* El presente reporte podría no reflejar datos correctos, debido a que existen Conceptos INGAS duplicados en un mismo Presupuesto, los cuales se encuentran resaltados.');
+                    $this->docexcel->getActiveSheet()->getStyle('B4')->applyFromArray($styleError);
+                }
+
+                $this->totales_segun_memoria += $value['importe'];
+                $this->totales_aprobado += $value['importe_aprobado'];
+                $this->totales_ajustado += $ajustado;
+                $this->totales_vigente += $value['formulado'];
+                $this->totales_comprometido += $value['comprometido'];
+                $this->totales_ejecutado += $value['ejecutado'];
+                $this->totales_pagado += $value['pagado'];
+                $this->totales_saldoXcomprometer += $sal_comprometido;
+                $this->totales_saldoXdevengar += $sal_ejecutado;
+                $this->totales_saldoXpagar += $sal_pagado;
+                $this->totales_porcentaje_ejecucion += $por_eje;
+                $fila++;
+            }
+            $presupuesto_actual = $value['id_presupuesto'];
+            $row = $value['id_presupuesto'] . $value['codigo'] . $value['nombre_partida'] . $value['desc_ingas'];
+            $primero = false;
+        }
+
+        $styleTitulos = array(
+            'font' => array(
+                'bold' => true,
+                'size' => 8,
+                'name' => 'Arial'
+            ),
+            'fill' => array(
+                'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                'color' => array('rgb' => 'FACC2E')
+            ),
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            ));
+
+        $this->docexcel->getActiveSheet()->getStyle('B' . $fila . ':' . 'O' . $fila)->applyFromArray($styleTitulos);
+        $this->docexcel->getActiveSheet()->getStyle('C:O')->getNumberFormat()->setFormatCode('#,##0.00');
+
+        $por_eje = number_format((float)$this->totales_porcentaje_ejecucion, 2, '.', '');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(1, $fila, 'TOTALES');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(2, $fila, '');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(3, $fila, '');
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(4, $fila, $this->totales_segun_memoria);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(5, $fila, $this->totales_aprobado);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(6, $fila, $this->totales_ajustado);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(7, $fila, $this->totales_vigente);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(8, $fila, $this->totales_comprometido);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(9, $fila, $this->totales_ejecutado);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(10, $fila, $this->totales_pagado);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(11, $fila, $this->totales_saldoXcomprometer);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(12, $fila, $this->totales_saldoXdevengar);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(13, $fila, $this->totales_saldoXpagar);
+        $this->docexcel->setActiveSheetIndex(0)->setCellValueByColumnAndRow(14, $fila, $por_eje);
+    }
+
+    function generarReporte()
+    {
+        $this->imprimeDatos();
+        $this->docexcel->setActiveSheetIndex(0);
+        $this->objWriter = PHPExcel_IOFactory::createWriter($this->docexcel, 'Excel5');
+        $this->objWriter->save($this->url_archivo);
+    }
+}
+
+?>
