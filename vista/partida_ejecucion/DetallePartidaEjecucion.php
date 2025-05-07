@@ -13,6 +13,7 @@ header("content-type: text/javascript; charset=UTF-8");
 Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
 
 	constructor:function(config){
+        main=this;
 		this.maestro=config.maestro;
     	//llama al constructor de la clase padre
 		Phx.vista.DetallePartidaEjecucion.superclass.constructor.call(this,config);
@@ -34,6 +35,11 @@ Phx.vista.DetallePartidaEjecucion=Ext.extend(Phx.gridInterfaz,{
                 tooltip: '<b>Detalle de N° Tramite.</b>'
         });                        
 		//this.load({params:{start:0, limit:this.tam_pag}})
+        //fRnk: b.r) HR01765-2024
+        document.getElementsByClassName('x-btn-split')[0].addEventListener('click', function (){
+            var g=document.getElementsByClassName('fkgestion')[0].value;
+            main.title2=g.length>4?'':'Gestión '+g;
+        });
 	},
 			
 	Atributos:[

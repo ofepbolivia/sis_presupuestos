@@ -66,13 +66,14 @@ header("content-type: text/javascript; charset=UTF-8");
                 config: {
                     name: 'id_gestion',
                     origen: 'GESTION',
-                    fieldLabel: 'Gestion',
+                    fieldLabel: 'Gestión',
                     allowBlank: false,
-                    width: 150
+                    width: 150,
+                    cls:'fkgestion', //fRnk: b.r) HR01765-2024
                 },
                 type: 'ComboRec',
                 id_grupo: 0,
-                form: true
+                form: true,
             },
             {
                 config: {
