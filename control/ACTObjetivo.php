@@ -1,132 +1,132 @@
 <?php
 /**
-*@package pXP
-*@file gen-ACTObjetivo.php
-*@author  (gvelasquez)
-*@date 20-07-2016 20:37:41
-*@description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
-*/
-//require_once(dirname(__FILE__).'/../reportes/RpoaXls.php');
-class ACTObjetivo extends ACTbase{    
-			
-	function listarObjetivo(){
-		$this->objParam->defecto('ordenacion','id_objetivo');
+ * @package pXP
+ * @file gen-ACTObjetivo.php
+ * @author  (gvelasquez)
+ * @date 20-07-2016 20:37:41
+ * @description Clase que recibe los parametros enviados por la vista para mandar a la capa de Modelo
+ */
 
-		/////////////////
-		//	FILTROS
-		////////////////
-		if($this->objParam->getParametro('id_gestion')!='') {
-	    	$this->objParam->addFiltro("obj.id_gestion = ".$this->objParam->getParametro('id_gestion'));	
-		}
+require_once(dirname(__FILE__).'/../reportes/RPoaXls.php');
+require_once(dirname(__FILE__).'/../reportes/RPoaPdf.php');
 
-        if($this->objParam->getParametro('sw_transaccional')!='') {
-            $this->objParam->addFiltro("obj.sw_transaccional = ''".$this->objParam->getParametro('sw_transaccional')."''");
+class ACTObjetivo extends ACTbase
+{
+
+    function listarObjetivo()
+    {
+        $this->objParam->defecto('ordenacion', 'id_objetivo');
+
+        /////////////////
+        //	FILTROS
+        ////////////////
+        if ($this->objParam->getParametro('id_gestion') != '') {
+            $this->objParam->addFiltro("obj.id_gestion = " . $this->objParam->getParametro('id_gestion'));
         }
-		
-		/////////////////////
-		//Llamada al Modelo	
-		/////////////////////	
-		
-		$this->objParam->defecto('dir_ordenacion','asc');
-		if($this->objParam->getParametro('tipoReporte')=='excel_grid' || $this->objParam->getParametro('tipoReporte')=='pdf_grid'){
-			$this->objReporte = new Reporte($this->objParam,$this);
-			$this->res = $this->objReporte->generarReporteListado('MODObjetivo','listarObjetivo');
-		} else{
-			$this->objFunc=$this->create('MODObjetivo');
-			
-			$this->res=$this->objFunc->listarObjetivo($this->objParam);
-		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-	
-	function listarObjetivoArb(){
-        //$this->objFunc=$this->create('MODPartida');    
-        
+
+        if ($this->objParam->getParametro('sw_transaccional') != '') {
+            $this->objParam->addFiltro("obj.sw_transaccional = ''" . $this->objParam->getParametro('sw_transaccional') . "''");
+        }
+
+        /////////////////////
+        //Llamada al Modelo
+        /////////////////////
+
+        $this->objParam->defecto('dir_ordenacion', 'asc');
+        if ($this->objParam->getParametro('tipoReporte') == 'excel_grid' || $this->objParam->getParametro('tipoReporte') == 'pdf_grid') {
+            $this->objReporte = new Reporte($this->objParam, $this);
+            $this->res = $this->objReporte->generarReporteListado('MODObjetivo', 'listarObjetivo');
+        } else {
+            $this->objFunc = $this->create('MODObjetivo');
+
+            $this->res = $this->objFunc->listarObjetivo($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function listarObjetivoArb()
+    {
+        //$this->objFunc=$this->create('MODPartida');
+
         //obtiene el parametro nodo enviado por la vista
-        $node=$this->objParam->getParametro('node');
+        $node = $this->objParam->getParametro('node');
 
-        $id_objetivo=$this->objParam->getParametro('id_objetivo');
-        $tipo_nodo=$this->objParam->getParametro('tipo_nodo');
-        
-                   
-        if($node=='id'){
-            $this->objParam->addParametro('id_padre','%');
+        $id_objetivo = $this->objParam->getParametro('id_objetivo');
+        $tipo_nodo = $this->objParam->getParametro('tipo_nodo');
+
+        if ($node == 'id') {
+            $this->objParam->addParametro('id_padre', '%');
+        } else {
+            $this->objParam->addParametro('id_padre', $id_objetivo);
         }
-        else {
-            $this->objParam->addParametro('id_padre',$id_objetivo);
-        }
-		
-        
-		$this->objFunc=$this->create('MODObjetivo');
-        $this->res=$this->objFunc->listarObjetivoArb();
-        
+
+        $this->objFunc = $this->create('MODObjetivo');
+        $this->res = $this->objFunc->listarObjetivoArbD();
+
         $this->res->setTipoRespuestaArbol();
-        
-        $arreglo=array();
-        
-        array_push($arreglo,array('nombre'=>'id','valor'=>'id_objetivo'));
-        array_push($arreglo,array('nombre'=>'id_p','valor'=>'id_objetivo_fk'));
-        
-        
-        array_push($arreglo,array('nombre'=>'text','valores'=>'#codigo# - #descripcion#'));
-        array_push($arreglo,array('nombre'=>'cls','valor'=>'codigo'));
-        array_push($arreglo,array('nombre'=>'qtip','valores'=>'<b> #codigo#</b><b> #descripcion#</b><br> #indicador_logro#'));
-        
-        
-        $this->res->addNivelArbol('tipo_nodo','raiz',array('leaf'=>false,
-                                                        'allowDelete'=>true,
-                                                        'allowEdit'=>true,
-                                                        'cls'=>'folder',
-                                                        'tipo_nodo'=>'raiz',
-                                                        'icon'=>'../../../lib/imagenes/a_form.png'),
-                                                        $arreglo);
-         
+
+        $arreglo = array();
+
+        array_push($arreglo, array('nombre' => 'id', 'valor' => 'id_objetivo'));
+        array_push($arreglo, array('nombre' => 'id_p', 'valor' => 'id_objetivo_fk'));
+
+        array_push($arreglo, array('nombre' => 'text', 'valores' => '#codigo# - #descripcion#'));
+        array_push($arreglo, array('nombre' => 'cls', 'valor' => 'codigo'));
+        array_push($arreglo, array('nombre' => 'qtip', 'valores' => '<b> #codigo#</b><b> #descripcion#</b><br> #indicador_logro#'));
+
+        $this->res->addNivelArbol('tipo_nodo', 'raiz', array('leaf' => false,
+            'allowDelete' => true,
+            'allowEdit' => true,
+            'cls' => 'folder',
+            'tipo_nodo' => 'raiz',
+            'icon' => '../../../lib/imagenes/a_form.png'),
+            $arreglo);
+
         /*se ande un nivel al arbol incluyendo con tido de nivel carpeta con su arreglo de equivalencias
           es importante que entre los resultados devueltos por la base exista la variable\
           tipo_dato que tenga el valor en texto = 'hoja' */
-                                                                
 
-         $this->res->addNivelArbol('tipo_nodo','hijo',array(
-                                                        'leaf'=>false,
-                                                        'allowDelete'=>true,
-                                                        'allowEdit'=>true,
-                                                        'tipo_nodo'=>'hijo',
-                                                        'icon'=>'../../../lib/imagenes/a_form.png'),
-                                                        $arreglo);
-														
-		$this->res->addNivelArbol('tipo_nodo','hoja',array(
-                                                        'leaf'=>true,
-                                                        'allowDelete'=>true,
-                                                        'allowEdit'=>true,
-                                                        'tipo_nodo'=>'hoja',
-                                                        'icon'=>'../../../lib/imagenes/a_form.png'),
-                                                        $arreglo);												
-														
+        $this->res->addNivelArbol('tipo_nodo', 'hijo', array(
+            'leaf' => false,
+            'allowDelete' => true,
+            'allowEdit' => true,
+            'tipo_nodo' => 'hijo',
+            'icon' => '../../../lib/imagenes/a_form.png'),
+            $arreglo);
 
-        $this->res->imprimirRespuesta($this->res->generarJson());         
+        $this->res->addNivelArbol('tipo_nodo', 'hoja', array(
+            'leaf' => true,
+            'allowDelete' => true,
+            'allowEdit' => true,
+            'tipo_nodo' => 'hoja',
+            'icon' => '../../../lib/imagenes/a_form.png'),
+            $arreglo);
 
+        $this->res->imprimirRespuesta($this->res->generarJson());
     }
-				
-	function insertarObjetivo(){
-		$this->objFunc=$this->create('MODObjetivo');	
-		if($this->objParam->insertar('id_objetivo')){
-			$this->res=$this->objFunc->insertarObjetivo($this->objParam);			
-		} else{			
-			$this->res=$this->objFunc->modificarObjetivo($this->objParam);
-		}
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
-						
-	function eliminarObjetivo(){
-			$this->objFunc=$this->create('MODObjetivo');	
-		$this->res=$this->objFunc->eliminarObjetivo($this->objParam);
-		$this->res->imprimirRespuesta($this->res->generarJson());
-	}
 
-    function ReportePoa(){
+    function insertarObjetivo()
+    {
+        $this->objFunc = $this->create('MODObjetivo');
+        if ($this->objParam->insertar('id_objetivo')) {
+            $this->res = $this->objFunc->insertarObjetivo($this->objParam);
+        } else {
+            $this->res = $this->objFunc->modificarObjetivo($this->objParam);
+        }
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function eliminarObjetivo()
+    {
+        $this->objFunc = $this->create('MODObjetivo');
+        $this->res = $this->objFunc->eliminarObjetivo($this->objParam);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function ReportePoa()
+    {
         $this->objFunc = $this->create('MODObjetivo');
         $this->res = $this->objFunc->ReportePOA($this->objParam);
-        //var_dump( $this->res);exit;
         //obtener titulo de reporte
         $titulo = 'Reporte POA';
         //Genera el nombre del archivo (aleatorio + titulo)
@@ -141,21 +141,108 @@ class ACTObjetivo extends ACTbase{
         $this->objReporteFormato->generarReporte();
 
         $this->mensajeExito = new Mensaje();
-        $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado','Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
+        $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado', 'Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
         $this->mensajeExito->setArchivoGenerado($nombreArchivo);
         $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
     }
 
-    function listarActividadesPorPartida(){ //fRnk: HR00488
-        $this->objParam->defecto('ordenacion','codigo');
-        $this->objParam->defecto('dir_ordenacion','asc');
-        if($this->objParam->getParametro('id_partida')!='') {
-            $this->objParam->addFiltro("id_objetivo in(select id_objetivo from pre.tobjetivo_partida where id_partida=".$this->objParam->getParametro('id_partida').")");
+    function listarActividadesPorPartida()
+    { //fRnk: HR00488
+        $this->objParam->defecto('ordenacion', 'codigo');
+        $this->objParam->defecto('dir_ordenacion', 'asc');
+        if ($this->objParam->getParametro('id_partida') != '') {
+            $this->objParam->addFiltro("id_objetivo in(select id_objetivo from pre.tobjetivo_partida where id_partida=" . $this->objParam->getParametro('id_partida') . ")");
         }
-        $this->objFunc=$this->create('MODObjetivo');
-        $this->res=$this->objFunc->listarActividadesPorPartida($this->objParam);
+        $this->objFunc = $this->create('MODObjetivo');
+        $this->res = $this->objFunc->listarActividadesPorPartida($this->objParam);
         $this->res->imprimirRespuesta($this->res->generarJson());
     }
+
+    function generarReportes()
+    {
+        $this->objParam->defecto('ordenacion', 'codigo');
+        $this->objParam->addFiltro("obj.id_gestion = " . $this->objParam->getParametro('id_gestion'));
+        $this->objParam->defecto('dir_ordenacion', 'asc');
+        $this->objParam->defecto('puntero', '0');
+        $this->objParam->defecto('cantidad', '250');
+        $this->objFunc = $this->create('MODObjetivo');
+        $this->res = $this->objFunc->listarObjetivo($this->objParam);
+
+        if ($this->objParam->getParametro('tipo') == 'xls') {
+            $nombreArchivo = 'POA' . uniqid(md5(session_id())) . '.xls';
+
+            $paramReporte = new CTParametro('{}', '{}', null);
+
+            $paramReporte->addParametro('nombre_archivo', $nombreArchivo);
+            $paramReporte->addParametro('titulo_archivo', $nombreArchivo);
+            $paramReporte->addParametro('id_gestion', $this->objParam->getParametro('id_gestion'));
+            $reporte = new RPoaXls($paramReporte);
+            $reporte->datosHeader($this->res->datos);
+            $reporte->imprimeCabecera();
+            $reporte->generarReporte();
+        } elseif ($this->objParam->getParametro('tipo') == 'pdf-h') {
+            $nombreArchivo = 'POA' . uniqid(md5(session_id())) . '.pdf';
+
+            $paramReporte = new CTParametro('{}', '{}', null);
+
+            $paramReporte->addParametro('titulo_archivo', $nombreArchivo);
+            $paramReporte->addParametro('nombre_archivo', $nombreArchivo);
+            $paramReporte->addParametro('id_gestion', $this->objParam->getParametro('id_gestion'));
+
+            $reporte = new RPoaPdf($paramReporte);
+
+            $reporte->setDatos($this->res->datos, $this->objParam->getParametro('id_gestion'));
+            $reporte->generarReporteH();
+            $reporte->output($reporte->url_archivo, 'F');
+        } else {
+            $nombreArchivo = 'POA' . uniqid(md5(session_id())) . '.pdf';
+
+            $paramReporte = new CTParametro('{}', '{}', null);
+
+            $paramReporte->addParametro('titulo_archivo', $nombreArchivo);
+            $paramReporte->addParametro('nombre_archivo', $nombreArchivo);
+            $paramReporte->addParametro('id_gestion', $this->objParam->getParametro('id_gestion'));
+
+            $reporte = new RPoaPdf($paramReporte);
+
+            $reporte->setDatos($this->res->datos, $this->objParam->getParametro('id_gestion'));
+            $reporte->generarReporte();
+            $reporte->output($reporte->url_archivo, 'F');
+        }
+        $this->mensajeExito = new Mensaje();
+        $this->mensajeExito->setMensaje('EXITO', 'Reporte.php', 'Reporte generado', 'Se generó con éxito el reporte: ' . $nombreArchivo, 'control');
+        $this->mensajeExito->setArchivoGenerado($nombreArchivo);
+        $this->mensajeExito->imprimirRespuesta($this->mensajeExito->generarJson());
+    }
+
+    function obtenerAMedianoPlazo()
+    {
+        $this->objFunc = $this->create('MODObjetivo');
+
+        $this->res = $this->objFunc->obtenerAccionesMedianoPlazo($this->objParam);
+        $datos = $this->res->getDatos();
+        array_unshift($datos, array(
+            'id_objetivo' => '0',
+            'descripcion' => 'Todos'
+        ));
+        $this->res->setDatos($datos);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
+    function obtenerACortoPlazo()
+    {
+        $this->objFunc = $this->create('MODObjetivo');
+
+        $this->res = $this->objFunc->obtenerAccionesCortoPlazo($this->objParam);
+        $datos = $this->res->getDatos();
+        array_unshift($datos, array(
+            'id_objetivo' => '0',
+            'descripcion' => 'Todos'
+        ));
+        $this->res->setDatos($datos);
+        $this->res->imprimirRespuesta($this->res->generarJson());
+    }
+
 }
 
 ?>
